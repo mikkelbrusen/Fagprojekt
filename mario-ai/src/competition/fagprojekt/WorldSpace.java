@@ -34,16 +34,34 @@ public class WorldSpace
         // TODO: Only perform observation check when reaching new x, for optimization
         for(int i = 0; i < levelObs.length; i++) { // Row = Y
             for(int j = 0; j < levelObs[0].length; j++) { // Col = X
-                int y = i - marioOffsetY + marioWorldY;
-                int x = i - marioOffsetX + marioWorldX;
+                int y = i - marioOffsetY + marioWorldY + 9;
+                int x = i - marioOffsetX + marioWorldX + 9;
 
-                if(x < 0 || y < 0)
-                    continue; // TODO: Make sure this is correct. We assume this is out of bounds
+                //if(x < 0 || y < 0)
+                    //continue; // TODO: Make sure this is correct. We assume this is out of bounds
 
                 // TODO: Create method for converting int value to CellType
-                CellType cellType = levelObs[y][x] == 0 ? CellType.Empty : CellType.Solid;
+                CellType cellType = levelObs[i][j] == 0 ? CellType.Empty : CellType.Solid;
                 cells[y][x] = new Cell(cellType);
             }
         }
+
+        printWorldSpace();
+
+    }
+
+    void printWorldSpace()
+    {
+         for(int i = 0; i < 20; i++) { // Row = Y
+            String line = String.format("%2d:", i);
+            for(int j = 0; j < 100; j++) { // Col = X
+                Cell c = cells[i][j];
+                int v = c == null ? -1 : (c.type == CellType.Empty ? 0 : 1);
+                line += v + " ";
+            }
+            System.out.println(line);
+        }
+
+        System.out.println();
     }
 }
