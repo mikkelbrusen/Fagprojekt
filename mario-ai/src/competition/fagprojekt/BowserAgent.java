@@ -17,6 +17,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
 
     public boolean[] getAction()
     {
+        action[Mario.KEY_RIGHT] = true;
         return action;
     }
 
