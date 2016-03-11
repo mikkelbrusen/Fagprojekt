@@ -34,11 +34,11 @@ public class WorldSpace
         // TODO: Only perform observation check when reaching new x, for optimization
         for(int i = 0; i < levelObs.length; i++) { // Row = Y
             for(int j = 0; j < levelObs[0].length; j++) { // Col = X
-                int y = i - marioOffsetY + marioWorldY + 9;
-                int x = i - marioOffsetX + marioWorldX + 9;
+                int y = i - marioOffsetY + marioWorldY;
+                int x = j - marioOffsetX + marioWorldX;
 
-                //if(x < 0 || y < 0)
-                    //continue; // TODO: Make sure this is correct. We assume this is out of bounds
+                if(x < 0 || y < 0)
+                    continue; // TODO: Make sure this is correct. We assume this is out of bounds
 
                 // TODO: Create method for converting int value to CellType
                 CellType cellType = levelObs[i][j] == 0 ? CellType.Empty : CellType.Solid;
@@ -47,7 +47,6 @@ public class WorldSpace
         }
 
         printWorldSpace();
-
     }
 
     void printWorldSpace()
