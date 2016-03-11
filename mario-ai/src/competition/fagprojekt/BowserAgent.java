@@ -7,6 +7,8 @@ import ch.idsia.benchmark.mario.environments.Environment;
 
 public class BowserAgent extends BasicMarioAIAgent implements Agent
 {
+    WorldSpace worldSpace = new WorldSpace();
+
     public BowserAgent()
     {
         super("BowserAgent");
@@ -16,6 +18,14 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
     public boolean[] getAction()
     {
         return action;
+    }
+
+    @Override
+    public void integrateObservation(Environment environment)
+    {
+        super.integrateObservation(environment);
+
+        worldSpace.integrateObservation(environment);
     }
 
     public void reset()
