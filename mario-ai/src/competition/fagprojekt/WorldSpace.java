@@ -2,6 +2,9 @@ package competition.fagprojekt;
 
 import ch.idsia.benchmark.mario.environments.Environment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class WorldSpace
 {
     // Cells are square, but this allows for any rectagular shape
@@ -9,6 +12,9 @@ public class WorldSpace
     final static float CellHeight = 16f;
 
     Cell[][] cells;
+
+    int maxWalkableX = 0;
+    public List<Vec2i> rightMostWalkables = new ArrayList<>();
 
     public WorldSpace() {
         cells = new Cell[100][100];
@@ -39,10 +45,21 @@ public class WorldSpace
                 // TODO: Create method for converting int value to CellType
                 CellType cellType = getCellType(levelObs, j, i);
 
+                // Check if space is walkable
                 if(i != levelObs.length - 1) {
                     CellType cellBelow = getCellType(levelObs, j, i + 1);
-                    if (cellType == CellType.Empty && cellBelow == CellType.Solid)
+                    if (cellType == CellType.Empty && cellBelow == CellType.Solid) {
+
+                        // Update the right most walkable cells
+                        if(x > maxWalkableX)
+                            rightMostWalkables.clear();
+                        if(x >= maxWalkableX) {
+                            maxWalkableX = x;
+                            rightMostWalkables.add(new Vec2i(x, y));
+                        }
+
                         cellType = CellType.Walkable;
+                    }
                 }
 
                 cells[y][x] = new Cell(cellType);
