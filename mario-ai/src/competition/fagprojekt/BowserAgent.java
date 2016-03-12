@@ -12,7 +12,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
     Pathfinder pathfinder;
     MarioMove marioMove;
 
-    Vector2i targetPos;
+    Vec2i targetPos;
 
     public BowserAgent()
     {
@@ -22,13 +22,13 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
 
     public boolean[] getAction()
     {
-        targetPos = new Vector2i(11, 13);
-        System.out.println("Mario: " + marioMove.lastCell + " -> " + targetPos);
-        List<Vector2i> path = pathfinder.searchBfs(marioMove.lastCell, targetPos);
+        targetPos = new Vec2i(11, 13);
+        //System.out.println("Mario: " + marioMove.lastCell + " -> " + targetPos);
+        List<Vec2i> path = pathfinder.searchBfs(marioMove.lastCell, targetPos);
         if(path != null && !path.isEmpty()) {
-            Vector2i nextCell = path.get(0);
+            Vec2i nextCell = path.get(0);
 
-            System.out.println("  -> " + nextCell);
+            //System.out.println("  -> " + nextCell);
             action = marioMove.actionsTowardsCell(nextCell);
         }
 

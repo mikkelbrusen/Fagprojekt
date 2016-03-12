@@ -1,33 +1,33 @@
 package competition.fagprojekt;
 
-public class Vector2i {
+public class Vec2i {
     public int x;
     public int y;
 
-    public Vector2i(int x, int y) {
+    public Vec2i(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    public Vector2i clone() {
-        return new Vector2i(x, y);
+    public Vec2i clone() {
+        return new Vec2i(x, y);
     }
 
     // Make this member methods instead? Might be confusing,
     // as they should return new vectors / have no side effects
-    public static Vector2i add(Vector2i a, Vector2i b) {
-        return new Vector2i(a.x + b.x, a.y + b.y);
+    public static Vec2i add(Vec2i a, Vec2i b) {
+        return new Vec2i(a.x + b.x, a.y + b.y);
     }
-    public static Vector2i subtract(Vector2i a, Vector2i b) {
-        return new Vector2i(a.x - b.x, a.y - b.y);
+    public static Vec2i subtract(Vec2i a, Vec2i b) {
+        return new Vec2i(a.x - b.x, a.y - b.y);
     }
 
     @Override
     public boolean equals(Object other) {
-        if(!(other instanceof Vector2i))
+        if(!(other instanceof Vec2i))
             return false;
 
-        Vector2i rhs = (Vector2i)other;
+        Vec2i rhs = (Vec2i)other;
         return x == rhs.x && y == rhs.y;
     }
 

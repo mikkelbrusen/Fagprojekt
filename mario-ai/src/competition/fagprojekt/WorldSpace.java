@@ -19,7 +19,7 @@ public class WorldSpace
         // TODO: Possibly extend the cells array
 
         // Mario's position in world space, in cell units
-        Vector2i marioWorldPos = getMarioWorldPos(env);
+        Vec2i marioWorldPos = getMarioCellPos(env);
 
         // Mario's offset in the observation array
         int marioOffsetX = env.getMarioEgoPos()[0]; // Maybe need to be switched
@@ -87,11 +87,14 @@ public class WorldSpace
         System.out.println();
     }
     
-    public static Vector2i getMarioWorldPos(Environment env) {
-        float[] marioFloatPos = env.getMarioFloatPos();
-        
-        int x = (int)(marioFloatPos[0] / CellWidth);
-        int y = (int)(marioFloatPos[1] / CellHeight);        
-        return new Vector2i(x, y);
+    public static Vec2i getMarioCellPos(Environment env) {
+        Vec2f p = getMarioFloatPos(env);
+        int x = (int)(p.x / CellWidth);
+        int y = (int)(p.y / CellHeight);
+        return new Vec2i(x, y);
+    }
+    public static Vec2f getMarioFloatPos(Environment env) {
+        float[] floatPos = env.getMarioFloatPos();
+        return new Vec2f(floatPos[0], floatPos[1]);
     }
 }

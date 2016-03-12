@@ -9,7 +9,7 @@ public class Pathfinder {
         this.worldSpace = worldSpace;
     }
 
-    public List<Vector2i> searchBfs(Vector2i start, Vector2i end) {
+    public List<Vec2i> searchBfs(Vec2i start, Vec2i end) {
         Queue<PathNode> toBeSearched = new LinkedList<>();
         PathNode current = new PathNode(start.clone(), null);
 
@@ -21,7 +21,7 @@ public class Pathfinder {
             if (current.position.equals(end))
                 hasFoundEnd = true;
             else {
-                for (Vector2i n : getNeighbours(current.position))
+                for (Vec2i n : getNeighbours(current.position))
                     toBeSearched.add(new PathNode(n, current));
             }
         }
@@ -29,7 +29,7 @@ public class Pathfinder {
         if (!hasFoundEnd)
             return null;
 
-        List<Vector2i> path = new ArrayList<>();
+        List<Vec2i> path = new ArrayList<>();
         while (current.parent != null) {
             path.add(current.position);
             current = current.parent;
@@ -38,21 +38,21 @@ public class Pathfinder {
         return path;
     }
 
-    List<Vector2i> getNeighbours(Vector2i p) {
+    List<Vec2i> getNeighbours(Vec2i p) {
         return getNeighbours(p.x, p.y);
     }
 
-    List<Vector2i> getNeighbours(int x, int y) {
-        List<Vector2i> neighbours = new ArrayList<Vector2i>();
+    List<Vec2i> getNeighbours(int x, int y) {
+        List<Vec2i> neighbours = new ArrayList<Vec2i>();
 
         if (isWalkable(x - 1, y))
-            neighbours.add(new Vector2i(x - 1, y));
+            neighbours.add(new Vec2i(x - 1, y));
 
         if (isWalkable(x + 1, y))
-            neighbours.add(new Vector2i(x + 1, y));
+            neighbours.add(new Vec2i(x + 1, y));
 
         if (isEmpty(x, y + 1)) // Falling
-            neighbours.add(new Vector2i(x, y + 1));
+            neighbours.add(new Vec2i(x, y + 1));
 
         // TODO: Add jumps
 
