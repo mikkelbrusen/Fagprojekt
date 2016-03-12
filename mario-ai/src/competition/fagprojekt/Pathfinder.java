@@ -11,17 +11,23 @@ public class Pathfinder {
 
     public List<Vec2i> searchBfs(Vec2i start, Vec2i end) {
         Queue<PathNode> toBeSearched = new LinkedList<>();
+        List<Vec2i> hasSearched = new LinkedList<>(); // TODO: Should be hash table for best complexity, but we need to override hashCode() then
         PathNode current = new PathNode(start.clone(), null);
 
         boolean hasFoundEnd = false;
+        hasSearched.add(current.position.clone());
         toBeSearched.add(current);
-        while (!hasFoundEnd && !toBeSearched.isEmpty()) {
+        while (!toBeSearched.isEmpty()) {
             current = toBeSearched.poll();
+            hasSearched.add(current.position.clone());
 
-            if (current.position.equals(end))
+            if (current.position.equals(end)) {
                 hasFoundEnd = true;
-            else {
-                for (Vec2i n : getNeighbours(current.position))
+                break;
+            }
+
+            for (Vec2i n : getNeighbours(current.position)) {
+                if (!hasSearched.contains(n))
                     toBeSearched.add(new PathNode(n, current));
             }
         }
