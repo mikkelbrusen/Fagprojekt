@@ -18,12 +18,8 @@ public class WorldSpace
 
         // TODO: Possibly extend the cells array
 
-
-        float[] marioFloatPos = env.getMarioFloatPos();
-
         // Mario's position in world space, in cell units
-        int marioWorldX = (int)(marioFloatPos[0] / CellWidth);
-        int marioWorldY = (int)(marioFloatPos[1] / CellHeight);
+        Vector2i marioWorldPos = getMarioWorldPos(env);
 
         // Mario's offset in the observation array
         int marioOffsetX = env.getMarioEgoPos()[0]; // Maybe need to be switched
@@ -34,8 +30,8 @@ public class WorldSpace
         // TODO: Only perform observation check when reaching new x, for optimization
         for(int i = levelObs.length - 1; i >= 0; i--) { // Row = Y. Iterate bottom to top
             for(int j = 0; j < levelObs[0].length; j++) { // Col = X
-                int y = i - marioOffsetY + marioWorldY;
-                int x = j - marioOffsetX + marioWorldX;
+                int y = i - marioOffsetY + marioWorldPos.y;
+                int x = j - marioOffsetX + marioWorldPos.x;
 
                 if(x < 0 || y < 0)
                     continue; // TODO: Make sure this is correct. We assume this is out of bounds
@@ -52,8 +48,12 @@ public class WorldSpace
                 cells[y][x] = new Cell(cellType);
             }
         }
+    }
 
-        printWorldSpace();
+    public Cell getCell(int x, int y) {
+        if(0 <= y && y < cells.length && 0 <= x && x < cells[0].length)
+            return cells[y][x];
+        return null; // Maybe log a warning here? Might not matter
     }
 
     CellType getCellType(byte[][] levelObs, int x, int y)
@@ -85,5 +85,13 @@ public class WorldSpace
         }
 
         System.out.println();
+    }
+    
+    public static Vector2i getMarioWorldPos(Environment env) {
+        float[] marioFloatPos = env.getMarioFloatPos();
+        
+        int x = (int)(marioFloatPos[0] / CellWidth);
+        int y = (int)(marioFloatPos[1] / CellHeight);        
+        return new Vector2i(x, y);
     }
 }
