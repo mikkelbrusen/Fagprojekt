@@ -114,4 +114,8 @@ public class WorldSpace
         float[] floatPos = env.getMarioFloatPos();
         return new Vec2f(floatPos[0], floatPos[1]);
     }
+
+    public static Vec2f cellToFloat(Vec2i p) {
+        return new Vec2f(p.x * CellWidth, p.y * CellHeight);
+    }
 }
