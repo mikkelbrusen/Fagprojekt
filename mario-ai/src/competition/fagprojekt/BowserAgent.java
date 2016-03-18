@@ -27,7 +27,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
 
     public boolean[] getAction()
     {
-        worldSpace.printWorldSpace();
+        // worldSpace.printWorldSpace();
 
         // Update target pos
         if(!worldSpace.rightMostWalkables.isEmpty())

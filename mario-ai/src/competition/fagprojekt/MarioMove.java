@@ -43,11 +43,12 @@ public class MarioMove {
     public static boolean[] newAction() {
         return new boolean[Environment.numberOfKeys];
     }
-    public static boolean[] runAction(int dir) {
+    public static boolean[] moveAction(int dir, boolean doJump) {
         boolean[] a = newAction();
         a[Mario.KEY_SPEED] = true;
         a[Mario.KEY_RIGHT] = dir == 1;
         a[Mario.KEY_LEFT] = dir == -1;
+        a[Mario.KEY_JUMP] = doJump;
         return a;
     }
 }

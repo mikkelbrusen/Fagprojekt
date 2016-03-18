@@ -1,7 +1,5 @@
 package competition.fagprojekt;
 
-import ch.idsia.benchmark.mario.engine.sprites.Mario;
-
 import java.util.*;
 
 public class Pathfinder {
@@ -17,16 +15,16 @@ public class Pathfinder {
     // is defined as the move from one position to the next
     // eg. a jump or a run from one cell to the next
     public List<boolean[]> searchAStar(Vec2i start, Vec2i end) {
-        Queue<PathNode> toBeSearched = new PriorityQueue<>();
-        List<Vec2i> hasSearched = new LinkedList<>(); // TODO: Should be hash table for best complexity, but we need to override hashCode() then
+        Queue<PathNode> open = new PriorityQueue<>();
+        List<Vec2i> closed = new LinkedList<>(); // TODO: Should be hash table for best complexity, but we need to override hashCode() then
         PathNode current = new PathNode(start.clone());
 
         boolean hasFoundEnd = false;
-        hasSearched.add(current.position.clone());
-        toBeSearched.add(current);
-        while (!toBeSearched.isEmpty()) {
-            current = toBeSearched.poll();
-            hasSearched.add(current.position.clone());
+        closed.add(current.position.clone());
+        open.add(current);
+        while (!open.isEmpty()) {
+            current = open.poll();
+            closed.add(current.position.clone());
 
             if (current.position.equals(end)) {
                 hasFoundEnd = true;
@@ -34,8 +32,8 @@ public class Pathfinder {
             }
 
             for (PathNode n : getNeighbours(current)) {
-                if (!hasSearched.contains(n.position)) {
-                    toBeSearched.add(n);
+                if (!closed.contains(n.position)) {
+                    open.add(n);
                 }
             }
         }
@@ -71,7 +69,7 @@ public class Pathfinder {
             PathNode node = new PathNode(p, parent, scoreForRunEdge, newV);
 
             for(int i = 0; i < framesNeeded; i++)
-                node.actions.add(MarioMove.runAction(dir));
+                node.actions.add(MarioMove.moveAction(dir,false));
 
             neighbours.add(node);
         }
@@ -94,13 +92,11 @@ public class Pathfinder {
 
             int framesNeeded = Math.max(jumpFrames, runFrames);
             int scoreForJumpEdge = framesNeeded; // TODO: Weight properly
+            boolean doJump;
             PathNode node = new PathNode(p, parent, scoreForJumpEdge, newV);
             for(int i = 0; i < framesNeeded; i++) {
-                node.actions.add(MarioMove.newAction());
-                node.actions.get(i)[Mario.KEY_SPEED] = true;
-                node.actions.get(i)[Mario.KEY_RIGHT] = i < runFrames && dir == 1;
-                node.actions.get(i)[Mario.KEY_LEFT] = i < runFrames && dir == -1;
-                node.actions.get(i)[Mario.KEY_JUMP] = i < jumpFrames;
+                doJump = i < jumpFrames;
+                node.actions.add(marioMove.moveAction(dir,doJump));
             }
 
             neighbours.add(node);
