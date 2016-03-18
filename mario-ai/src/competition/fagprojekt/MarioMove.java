@@ -5,6 +5,13 @@ import ch.idsia.benchmark.mario.environments.Environment;
 
 public class MarioMove {
 
+    public static final float RunSpeed = 1.2f;
+    public static final float WalkSpeed = 0.6f;
+    public static final float Gravity = 3f;
+    public static final float GroundInertia = 0.89f;
+    public static final float FallInertia = 0.85f;
+    public static final float JumpSpeed = -1.89f;
+
     public Vec2i lastCell = new Vec2i(0, 0);
     public Vec2f lastFloatPos = new Vec2f(0, 0);
 
@@ -31,5 +38,16 @@ public class MarioMove {
         }
 
         return actions;
+    }
+
+    public static boolean[] newAction() {
+        return new boolean[Environment.numberOfKeys];
+    }
+    public static boolean[] runAction(int dir) {
+        boolean[] a = newAction();
+        a[Mario.KEY_SPEED] = true;
+        a[Mario.KEY_RIGHT] = dir == 1;
+        a[Mario.KEY_LEFT] = dir == -1;
+        return a;
     }
 }

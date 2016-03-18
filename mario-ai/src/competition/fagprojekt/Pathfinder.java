@@ -1,18 +1,25 @@
 package competition.fagprojekt;
 
+import ch.idsia.benchmark.mario.engine.sprites.Mario;
+
 import java.util.*;
 
 public class Pathfinder {
     WorldSpace worldSpace;
+    MarioMove marioMove;
 
-    public Pathfinder(WorldSpace worldSpace) {
+    public Pathfinder(WorldSpace worldSpace, MarioMove marioMove) {
         this.worldSpace = worldSpace;
+        this.marioMove = marioMove;
     }
 
-    public List<Vec2i> searchBfs(Vec2i start, Vec2i end) {
-        Queue<PathNode> toBeSearched = new LinkedList<>();
+    // We have to return a list of moves, where a move
+    // is defined as the move from one position to the next
+    // eg. a jump or a run from one cell to the next
+    public List<boolean[]> searchAStar(Vec2i start, Vec2i end) {
+        Queue<PathNode> toBeSearched = new PriorityQueue<>();
         List<Vec2i> hasSearched = new LinkedList<>(); // TODO: Should be hash table for best complexity, but we need to override hashCode() then
-        PathNode current = new PathNode(start.clone(), null);
+        PathNode current = new PathNode(start.clone());
 
         boolean hasFoundEnd = false;
         hasSearched.add(current.position.clone());
@@ -26,50 +33,139 @@ public class Pathfinder {
                 break;
             }
 
-            for (Vec2i n : getNeighbours(current.position)) {
-                if (!hasSearched.contains(n))
-                    toBeSearched.add(new PathNode(n, current));
+            for (PathNode n : getNeighbours(current)) {
+                if (!hasSearched.contains(n.position)) {
+                    toBeSearched.add(n);
+                }
             }
         }
 
         if (!hasFoundEnd)
             return null;
 
-        List<Vec2i> path = new ArrayList<>();
+        List<boolean[]> path = new ArrayList<>();
         while (current.parent != null) {
-            path.add(current.position);
+            path.addAll(current.actions);
             current = current.parent;
         }
         Collections.reverse(path);
         return path;
     }
 
-    List<Vec2i> getNeighbours(Vec2i p) {
-        return getNeighbours(p.x, p.y);
-    }
+    List<PathNode> getNeighbours(PathNode parent) {
+        List<PathNode> neighbours = new ArrayList<>();
 
-    List<Vec2i> getNeighbours(int x, int y) {
-        List<Vec2i> neighbours = new ArrayList<Vec2i>();
+        Vec2i pos = parent.position;
 
-        if (isWalkable(x - 1, y))
-            neighbours.add(new Vec2i(x - 1, y));
+        for(Vec2i p : getWalkables(pos)) {
+            if (!isWalkable(p.x, p.y))
+                continue;
 
-        if (isWalkable(x + 1, y))
-            neighbours.add(new Vec2i(x + 1, y));
+            int dir = p.x < parent.position.x ? -1 : 1;
+            int framesNeeded = framesToRunTo(parent.position, parent.marioVelocity, p);
 
-        if (isEmpty(x, y + 1)) // Falling
-            neighbours.add(new Vec2i(x, y + 1));
+            Vec2f newV = parent.marioVelocity.clone();
+            newV.x = xVelocityAfter(parent.marioVelocity, framesNeeded, dir);
 
-        // TODO: Add jumps
+            int scoreForRunEdge = framesNeeded; // TODO: Score run edge
+            PathNode node = new PathNode(p, parent, scoreForRunEdge, newV);
+
+            for(int i = 0; i < framesNeeded; i++)
+                node.actions.add(MarioMove.runAction(dir));
+
+            neighbours.add(node);
+        }
+
+        for(Vec2i p : getJumpables(pos)) {
+            if (!isWalkable(p.x, p.y))
+                continue;
+
+            // Calculate jump actions first
+            float h = (p.y - parent.position.y) * WorldSpace.CellHeight; // Height of jump
+            int jumpFrames = 7; // TODO: Actually calculate the number of jump frames. Remember frames for falling too
+
+            // Calculate run actions
+            int dir = p.x < parent.position.x ? -1 : 1;
+            int runFrames = framesToRunTo(parent.position, parent.marioVelocity, p);
+
+            Vec2f newV = parent.marioVelocity.clone();
+            newV.x = xVelocityAfter(parent.marioVelocity, runFrames, dir);
+            newV.y = yVelocityAfterJumping(parent.marioVelocity, jumpFrames);
+
+            int framesNeeded = Math.max(jumpFrames, runFrames);
+            int scoreForJumpEdge = framesNeeded; // TODO: Weight properly
+            PathNode node = new PathNode(p, parent, scoreForJumpEdge, newV);
+            for(int i = 0; i < framesNeeded; i++) {
+                node.actions.add(MarioMove.newAction());
+                node.actions.get(i)[Mario.KEY_SPEED] = true;
+                node.actions.get(i)[Mario.KEY_RIGHT] = i < runFrames && dir == 1;
+                node.actions.get(i)[Mario.KEY_LEFT] = i < runFrames && dir == -1;
+                node.actions.get(i)[Mario.KEY_JUMP] = i < jumpFrames;
+            }
+
+            neighbours.add(node);
+        }
+
+        if (isEmpty(pos.x, pos.y + 1)) { // Falling
+            Vec2f newV = parent.marioVelocity.clone();
+            newV.y = yVelocityAfterFalling(parent.marioVelocity, 1);
+
+            int scoreForFalling = 10;
+            neighbours.add(new PathNode(new Vec2i(pos.x, pos.y + 1), parent, scoreForFalling, newV));
+        }
 
         return neighbours;
     }
 
+    // TODO: Makes this return the number of frame, needed to run to p1,
+    // starting in p0 with velocity v0
+    static int framesToRunTo(Vec2i p0, Vec2f v, Vec2i p1) {
+        return 5;
+    }
+
+    // TODO: Maybe put these functions in MarioMove?
+    // TODO: Makes this return x-velocity of Mario, after moving in direction
+    // dir (left = -1, right = 1) for frames frames
+    static float xVelocityAfter(Vec2f v0, int frames, int dir) {
+        float vx = v0.x;
+        for(int i = 0; i < frames; i++)
+            vx += MarioMove.RunSpeed * Math.pow(MarioMove.GroundInertia, i + 1);
+        return vx;
+    }
+    static float yVelocityAfterFalling(Vec2f v0, int frames) {
+        float vy = v0.y;
+        for(int i = 0; i < frames; i++)
+            vy += MarioMove.Gravity * Math.pow(MarioMove.FallInertia, i + 1);
+        return vy;
+    }
+    static float yVelocityAfterJumping(Vec2f v0, int frames) {
+        return frames <= 1
+                ? MarioMove.JumpSpeed * 7
+                : MarioMove.JumpSpeed * (8 - frames);
+    }
+
+    static Vec2i[] getWalkables(Vec2i p) {
+        return new Vec2i[] {
+                new Vec2i(p.x - 1, p.y),
+                new Vec2i(p.x + 1, p.y)
+        };
+    }
+    static Vec2i[] getJumpables(Vec2i p) {
+        return new Vec2i[] {
+                new Vec2i(p.x - 1, p.y - 1),
+                new Vec2i(p.x + 1, p.y - 1),
+                new Vec2i(p.x - 1, p.y + 1),
+                new Vec2i(p.x + 1, p.y + 1),
+        };
+    }
     boolean isEmpty(int x, int y) {
         return isType(x, y, CellType.Empty);
     }
     boolean isWalkable(int x, int y) {
         return isType(x, y, CellType.Walkable);
+    }
+    boolean isSolid(int x, int y) {
+        return isType(x, y, CellType.Solid);
     }
 
     boolean isType(int x, int y, CellType type) {
