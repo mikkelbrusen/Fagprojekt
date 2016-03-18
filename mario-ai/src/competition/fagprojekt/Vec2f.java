@@ -33,7 +33,7 @@ public class Vec2f {
 
     @Override
     public String toString() {
-        return String.format("(%d, %d)", x, y);
+        return String.format("(%f, %f)", x, y);
     }
 
 }
