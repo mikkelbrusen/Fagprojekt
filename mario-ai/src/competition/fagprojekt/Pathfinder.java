@@ -125,7 +125,7 @@ public class Pathfinder {
     static float xVelocityAfter(Vec2f v0, int frames, int dir) {
         float vx = v0.x;
         for(int i = 0; i < frames; i++)
-            vx += MarioMove.RunSpeed * Math.pow(MarioMove.GroundInertia, i + 1);
+            vx += MarioMove.RunAcceleration * Math.pow(MarioMove.GroundInertia, i + 1);
         return vx;
     }
     static float yVelocityAfterFalling(Vec2f v0, int frames) {

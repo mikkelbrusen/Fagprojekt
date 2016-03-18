@@ -5,8 +5,8 @@ import ch.idsia.benchmark.mario.environments.Environment;
 
 public class MarioMove {
 
-    public static final float RunSpeed = 1.2f;
-    public static final float WalkSpeed = 0.6f;
+    public static final float RunAcceleration = 1.2f;
+    public static final float WalkAcceleration = 0.6f;
     public static final float Gravity = 3f;
     public static final float GroundInertia = 0.89f;
     public static final float FallInertia = 0.85f;
