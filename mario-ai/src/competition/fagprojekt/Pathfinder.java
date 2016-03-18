@@ -85,12 +85,13 @@ public class Pathfinder {
             // Calculate run actions
             int dir = p.x < parent.position.x ? -1 : 1;
             int runFrames = framesToRunTo(parent.position, parent.marioVelocity, p);
+            int jumpAndFallFrames = runFrames * 2; // TODO: Hack, see above
 
             Vec2f newV = parent.marioVelocity.clone();
             newV.x = xVelocityAfter(parent.marioVelocity, runFrames, dir);
             newV.y = yVelocityAfterJumping(parent.marioVelocity, jumpFrames);
 
-            int framesNeeded = Math.max(jumpFrames, runFrames);
+            int framesNeeded = Math.max(jumpFrames, jumpAndFallFrames);
             int scoreForJumpEdge = framesNeeded; // TODO: Weight properly
             boolean doJump;
             PathNode node = new PathNode(p, parent, scoreForJumpEdge, newV);
@@ -116,20 +117,21 @@ public class Pathfinder {
     // TODO: Refactor, to maybe use sign of difference
     static int framesToRunTo(Vec2i p0, Vec2f v0, Vec2i p1) {
         float v = v0.x;
-        float x = p0.x;
+        float x = p0.x * WorldSpace.CellWidth;
+        float x1 = p1.x * WorldSpace.CellWidth;
         int t = 0;
-        if(p1.x > p0.x) { // Moving right
-            while(x < p1.x) {
+        if(x < x1) { // Moving right
+            while(x < x1) {
                 v += MarioMove.RunAcceleration;
                 x += v;
                 v *= MarioMove.GroundInertia;
                 t++;
             }
         }
-        else if(p1.x < p0.x) {
-            while(x > p1.x) {
+        else if(x1 < x) {
+            while(x1 < x) {
                 v -= MarioMove.RunAcceleration;
-                x -= v;
+                x += v;
                 v *= MarioMove.GroundInertia;
                 t++;
             }
