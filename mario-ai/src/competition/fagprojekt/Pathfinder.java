@@ -59,48 +59,14 @@ public class Pathfinder {
             if (!isWalkable(p.x, p.y))
                 continue;
 
-            int dir = p.x < parent.position.x ? -1 : 1;
-            int framesNeeded = framesToRunTo(parent.position, parent.marioVelocity, p);
-
-            Vec2f newV = parent.marioVelocity.clone();
-            newV.x = xVelocityAfter(parent.marioVelocity, framesNeeded, dir);
-
-            int scoreForRunEdge = framesNeeded; // TODO: Score run edge
-            PathNode node = new PathNode(p, parent, scoreForRunEdge, newV);
-
-            for(int i = 0; i < framesNeeded; i++)
-                node.actions.add(MarioMove.moveAction(dir,false));
-
-            neighbours.add(node);
+            neighbours.add(createNode(p,parent,false));
         }
 
         for(Vec2i p : getJumpables(pos)) {
             if (!isWalkable(p.x, p.y))
                 continue;
 
-            // Calculate jump actions first
-            float h = (p.y - parent.position.y) * WorldSpace.CellHeight; // Height of jump
-            int jumpFrames = 7; // TODO: Actually calculate the number of jump frames. Remember frames for falling too
-
-            // Calculate run actions
-            int dir = p.x < parent.position.x ? -1 : 1;
-            int runFrames = framesToRunTo(parent.position, parent.marioVelocity, p);
-            int jumpAndFallFrames = runFrames * 2; // TODO: Hack, see above
-
-            Vec2f newV = parent.marioVelocity.clone();
-            newV.x = xVelocityAfter(parent.marioVelocity, runFrames, dir);
-            newV.y = yVelocityAfterJumping(parent.marioVelocity, jumpFrames);
-
-            int framesNeeded = Math.max(jumpFrames, jumpAndFallFrames);
-            int scoreForJumpEdge = framesNeeded; // TODO: Weight properly
-            boolean doJump;
-            PathNode node = new PathNode(p, parent, scoreForJumpEdge, newV);
-            for(int i = 0; i < framesNeeded; i++) {
-                doJump = i < jumpFrames;
-                node.actions.add(marioMove.moveAction(dir,doJump));
-            }
-
-            neighbours.add(node);
+            neighbours.add(createNode(p,parent,true));
         }
 
         if (isEmpty(pos.x, pos.y + 1)) { // Falling
@@ -112,6 +78,48 @@ public class Pathfinder {
         }
 
         return neighbours;
+    }
+
+    public PathNode createNode(Vec2i p, PathNode parent, boolean isJump){
+        // Calculate run actions
+        int dir = p.x < parent.position.x ? -1 : 1;
+        int runFrames = framesToRunTo(parent.position, parent.marioVelocity, p);
+
+        Vec2f newV = parent.marioVelocity.clone();
+        newV.x = xVelocityAfter(parent.marioVelocity, runFrames, dir);
+
+        PathNode node = new PathNode(p);
+        node.marioVelocity.x = newV.x;
+        node.parent = parent;
+
+        int scoreForEdge = 0;
+        if(!isJump){
+            scoreForEdge = runFrames; // TODO: Score run edge
+
+            //PathNode node = new PathNode(p, parent, scoreForEdge, newV);
+            for(int i = 0; i < runFrames; i++)
+                node.actions.add(MarioMove.moveAction(dir, false));
+
+        } else {  // is jump
+            // Calculate jump actions first
+            float h = (p.y - parent.position.y) * WorldSpace.CellHeight; // Height of jump
+            int jumpFrames = 7; // TODO: Actually calculate the number of jump frames. Remember frames for falling too
+
+            newV.y = yVelocityAfterJumping(parent.marioVelocity, jumpFrames);
+            node.marioVelocity.y =  newV.y;
+
+            int framesNeeded = Math.max(jumpFrames, runFrames);
+            scoreForEdge = framesNeeded; // TODO: Weight properly
+
+            boolean doJump;
+            for(int i = 0; i < framesNeeded; i++) {
+                doJump = i < jumpFrames;
+                node.actions.add(marioMove.moveAction(dir, doJump));
+            }
+        }
+
+        node.scoreTo = scoreForEdge;
+        return node;
     }
 
     // TODO: Refactor, to maybe use sign of difference
