@@ -113,10 +113,30 @@ public class Pathfinder {
         return neighbours;
     }
 
-    // TODO: Makes this return the number of frame, needed to run to p1,
-    // starting in p0 with velocity v0
-    static int framesToRunTo(Vec2i p0, Vec2f v, Vec2i p1) {
-        return 5;
+    // TODO: Refactor, to maybe use sign of difference
+    static int framesToRunTo(Vec2i p0, Vec2f v0, Vec2i p1) {
+        float v = v0.x;
+        float x = p0.x;
+        int t = 0;
+        if(p1.x > p0.x) { // Moving right
+            while(x < p1.x) {
+                v += MarioMove.RunAcceleration;
+                x += v;
+                v *= MarioMove.GroundInertia;
+                t++;
+            }
+        }
+        else if(p1.x < p0.x) {
+            while(x > p1.x) {
+                v -= MarioMove.RunAcceleration;
+                x -= v;
+                v *= MarioMove.GroundInertia;
+                t++;
+            }
+        }
+
+        // t == 0, if on the same cell
+        return t;
     }
 
     // TODO: Maybe put these functions in MarioMove?
