@@ -27,7 +27,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
 
     public boolean[] getAction()
     {
-        // worldSpace.printWorldSpace();
+        worldSpace.printWorldSpace();
         if(worldSpace.rightMostWalkables.isEmpty())
             currentActions.add(MarioMove.newAction());
 
@@ -70,11 +70,24 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         */
 
         Debug debug = Debug.getInstance();
-        /*
         Vec2f p0 = marioMove.lastFloatPos;
-        Vec2f p1 = Vec2f.add(p0, new Vec2f(0, 32));
-        debug.drawLine(p0, p1);
-        */
+        Vec2f v0 = marioMove.velocity;
+
+        int w = 20;
+        int h = 20;
+        for(int i = 0; i < w; i++) {
+            for(int j = 0; j < h; j++) {
+                int x = marioMove.lastCell.x - (w / 2) + j;
+                int y = marioMove.lastCell.y - (h / 2) + i;
+                Vec2i p1 = new Vec2i(x, y);
+
+                Color color = marioMove.canJumpToCell(p0, v0, p1)
+                        ? Color.blue : Color.black;
+
+                debug.drawCell(p1, color);
+            }
+        }
+
         debug.drawCell(marioMove.lastCell);
 
         for(Vec2i rightMost : worldSpace.rightMostWalkables)

@@ -26,18 +26,41 @@ public class MarioMove {
         lastCell = marioPos.clone();
     }
 
-    public boolean[] actionsTowardsCell(Vec2i cell) {
-        Vec2i diff = Vec2i.subtract(cell, lastCell);
+    static final float MaxJumpHeight = 46.55f; // Calculated. See MarioMath.mw
+    public boolean canJumpToCell(Vec2f p0, Vec2f v0, Vec2i p1) {
+        // If doing a maximum jump, is the cell reachable?
+        Vec2f diff = Vec2f.subtract(WorldSpace.cellToFloat(p1), p0);
 
-        boolean[] actions = new boolean[Environment.numberOfKeys];
-        if(diff.x < 0) {
-            actions[Mario.KEY_LEFT] = true;
-        }
-        else if(diff.x > 0) {
-            actions[Mario.KEY_RIGHT] = true;
+        Vec2f endP = WorldSpace.cellToFloat(p1);
+        Vec2f p = p0.clone();
+        Vec2f v = v0.clone();
+
+        int facing = diff.x < 0 ? -1 :
+                diff.x > 0 ? 1 : 0;
+
+        int jumpTime = 7; // Look at Mario line 370 for this jumping code
+        while(facing == 1 && p.x < endP.x || facing == -1 && p.x > endP.x) {
+            // Apply jump, if possible
+            if(jumpTime > 0) {
+                v.y = jumpTime * -1.9f;
+                jumpTime--;
+            }
+
+            // Accelerate sideways
+            v.x += RunAcceleration * facing;
+
+            // Move
+            p = Vec2f.add(p, v);
+
+            // Apply inertia
+            v.x *= GroundInertia;
+            v.y *= FallInertia;
+
+            // Apply gravity
+            v.y += Gravity;
         }
 
-        return actions;
+        return p.y < endP.y; // Check if we're above the target cell now
     }
 
     public static boolean[] newAction() {
