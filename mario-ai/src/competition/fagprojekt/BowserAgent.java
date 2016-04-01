@@ -2,9 +2,8 @@ package competition.fagprojekt;
 
 import ch.idsia.agents.Agent;
 import ch.idsia.agents.controllers.BasicMarioAIAgent;
-import ch.idsia.benchmark.mario.engine.MarioVisualComponent;
-import ch.idsia.benchmark.mario.engine.sprites.Mario;
 import ch.idsia.benchmark.mario.environments.Environment;
+import competition.fagprojekt.Debug.Debug;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +69,14 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         }
         action[Mario.KEY_JUMP] = willJump;
         */
+
+        Debug debug = Debug.getInstance();
+        /*
+        Vec2f p0 = marioMove.lastFloatPos;
+        Vec2f p1 = Vec2f.add(p0, new Vec2f(0, 32));
+        debug.drawLine(p0, p1);
+        */
+        debug.drawCell(marioMove.lastCell);
 
         return action;
     }
