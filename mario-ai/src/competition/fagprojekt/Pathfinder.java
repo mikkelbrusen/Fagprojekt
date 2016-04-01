@@ -1,6 +1,10 @@
 package competition.fagprojekt;
 
+import competition.fagprojekt.Debug.Debug;
+
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class Pathfinder {
     WorldSpace worldSpace;
@@ -43,6 +47,8 @@ public class Pathfinder {
 
         List<boolean[]> path = new ArrayList<>();
         while (current.parent != null) {
+            Debug.getInstance().drawCell(current.position, Color.white);
+
             path.addAll(current.actions);
             current = current.parent;
         }
