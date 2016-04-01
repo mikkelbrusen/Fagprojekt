@@ -27,23 +27,21 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
     public boolean[] getAction()
     {
         // worldSpace.printWorldSpace();
+        if(worldSpace.rightMostWalkables.isEmpty())
+            currentActions.add(MarioMove.newAction());
 
-        // Update target pos
-        if(!worldSpace.rightMostWalkables.isEmpty())
-            targetPos = worldSpace.rightMostWalkables.get(0);
-
-        if(currentActions == null || currentActions.isEmpty()) {
-            List<boolean[]> path = pathfinder.searchAStar(marioMove.lastCell, targetPos);
-            if(path == null || path.isEmpty()) {
-                currentActions.add(MarioMove.newAction()); // Do nothing
-                System.out.println("No path: " + marioMove.lastCell + " -> " + targetPos);
+        if (currentActions == null || currentActions.isEmpty()) {
+            for(Vec2i targetCell : worldSpace.rightMostWalkables) {
+                targetPos = targetCell;
+                List<boolean[]> path = pathfinder.searchAStar(marioMove.lastCell, targetPos);
+                if (path == null || path.isEmpty()) {
+                    currentActions.add(MarioMove.newAction()); // Do nothing
+                    System.out.println("No path: " + marioMove.lastCell + " -> " + targetPos);
+                } else {
+                    currentActions.addAll(path);
+                    break;
+                }
             }
-            else
-                currentActions.addAll(path);
-        }
-
-        if(currentActions.size() > 1) {
-            int nothing = 0;
         }
 
         action = currentActions.get(0);
