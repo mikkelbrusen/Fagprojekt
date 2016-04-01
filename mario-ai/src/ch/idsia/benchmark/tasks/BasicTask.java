@@ -81,8 +81,11 @@ public boolean runSingleEpisode(final int repetitionsOfSingleEpisode)
                 agent.giveIntermediateReward(environment.getIntermediateReward());
 
                 boolean[] action = agent.getAction();
-                if (System.currentTimeMillis() - c > COMPUTATION_TIME_BOUND)
-                    return false;
+                long timeSpent = System.currentTimeMillis() - c;
+                if (timeSpent > COMPUTATION_TIME_BOUND) {
+                    System.out.println("ERROR!!! ABOVE TIME CONSTRAINT: " + timeSpent);
+                    //return false;
+                }
 //                System.out.println("action = " + Arrays.toString(action));
 //            environment.setRecording(GlobalOptions.isRecording);
                 environment.performAction(action);
