@@ -48,7 +48,7 @@ public class WorldSpace
                 // Check if space is walkable
                 if(i != levelObs.length - 1) {
                     CellType cellBelow = getCellType(levelObs, j, i + 1);
-                    if (cellType == CellType.Empty && cellBelow == CellType.Solid) {
+                    if (isPassable(cellType) && !isPassable(cellBelow)) {
 
                         // Update the right most walkable cells
                         if(x > maxWalkableX)
@@ -65,6 +65,11 @@ public class WorldSpace
                 cells[y][x] = new Cell(cellType);
             }
         }
+    }
+
+    public boolean isPassable(CellType ct) {
+        return (ct == CellType.Empty ||
+                ct == CellType.Coin);
     }
 
     public Cell getCell(int x, int y) {
