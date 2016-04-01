@@ -5,6 +5,7 @@ import ch.idsia.agents.controllers.BasicMarioAIAgent;
 import ch.idsia.benchmark.mario.environments.Environment;
 import competition.fagprojekt.Debug.Debug;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,6 +76,12 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         debug.drawLine(p0, p1);
         */
         debug.drawCell(marioMove.lastCell);
+
+        for(Vec2i rightMost : worldSpace.rightMostWalkables)
+            debug.drawCell(rightMost, Color.gray);
+
+        if(targetPos != null)
+            debug.drawCell(targetPos, Color.green);
 
         return action;
     }
