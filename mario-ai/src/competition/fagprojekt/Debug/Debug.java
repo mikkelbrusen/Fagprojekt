@@ -19,6 +19,10 @@ public class Debug
 
     private LevelScene _level;
 
+    // To make sure the debug stuff doesn't get drawn over,
+    // we collect all entities to be drawn and render them at once,
+    // via a call from MarioVisualComponent, after it has rendered
+    // everything else.
     private ArrayList<DebugGfx> _graphicsThisFrame = new ArrayList<>();
 
     private Debug(LevelScene levelScene) {
