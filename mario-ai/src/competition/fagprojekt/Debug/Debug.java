@@ -6,6 +6,7 @@ import ch.idsia.benchmark.mario.engine.MarioVisualComponent;
 import ch.idsia.benchmark.mario.environments.MarioEnvironment;
 import competition.fagprojekt.Vec2f;
 import competition.fagprojekt.Vec2i;
+import competition.fagprojekt.WorldSpace;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -53,6 +54,21 @@ public class Debug
         Vec2i pp1 = toScreenPixel(p1);
         DebugLine line = new DebugLine(pp0.x, pp0.y, pp1.x, pp1.y, color);
         _graphicsThisFrame.add(line);
+    }
+
+    public void drawCell(Vec2i cp0) {
+        drawCell(cp0, Color.red);
+    }
+    public void drawCell(Vec2i cp0, Color color) {
+        Vec2f p0 = WorldSpace.cellToFloat(cp0); // Top left
+        Vec2f p1 = WorldSpace.cellToFloat(new Vec2i(cp0.x + 1, cp0.y)); // Top right
+        Vec2f p2 = WorldSpace.cellToFloat(new Vec2i(cp0.x + 1, cp0.y + 1)); // Bottom right
+        Vec2f p3 = WorldSpace.cellToFloat(new Vec2i(cp0.x, cp0.y + 1)); // Bottom left
+
+        drawLine(p0, p1, color);
+        drawLine(p1, p2, color);
+        drawLine(p2, p3, color);
+        drawLine(p3, p0, color);
     }
 
     public Vec2i toScreenPixel(Vec2f floatPos) {
