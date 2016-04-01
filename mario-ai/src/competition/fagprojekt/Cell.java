@@ -1,6 +1,6 @@
 package competition.fagprojekt;
 
-enum CellType { Empty, Solid, Walkable, Enemy };
+enum CellType { Empty, Solid, Coin, Walkable, Enemy };
 
 public class Cell
 {

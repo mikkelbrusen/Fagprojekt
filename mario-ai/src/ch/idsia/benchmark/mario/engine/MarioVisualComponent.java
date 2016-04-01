@@ -38,6 +38,7 @@ import ch.idsia.benchmark.mario.environments.MarioEnvironment;
 import ch.idsia.tools.GameViewer;
 import ch.idsia.tools.MarioAIOptions;
 import ch.idsia.tools.Scale2x;
+import competition.fagprojekt.Debug.Debug;
 
 import javax.swing.*;
 import java.awt.*;
@@ -336,6 +337,9 @@ public void render(Graphics g)
         g.drawString("x : " + mario.x + "y: " + mario.y, 10, 215);
         g.drawString("xOld : " + mario.xOld + "yOld: " + mario.yOld, 10, 225);
     }
+
+    Debug debug = Debug.getInstance();
+    debug.renderFrame(g);
 }
 
 private void drawProgress(Graphics g)

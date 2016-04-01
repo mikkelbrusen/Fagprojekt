@@ -634,9 +634,13 @@ public int getTimeLeft()
     return levelScene.getTimeLeft();
 }
 
-public Level getLevel()
-{
+public Level getLevel() {
     return levelScene.level;
+}
+
+// TODO: Remove this, it's a change in provided file
+public LevelScene getLevelScene() {
+    return levelScene;
 }
 
 private void computeEvaluationInfo()

@@ -17,7 +17,7 @@ public class WorldSpace
     public List<Vec2i> rightMostWalkables = new ArrayList<>();
 
     public WorldSpace() {
-        cells = new Cell[100][100];
+        cells = new Cell[100][1000]; // TODO: Dynamic resizing
     }
 
     public void integrateObservation(Environment env) {
@@ -48,7 +48,7 @@ public class WorldSpace
                 // Check if space is walkable
                 if(i != levelObs.length - 1) {
                     CellType cellBelow = getCellType(levelObs, j, i + 1);
-                    if (cellType == CellType.Empty && cellBelow == CellType.Solid) {
+                    if (isPassable(cellType) && !isPassable(cellBelow)) {
 
                         // Update the right most walkable cells
                         if(x > maxWalkableX)
@@ -67,21 +67,37 @@ public class WorldSpace
         }
     }
 
+    public boolean isPassable(CellType ct) {
+        return (ct == CellType.Empty ||
+                ct == CellType.Coin);
+    }
+
     public Cell getCell(int x, int y) {
         if(0 <= y && y < cells.length && 0 <= x && x < cells[0].length)
             return cells[y][x];
         return null; // Maybe log a warning here? Might not matter
     }
 
+
+
+    // All ids can be found GeneralizerLevenScene
     CellType getCellType(byte[][] levelObs, int x, int y)
     {
-        CellType type = CellType.Empty;
-
+        CellType type;
+        /*
+         *  typeid:
+         *  -60: Box
+         */
         int v = levelObs[y][x];
-        if(v == 0)
-            type = CellType.Empty;
-        else
-            type = CellType.Solid;
+        switch (v) {
+            case 0:     type = CellType.Empty;
+                        break;
+
+            case 2:     type = CellType.Coin;
+                        break;
+
+            default:    type = CellType.Solid;
+        }
 
         return type;
     }
@@ -117,5 +133,10 @@ public class WorldSpace
 
     public static Vec2f cellToFloat(Vec2i p) {
         return new Vec2f(p.x * CellWidth, p.y * CellHeight);
+    }
+    public static Vec2i floatToCell(Vec2f p) {
+        return new Vec2i(
+                (int)(p.x / CellWidth),
+                (int)(p.y / CellHeight));
     }
 }
