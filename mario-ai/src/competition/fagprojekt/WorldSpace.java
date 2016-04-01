@@ -73,15 +73,26 @@ public class WorldSpace
         return null; // Maybe log a warning here? Might not matter
     }
 
+
+
+    // All ids can be found GeneralizerLevenScene
     CellType getCellType(byte[][] levelObs, int x, int y)
     {
-        CellType type = CellType.Empty;
-
+        CellType type;
+        /*
+         *  typeid:
+         *  -60: Box
+         */
         int v = levelObs[y][x];
-        if(v == 0)
-            type = CellType.Empty;
-        else
-            type = CellType.Solid;
+        switch (v) {
+            case 0:     type = CellType.Empty;
+                        break;
+
+            case 2:     type = CellType.Coin;
+                        break;
+
+            default:    type = CellType.Solid;
+        }
 
         return type;
     }
