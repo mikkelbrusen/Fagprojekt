@@ -27,7 +27,7 @@ public class MarioMove {
     }
 
     static final float MaxJumpHeight = 46.55f; // Calculated. See MarioMath.mw
-    public boolean canJumpToCell(Vec2f p0, Vec2f v0, Vec2i p1) {
+    public static boolean canJumpToCell(Vec2f p0, Vec2f v0, Vec2i p1) {
         // If doing a maximum jump, is the cell reachable?
         Vec2f diff = Vec2f.subtract(WorldSpace.cellToFloat(p1), p0);
 

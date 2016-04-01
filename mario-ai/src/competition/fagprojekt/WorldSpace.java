@@ -17,7 +17,7 @@ public class WorldSpace
     public List<Vec2i> rightMostWalkables = new ArrayList<>();
 
     public WorldSpace() {
-        cells = new Cell[100][100];
+        cells = new Cell[100][1000]; // TODO: Dynamic resizing
     }
 
     public void integrateObservation(Environment env) {
@@ -133,5 +133,10 @@ public class WorldSpace
 
     public static Vec2f cellToFloat(Vec2i p) {
         return new Vec2f(p.x * CellWidth, p.y * CellHeight);
+    }
+    public static Vec2i floatToCell(Vec2f p) {
+        return new Vec2i(
+                (int)(p.x / CellWidth),
+                (int)(p.y / CellHeight));
     }
 }

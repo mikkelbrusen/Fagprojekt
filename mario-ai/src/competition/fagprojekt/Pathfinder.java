@@ -60,6 +60,7 @@ public class Pathfinder {
         List<PathNode> neighbours = new ArrayList<>();
 
         Vec2i pos = parent.position;
+        Vec2f floatPos = WorldSpace.cellToFloat(pos);
 
         for(Vec2i p : getWalkables(pos)) {
             if (!isWalkable(p.x, p.y))
@@ -68,7 +69,7 @@ public class Pathfinder {
             neighbours.add(createNode(p,parent,false));
         }
 
-        for(Vec2i p : getJumpables(pos)) {
+        for(Vec2i p : getJumpables(floatPos, parent.marioVelocity)) {
             if (!isWalkable(p.x, p.y))
                 continue;
 
@@ -124,7 +125,8 @@ public class Pathfinder {
             }
         }
 
-        node.scoreTo = scoreForEdge;
+        int heuristic = p.x;
+        node.scoreTo = parent.scoreTo + scoreForEdge + heuristic;
         return node;
     }
 
@@ -181,6 +183,26 @@ public class Pathfinder {
                 new Vec2i(p.x - 1, p.y),
                 new Vec2i(p.x + 1, p.y)
         };
+    }
+
+    static List<Vec2i> getJumpables(Vec2f p0, Vec2f v0) {
+        List<Vec2i> targets = new ArrayList<>();
+
+        Vec2i cp0 = WorldSpace.floatToCell(p0);
+        int w = 20;
+        int h = 20;
+        for(int i = 0; i < w; i++) {
+            for(int j = 0; j < h; j++) {
+                int x = cp0.x - (w / 2) + j;
+                int y = cp0.y - (h / 2) + i;
+                Vec2i p1 = new Vec2i(x, y);
+
+                if(MarioMove.canJumpToCell(p0, v0, p1))
+                    targets.add(p1);
+            }
+        }
+
+        return targets;
     }
     static Vec2i[] getJumpables(Vec2i p) {
         return new Vec2i[] {
