@@ -2,10 +2,13 @@ package competition.fagprojekt;
 
 import ch.idsia.agents.Agent;
 import ch.idsia.agents.controllers.BasicMarioAIAgent;
+import ch.idsia.benchmark.mario.engine.sprites.Mario;
 import ch.idsia.benchmark.mario.environments.Environment;
 import competition.fagprojekt.Debug.Debug;
+import competition.fagprojekt.Debug.DebugInput;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +30,8 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
 
     public boolean[] getAction()
     {
-        worldSpace.printWorldSpace();
+        //worldSpace.printWorldSpace();
+
         if(worldSpace.rightMostWalkables.isEmpty())
             currentActions.add(MarioMove.newAction());
 
@@ -48,31 +52,11 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         action = currentActions.get(0);
         currentActions.remove(0);
 
-        /*
-        boolean isJumping = action[Mario.KEY_JUMP];
-        boolean willJump = marioMove.lastCell.x >= 4;
-
-        if(!isJumping && willJump) {
-            framesJumping = 0;
-            startY = marioMove.lastFloatPos.y;
-            System.out.println("START DEBUG");
-        }
-
-        if(willJump) {
-            framesJumping++;
-        }
-
-        if(framesJumping > 0) {
-            float h = marioMove.lastFloatPos.y - startY;
-            System.out.println(framesJumping + ": " + h);
-        }
-        action[Mario.KEY_JUMP] = willJump;
-        */
-
         Debug debug = Debug.getInstance();
         Vec2f p0 = marioMove.lastFloatPos;
         Vec2f v0 = marioMove.velocity;
 
+        /*
         int w = 20;
         int h = 20;
         for(int i = 0; i < w; i++) {
@@ -87,6 +71,9 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
                 debug.drawCell(p1, color);
             }
         }
+        */
+
+        debug.updateDebugCell();
 
         debug.drawCell(marioMove.lastCell);
 
@@ -113,6 +100,14 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         worldSpace = new WorldSpace();
         marioMove = new MarioMove();
         pathfinder = new Pathfinder(worldSpace, marioMove);
+    }
+
+    // Debug
+    public void keyPressed(KeyEvent e) {
+        DebugInput.keyPressed(e);
+    }
+    public void keyReleased(KeyEvent e) {
+        DebugInput.keyReleased(e);
     }
 }
 
