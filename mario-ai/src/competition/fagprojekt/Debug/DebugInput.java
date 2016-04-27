@@ -12,8 +12,9 @@ public class DebugInput {
     public static final int KEY_RIGHT = 1;
     public static final int KEY_UP = 2;
     public static final int KEY_DOWN = 3;
+    public static final int KEY_K = 4;
 
-    public static boolean[] keysPressed = new boolean[4];
+    public static boolean[] keysPressed = new boolean[5];
 
     public static void keyPressed(KeyEvent e) {
         toggleKey(e.getKeyCode(), true);
@@ -36,6 +37,9 @@ public class DebugInput {
                 break;
             case KeyEvent.VK_UP:
                 keysPressed[KEY_UP] = isPressed;
+                break;
+            case KeyEvent.VK_K:
+                keysPressed[KEY_K] = isPressed;
                 break;
         }
     }

@@ -83,6 +83,28 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         if(targetPos != null)
             debug.drawCell(targetPos, Color.green);
 
+        // Debug pathfinding
+        if(DebugInput.keysPressed[DebugInput.KEY_K]) {
+            Vec2i c0 = marioMove.lastCell;
+            Vec2i c1 = debug.debugCell;
+            System.out.println("DEBUG: " + c0 + " -> " + c1);
+
+            List<boolean[]> path;
+            path = pathfinder.searchAStar(c0, c1);
+
+            float y0f = c0.y * WorldSpace.CellHeight;
+            float y1f = c1.y * WorldSpace.CellHeight;
+            int jumpFrames = MarioMove.minimumJumpFramesToEndAtHeight(y0f, y1f);
+            System.out.println("JumpFrames: " + jumpFrames);
+
+            if(path != null) {
+                for(int i = 0; i < path.size(); i++) {
+                    boolean[] aFrame = path.get(i);
+                    System.out.println(i + ": " + BUtil.actionToString(aFrame));
+                }
+            }
+        }
+
         return action;
     }
 
