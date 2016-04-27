@@ -1,7 +1,6 @@
 package competition.fagprojekt;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class PathNode implements Comparable<PathNode> {
@@ -28,8 +27,12 @@ public class PathNode implements Comparable<PathNode> {
         this.actions = new ArrayList<>();
     }
 
+    public int getHeuristic() {
+        return position.x;
+    }
+
     @Override
     public int compareTo(PathNode o) {
-        return scoreTo > o.scoreTo ? 1 : -1;
+        return (scoreTo + getHeuristic()) > (o.scoreTo + o.getHeuristic()) ? 1 : -1;
     }
 }

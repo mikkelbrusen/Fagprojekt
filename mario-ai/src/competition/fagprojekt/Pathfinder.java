@@ -47,7 +47,7 @@ public class Pathfinder {
 
         List<boolean[]> path = new ArrayList<>();
         while (current.parent != null) {
-            Debug.getInstance().drawCell(current.position, Color.white);
+            Debug.getInstance().drawCell(current.position, Color.green);
 
             path.addAll(current.actions);
             current = current.parent;
@@ -107,26 +107,31 @@ public class Pathfinder {
             for(int i = 0; i < runFrames; i++)
                 node.actions.add(MarioMove.moveAction(dir, false));
 
-        } else {  // is jump
-            // Calculate jump actions first
-            float h = (p.y - parent.position.y) * WorldSpace.CellHeight; // Height of jump
-            int jumpFrames = 7; // TODO: Actually calculate the number of jump frames. Remember frames for falling too
+        } else {  // Is jump
+            float y0f = parent.position.y * WorldSpace.CellHeight;
+            float y1f = p.y * WorldSpace.CellHeight;
 
-            newV.y = yVelocityAfterJumping(parent.marioVelocity, jumpFrames);
+            int jumpFrames = MarioMove.minimumJumpFramesToEndAtHeight(y0f, y1f);
+            int fallFrames = jumpFrames; // TODO: Actually calculate these too
+
+            int framesNeeded = Math.max(jumpFrames + fallFrames, runFrames);
+
+            Body1D yBody = MarioMove.bodyAfterJumpAndFall(y0f, jumpFrames, framesNeeded);
+            newV.y = yBody.velocity;
             node.marioVelocity.y =  newV.y;
 
-            int framesNeeded = Math.max(jumpFrames, runFrames);
             scoreForEdge = framesNeeded; // TODO: Weight properly
+            scoreForEdge = 3; // Debug
 
             boolean doJump;
             for(int i = 0; i < framesNeeded; i++) {
                 doJump = i < jumpFrames;
-                node.actions.add(marioMove.moveAction(dir, doJump));
+                int moveDir = dir * (i < runFrames ? 1 : 0); // Might not run for all frames
+                node.actions.add(MarioMove.moveAction(moveDir, doJump));
             }
         }
 
-        int heuristic = p.x;
-        node.scoreTo = parent.scoreTo + scoreForEdge + heuristic;
+        node.scoreTo = parent.scoreTo + scoreForEdge;
         return node;
     }
 

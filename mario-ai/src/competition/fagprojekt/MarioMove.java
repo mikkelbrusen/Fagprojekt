@@ -11,6 +11,7 @@ public class MarioMove {
     public static final float GroundInertia = 0.89f;
     public static final float FallInertia = 0.85f;
     public static final float JumpSpeed = -1.89f;
+    public static final int MaxJumpFrames = 7;
 
     public Vec2i lastCell = new Vec2i(0, 0);
     public Vec2f lastFloatPos = new Vec2f(0, 0);
@@ -61,6 +62,36 @@ public class MarioMove {
         }
 
         return p.y < endP.y; // Check if we're above the target cell now
+    }
+
+    public static int minimumJumpFramesToEndAtHeight(float y0, float y1) {
+        for(int i = 0; i <= MaxJumpFrames; i++) { // Try every jump frame combination
+            if(bodyAfterJumpAndFall(y0, i, i).position <= y1)
+                return i;
+        }
+        return -1; // TODO: What to return here? Implicit check for possibility?
+    }
+    public static int minimumJumpFramesToEndAtHeightAfterFrames(float y0, float y1, int runFrames) {
+        for(int i = 0; i <= MaxJumpFrames; i++) { // Try every jump frame combination
+            if(bodyAfterJumpAndFall(y0, i, runFrames).position <= y1)
+                return i;
+        }
+        return -1; // TODO: What to return here? Implicit check for possibility?
+    }
+
+    public static Body1D bodyAfterJumpAndFall(float y, int jumpFrames, int totalFrames) {
+        Body1D yBody = new Body1D(y, 0); // Jumping reset vertical velocity, so we can ignore it as input
+        for(int i = 0; i < totalFrames; i++) {
+            if(i < jumpFrames)
+                yBody.velocity = (MaxJumpFrames - i) * JumpSpeed;
+
+            yBody.position += yBody.velocity;
+
+            yBody.velocity *= FallInertia;
+            yBody.velocity += Gravity;
+        }
+
+        return yBody;
     }
 
     public static boolean[] newAction() {
