@@ -129,6 +129,7 @@ public class Pathfinder {
                 int moveDir = dir * (i < runFrames ? 1 : 0); // Might not run for all frames
                 node.actions.add(MarioMove.moveAction(moveDir, doJump));
             }
+            Collections.reverse(node.actions);
         }
 
         node.scoreTo = parent.scoreTo + scoreForEdge;
