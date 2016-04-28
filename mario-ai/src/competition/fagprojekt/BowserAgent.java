@@ -30,12 +30,16 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
 
     public boolean[] getAction()
     {
+        Debug debug = Debug.getInstance();
+
         //worldSpace.printWorldSpace();
 
         if(worldSpace.rightMostWalkables.isEmpty())
             currentActions.add(MarioMove.newAction());
 
         if (currentActions == null || currentActions.isEmpty()) {
+            System.out.println(debug.frameCount + ": Recalculating path");
+
             for(Vec2i targetCell : worldSpace.rightMostWalkables) {
                 targetPos = targetCell;
                 List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastCell, targetPos);
@@ -53,7 +57,6 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         action = currentActions.get(0);
         currentActions.remove(0);
 
-        Debug debug = Debug.getInstance();
         Vec2f p0 = marioMove.lastFloatPos;
         Vec2f v0 = marioMove.velocity;
 
@@ -74,7 +77,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         }
         */
 
-        debug.updateDebugCell();
+        debug.update();
 
         debug.drawCell(marioMove.lastCell);
 

@@ -22,6 +22,8 @@ public class Debug
 
     public Vec2i debugCell = new Vec2i(5, 10);
 
+    public int frameCount = 0;
+
     // To make sure the debug stuff doesn't get drawn over,
     // we collect all entities to be drawn and render them at once,
     // via a call from MarioVisualComponent, after it has rendered
@@ -41,7 +43,7 @@ public class Debug
         return _instance;
     }
 
-    public void updateDebugCell() {
+    public void update() {
         if(DebugInput.keysPressed[DebugInput.KEY_LEFT])
             debugCell.x--;
         if(DebugInput.keysPressed[DebugInput.KEY_RIGHT])
@@ -52,6 +54,8 @@ public class Debug
             debugCell.y++;
 
         drawCell(debugCell, Color.magenta);
+
+        frameCount++;
     }
 
     public void renderFrame(Graphics g) {
