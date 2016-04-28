@@ -10,14 +10,17 @@ public class WorldSpace
     // Cells are square, but this allows for any rectagular shape
     final static float CellWidth = 16f;
     final static float CellHeight = 16f;
+    public static int length = 50;
+    static int height = 100;
 
     Cell[][] cells;
+    Cell[][] copyCells;
 
     int maxWalkableX = 0;
     public List<Vec2i> rightMostWalkables = new ArrayList<>();
 
     public WorldSpace() {
-        cells = new Cell[100][1000]; // TODO: Dynamic resizing
+        cells = new Cell[height][length]; // TODO: Dynamic resizing
     }
 
     public void integrateObservation(Environment env) {
@@ -33,6 +36,9 @@ public class WorldSpace
 
         byte[][] levelObs = env.getLevelSceneObservationZ(2);
 
+        if (marioWorldPos.x + levelObs[0].length >= length) {
+            expandWorldSpace();
+        }
         // TODO: Only perform observation check when reaching new x, for optimization
         for(int i = levelObs.length - 1; i >= 0; i--) { // Row = Y. Iterate bottom to top
             for(int j = 0; j < levelObs[0].length; j++) { // Col = X
@@ -65,6 +71,16 @@ public class WorldSpace
                 cells[y][x] = new Cell(cellType);
             }
         }
+    }
+
+    private void expandWorldSpace() {
+        length = 2 * length;
+        copyCells = cells;
+        cells = new Cell[height][length];
+        for (int i = 0; i < cells.length; i++) {
+            System.arraycopy(copyCells[i], 0, cells[i], 0, copyCells[i].length);
+        }
+
     }
 
     public boolean isPassable(CellType ct) {
@@ -106,7 +122,7 @@ public class WorldSpace
     {
          for(int i = 0; i < 20; i++) { // Row = Y
             String line = String.format("%2d:", i);
-            for(int j = 0; j < 100; j++) { // Col = X
+            for(int j = 0; j < length; j++) { // Col = X
                 Cell c = cells[i][j];
                 String v = c == null ? "-1" :
                         (c.type == CellType.Empty ? "0" :

@@ -2,10 +2,13 @@ package competition.fagprojekt;
 
 import ch.idsia.agents.Agent;
 import ch.idsia.agents.controllers.BasicMarioAIAgent;
+import ch.idsia.benchmark.mario.engine.sprites.Mario;
 import ch.idsia.benchmark.mario.environments.Environment;
 import competition.fagprojekt.Debug.Debug;
+import competition.fagprojekt.Debug.DebugInput;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,19 +30,25 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
 
     public boolean[] getAction()
     {
-        worldSpace.printWorldSpace();
+        Debug debug = Debug.getInstance();
+
+        //worldSpace.printWorldSpace();
+
         if(worldSpace.rightMostWalkables.isEmpty())
             currentActions.add(MarioMove.newAction());
 
         if (currentActions == null || currentActions.isEmpty()) {
+            System.out.println(debug.frameCount + ": Recalculating path");
+
             for(Vec2i targetCell : worldSpace.rightMostWalkables) {
                 targetPos = targetCell;
-                List<boolean[]> path = pathfinder.searchAStar(marioMove.lastCell, targetPos);
+                List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastCell, marioMove.velocity, targetPos);
                 if (path == null || path.isEmpty()) {
                     currentActions.add(MarioMove.newAction()); // Do nothing
                     System.out.println("No path: " + marioMove.lastCell + " -> " + targetPos);
                 } else {
-                    currentActions.addAll(path);
+                    for(ActionUnit unit : path) // TODO: Carry out one action unit, before recalculating. At least.
+                        currentActions.addAll(unit.actions);
                     break;
                 }
             }
@@ -48,31 +57,10 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         action = currentActions.get(0);
         currentActions.remove(0);
 
-        /*
-        boolean isJumping = action[Mario.KEY_JUMP];
-        boolean willJump = marioMove.lastCell.x >= 4;
-
-        if(!isJumping && willJump) {
-            framesJumping = 0;
-            startY = marioMove.lastFloatPos.y;
-            System.out.println("START DEBUG");
-        }
-
-        if(willJump) {
-            framesJumping++;
-        }
-
-        if(framesJumping > 0) {
-            float h = marioMove.lastFloatPos.y - startY;
-            System.out.println(framesJumping + ": " + h);
-        }
-        action[Mario.KEY_JUMP] = willJump;
-        */
-
-        Debug debug = Debug.getInstance();
         Vec2f p0 = marioMove.lastFloatPos;
         Vec2f v0 = marioMove.velocity;
 
+        /*
         int w = 20;
         int h = 20;
         for(int i = 0; i < w; i++) {
@@ -87,6 +75,9 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
                 debug.drawCell(p1, color);
             }
         }
+        */
+
+        debug.update();
 
         debug.drawCell(marioMove.lastCell);
 
@@ -95,6 +86,29 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
 
         if(targetPos != null)
             debug.drawCell(targetPos, Color.green);
+
+        // Debug pathfinding
+        if(DebugInput.keysPressed[DebugInput.KEY_K]) {
+            Vec2i c0 = marioMove.lastCell;
+            Vec2i c1 = debug.debugCell;
+            System.out.println("DEBUG: " + c0 + " -> " + c1);
+
+            List<ActionUnit> path = pathfinder.searchAStar(c0, v0, c1);
+
+            float y0f = c0.y * WorldSpace.CellHeight;
+            float y1f = c1.y * WorldSpace.CellHeight;
+            int jumpFrames = MarioMove.minimumJumpFramesToEndAtHeight(y0f, y1f);
+            System.out.println("JumpFrames: " + jumpFrames);
+
+            if(path != null) {
+                for(int i = 0; i < path.size(); i++) {
+                    ActionUnit aFrame = path.get(i);
+                    for(int j = 0; j < aFrame.actions.size(); j++) {
+                        System.out.println(i + ": " + BUtil.actionToString(aFrame.actions.get(j)));
+                    }
+                }
+            }
+        }
 
         return action;
     }
@@ -113,6 +127,14 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         worldSpace = new WorldSpace();
         marioMove = new MarioMove();
         pathfinder = new Pathfinder(worldSpace, marioMove);
+    }
+
+    // Debug
+    public void keyPressed(KeyEvent e) {
+        DebugInput.keyPressed(e);
+    }
+    public void keyReleased(KeyEvent e) {
+        DebugInput.keyReleased(e);
     }
 }
 

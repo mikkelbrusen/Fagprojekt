@@ -30,6 +30,8 @@ package ch.idsia.agents.controllers;
 import ch.idsia.agents.Agent;
 import ch.idsia.benchmark.mario.environments.Environment;
 
+import java.awt.event.KeyAdapter;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Sergey Karakovskiy
@@ -37,7 +39,7 @@ import ch.idsia.benchmark.mario.environments.Environment;
  * Time: 12:30:41 AM
  * Package: ch.idsia.agents.controllers;
  */
-public class BasicMarioAIAgent implements Agent
+public class BasicMarioAIAgent extends KeyAdapter implements Agent
 {
 protected boolean action[] = new boolean[Environment.numberOfKeys];
 protected String name = "Instance_of_BasicAIAgent._Change_this_name";

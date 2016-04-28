@@ -54,6 +54,7 @@ public static void main(String[] args)
 //            {
 //                marioAIOptions.setLevelDifficulty(i);
 //                marioAIOptions.setLevelRandSeed(seed++);
+    marioAIOptions.setMarioInvulnerable(true);
     basicTask.setOptionsAndReset(marioAIOptions);
 //    basicTask.runSingleEpisode(1);
     basicTask.doEpisodes(1,true,1);
