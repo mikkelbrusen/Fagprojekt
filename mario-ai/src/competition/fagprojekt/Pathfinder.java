@@ -121,7 +121,6 @@ public class Pathfinder {
             node.marioVelocity.y =  newV.y;
 
             scoreForEdge = framesNeeded; // TODO: Weight properly
-            scoreForEdge = 3; // Debug
 
             boolean doJump;
             for(int i = 0; i < framesNeeded; i++) {
