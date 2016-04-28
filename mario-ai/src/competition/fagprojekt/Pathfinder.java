@@ -18,10 +18,11 @@ public class Pathfinder {
     // We have to return a list of moves, where a move
     // is defined as the move from one position to the next
     // eg. a jump or a run from one cell to the next
-    public List<ActionUnit> searchAStar(Vec2i start, Vec2i end) {
+    public List<ActionUnit> searchAStar(Vec2i start, Vec2f startVelocity, Vec2i end) {
         Queue<PathNode> open = new PriorityQueue<>();
         List<Vec2i> closed = new LinkedList<>(); // TODO: Should be hash table for best complexity, but we need to override hashCode() then
         PathNode current = new PathNode(start.clone());
+        current.marioVelocity = startVelocity.clone();
 
         boolean hasFoundEnd = false;
         closed.add(current.position.clone());

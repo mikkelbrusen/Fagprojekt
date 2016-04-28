@@ -42,7 +42,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
 
             for(Vec2i targetCell : worldSpace.rightMostWalkables) {
                 targetPos = targetCell;
-                List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastCell, targetPos);
+                List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastCell, marioMove.velocity, targetPos);
                 if (path == null || path.isEmpty()) {
                     currentActions.add(MarioMove.newAction()); // Do nothing
                     System.out.println("No path: " + marioMove.lastCell + " -> " + targetPos);
@@ -93,7 +93,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
             Vec2i c1 = debug.debugCell;
             System.out.println("DEBUG: " + c0 + " -> " + c1);
 
-            List<ActionUnit> path = pathfinder.searchAStar(c0, c1);
+            List<ActionUnit> path = pathfinder.searchAStar(c0, v0, c1);
 
             float y0f = c0.y * WorldSpace.CellHeight;
             float y1f = c1.y * WorldSpace.CellHeight;
