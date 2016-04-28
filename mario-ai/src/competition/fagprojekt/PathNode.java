@@ -9,14 +9,14 @@ public class PathNode implements Comparable<PathNode> {
 
     public int scoreTo;
     public Vec2f marioVelocity;
-    public List<boolean[]> actions;
+    public ActionUnit actions;
 
     public PathNode(Vec2i position) {
         this.position = position;
         this.parent = null;
         this.scoreTo = 0;
         this.marioVelocity = new Vec2f(0f, 0f);
-        this.actions = new ArrayList<>();
+        this.actions = new ActionUnit();
     }
 
     public PathNode(Vec2i position, PathNode parent, int scoreTo, Vec2f marioVelocity) {
@@ -24,7 +24,7 @@ public class PathNode implements Comparable<PathNode> {
         this.parent = parent;
         this.scoreTo = scoreTo;
         this.marioVelocity = marioVelocity;
-        this.actions = new ArrayList<>();
+        this.actions = new ActionUnit();
     }
 
     public int getHeuristic() {

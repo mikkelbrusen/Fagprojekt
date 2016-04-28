@@ -38,12 +38,13 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         if (currentActions == null || currentActions.isEmpty()) {
             for(Vec2i targetCell : worldSpace.rightMostWalkables) {
                 targetPos = targetCell;
-                List<boolean[]> path = pathfinder.searchAStar(marioMove.lastCell, targetPos);
+                List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastCell, targetPos);
                 if (path == null || path.isEmpty()) {
                     currentActions.add(MarioMove.newAction()); // Do nothing
                     System.out.println("No path: " + marioMove.lastCell + " -> " + targetPos);
                 } else {
-                    currentActions.addAll(path);
+                    for(ActionUnit unit : path) // TODO: Carry out one action unit, before recalculating. At least.
+                        currentActions.addAll(unit.actions);
                     break;
                 }
             }
@@ -89,8 +90,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
             Vec2i c1 = debug.debugCell;
             System.out.println("DEBUG: " + c0 + " -> " + c1);
 
-            List<boolean[]> path;
-            path = pathfinder.searchAStar(c0, c1);
+            List<ActionUnit> path = pathfinder.searchAStar(c0, c1);
 
             float y0f = c0.y * WorldSpace.CellHeight;
             float y1f = c1.y * WorldSpace.CellHeight;
@@ -99,8 +99,10 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
 
             if(path != null) {
                 for(int i = 0; i < path.size(); i++) {
-                    boolean[] aFrame = path.get(i);
-                    System.out.println(i + ": " + BUtil.actionToString(aFrame));
+                    ActionUnit aFrame = path.get(i);
+                    for(int j = 0; j < aFrame.actions.size(); j++) {
+                        System.out.println(i + ": " + BUtil.actionToString(aFrame.actions.get(j)));
+                    }
                 }
             }
         }

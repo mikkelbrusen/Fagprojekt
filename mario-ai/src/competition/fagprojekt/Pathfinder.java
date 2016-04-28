@@ -18,7 +18,7 @@ public class Pathfinder {
     // We have to return a list of moves, where a move
     // is defined as the move from one position to the next
     // eg. a jump or a run from one cell to the next
-    public List<boolean[]> searchAStar(Vec2i start, Vec2i end) {
+    public List<ActionUnit> searchAStar(Vec2i start, Vec2i end) {
         Queue<PathNode> open = new PriorityQueue<>();
         List<Vec2i> closed = new LinkedList<>(); // TODO: Should be hash table for best complexity, but we need to override hashCode() then
         PathNode current = new PathNode(start.clone());
@@ -45,11 +45,11 @@ public class Pathfinder {
         if (!hasFoundEnd)
             return null;
 
-        List<boolean[]> path = new ArrayList<>();
+        List<ActionUnit> path = new ArrayList<>();
         while (current.parent != null) {
             Debug.getInstance().drawCell(current.position, Color.green);
 
-            path.addAll(current.actions);
+            path.add(current.actions);
             current = current.parent;
         }
         Collections.reverse(path);
@@ -128,7 +128,7 @@ public class Pathfinder {
                 int moveDir = dir * (i < runFrames ? 1 : 0); // Might not run for all frames
                 node.actions.add(MarioMove.moveAction(moveDir, doJump));
             }
-            Collections.reverse(node.actions);
+            Collections.reverse(node.actions.actions);
         }
 
         node.scoreTo = parent.scoreTo + scoreForEdge;
