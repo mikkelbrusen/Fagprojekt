@@ -36,8 +36,9 @@ public class WorldSpace
 
         byte[][] levelObs = env.getLevelSceneObservationZ(2);
 
-        extendArray(marioWorldPos.x + levelObs[0].length >= length, levelObs[0]);
-
+        if (marioWorldPos.x + levelObs[0].length >= length) {
+            expandWorldSpace();
+        }
         // TODO: Only perform observation check when reaching new x, for optimization
         for(int i = levelObs.length - 1; i >= 0; i--) { // Row = Y. Iterate bottom to top
             for(int j = 0; j < levelObs[0].length; j++) { // Col = X
@@ -72,15 +73,14 @@ public class WorldSpace
         }
     }
 
-    private void extendArray(boolean b, byte[] levelOb) {
-        if(b) {
-            length = 2 * length;
-            copyCells = cells;
-            cells = new Cell[height][length];
-            for (int i = 0; i < cells.length; i++) {
-                System.arraycopy(copyCells[i], 0, cells[i], 0, copyCells[i].length);
-            }
+    private void expandWorldSpace() {
+        length = 2 * length;
+        copyCells = cells;
+        cells = new Cell[height][length];
+        for (int i = 0; i < cells.length; i++) {
+            System.arraycopy(copyCells[i], 0, cells[i], 0, copyCells[i].length);
         }
+
     }
 
     public boolean isPassable(CellType ct) {
