@@ -2,6 +2,7 @@ package competition.fagprojekt;
 
 import ch.idsia.benchmark.mario.engine.sprites.Mario;
 import ch.idsia.benchmark.mario.environments.Environment;
+import com.sun.tools.doclint.Env;
 
 public class MarioMove {
 
@@ -92,6 +93,14 @@ public class MarioMove {
         }
 
         return yBody;
+    }
+
+    public static Body2D bodyAfterAction(Body2D body, boolean[] action) {
+        Body2D endBody = new Body2D(body.position, body.velocity);
+
+        SimMario mario = new SimMario(body.position, body.velocity);
+
+        return endBody;
     }
 
     public static boolean[] newAction() {

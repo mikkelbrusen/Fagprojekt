@@ -4,11 +4,13 @@ import ch.idsia.benchmark.mario.engine.GlobalOptions;
 import ch.idsia.benchmark.mario.engine.LevelScene;
 import ch.idsia.benchmark.mario.engine.MarioVisualComponent;
 import ch.idsia.benchmark.mario.environments.MarioEnvironment;
+import competition.fagprojekt.SimMario;
 import competition.fagprojekt.Vec2f;
 import competition.fagprojekt.Vec2i;
 import competition.fagprojekt.WorldSpace;
 
 import java.awt.*;
+import java.util.List.*;
 import java.util.ArrayList;
 
 /**
@@ -88,6 +90,16 @@ public class Debug
         drawLine(p1, p2, color);
         drawLine(p2, p3, color);
         drawLine(p3, p0, color);
+    }
+
+    public void drawActions(Vec2f startPosition, Vec2f startVelocity, java.util.List<boolean[]> actions, Color color) {
+        Vec2f lastPosition = startPosition.clone();
+        SimMario mario = new SimMario(startPosition, startVelocity);
+        for(boolean[] a : actions) {
+            mario.move(a);
+            drawLine(lastPosition, mario.body.position, color);
+            lastPosition = mario.body.position.clone();
+        }
     }
 
     public Vec2i toScreenPixel(Vec2f floatPos) {
