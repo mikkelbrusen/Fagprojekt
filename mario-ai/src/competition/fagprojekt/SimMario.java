@@ -6,6 +6,7 @@ package competition.fagprojekt;
  * Simulates a Mario for moving.
  * TODO: Use MarioMove values everywhere possible
  * TODO: Initialize with Mario actual values
+ * TODO: Implement collision
  */
 public class SimMario
 {
