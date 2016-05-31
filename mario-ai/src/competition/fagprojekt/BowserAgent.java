@@ -110,6 +110,14 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
             }
         }
 
+        if(currentActions != null) {
+            List<boolean[]> debugActions = new ArrayList<>();
+            for (int i = 0; i < 24; i++) {
+                debugActions.add(MarioMove.moveAction(1, i < MarioMove.MaxJumpFrames));
+            }
+            debug.drawActions(marioMove.lastFloatPos, marioMove.velocity, debugActions, Color.green);
+        }
+
         return action;
     }
 
