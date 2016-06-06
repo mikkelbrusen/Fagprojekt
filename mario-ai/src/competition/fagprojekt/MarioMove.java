@@ -98,8 +98,6 @@ public class MarioMove {
     public static Body2D bodyAfterAction(Body2D body, boolean[] action) {
         Body2D endBody = new Body2D(body.position, body.velocity);
 
-        SimMario mario = new SimMario(body.position, body.velocity);
-
         return endBody;
     }
 

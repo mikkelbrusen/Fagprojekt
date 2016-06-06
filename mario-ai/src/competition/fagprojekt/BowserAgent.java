@@ -4,6 +4,7 @@ import ch.idsia.agents.Agent;
 import ch.idsia.agents.controllers.BasicMarioAIAgent;
 import ch.idsia.benchmark.mario.engine.sprites.Mario;
 import ch.idsia.benchmark.mario.environments.Environment;
+import ch.idsia.benchmark.mario.environments.MarioEnvironment;
 import competition.fagprojekt.Debug.Debug;
 import competition.fagprojekt.Debug.DebugInput;
 
@@ -32,7 +33,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
     {
         Debug debug = Debug.getInstance();
 
-        //worldSpace.printWorldSpace();
+        worldSpace.printWorldSpace();
 
         if(worldSpace.rightMostWalkables.isEmpty())
             currentActions.add(MarioMove.newAction());
@@ -60,7 +61,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         Vec2f p0 = marioMove.lastFloatPos;
         Vec2f v0 = marioMove.velocity;
 
-        /*
+
         int w = 20;
         int h = 20;
         for(int i = 0; i < w; i++) {
@@ -75,7 +76,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
                 debug.drawCell(p1, color);
             }
         }
-        */
+
 
         debug.update();
 
@@ -135,6 +136,8 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         worldSpace = new WorldSpace();
         marioMove = new MarioMove();
         pathfinder = new Pathfinder(worldSpace, marioMove);
+
+        Debug.initialize(MarioEnvironment.getInstance().getLevelScene(), worldSpace);
     }
 
     // Debug

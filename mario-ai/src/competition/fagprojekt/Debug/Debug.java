@@ -21,6 +21,7 @@ public class Debug
     private static Debug _instance;
 
     private LevelScene _level;
+    private WorldSpace _worldSpace;
 
     public Vec2i debugCell = new Vec2i(5, 10);
 
@@ -32,16 +33,16 @@ public class Debug
     // everything else.
     private ArrayList<DebugGfx> _graphicsThisFrame = new ArrayList<>();
 
-    private Debug(LevelScene levelScene) {
+    private Debug(LevelScene levelScene, WorldSpace worldSpace) {
         _level = levelScene;
+        _worldSpace = worldSpace;
+    }
+
+    public static void initialize(LevelScene levelScene, WorldSpace worldSpace) {
+        _instance = new Debug(levelScene, worldSpace);
     }
 
     public static Debug getInstance() {
-        if(_instance != null)
-            return _instance;
-
-        LevelScene levelScene = MarioEnvironment.getInstance().getLevelScene();
-        _instance = new Debug(levelScene);
         return _instance;
     }
 
@@ -94,7 +95,7 @@ public class Debug
 
     public void drawActions(Vec2f startPosition, Vec2f startVelocity, java.util.List<boolean[]> actions, Color color) {
         Vec2f lastPosition = startPosition.clone();
-        SimMario mario = new SimMario(startPosition, startVelocity);
+        SimMario mario = new SimMario(startPosition, startVelocity, _worldSpace);
         for(boolean[] a : actions) {
             mario.move(a);
             drawLine(lastPosition, mario.body.position, color);
