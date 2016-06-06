@@ -50,11 +50,12 @@ public class WorldSpace
 
                 // TODO: Create method for converting int value to CellType
                 CellType cellType = getCellType(levelObs, j, i);
+                CellType cellAbove = getCellType(levelObs,j,i-1);
 
                 // Check if space is walkable
                 if(i != levelObs.length - 1) {
                     CellType cellBelow = getCellType(levelObs, j, i + 1);
-                    if (isPassable(cellType) && !isPassable(cellBelow)) {
+                    if (isPassable(cellType) && !isPassable(cellBelow) && isPassable(cellAbove)) {
 
                         // Update the right most walkable cells
                         if(x > maxWalkableX)
