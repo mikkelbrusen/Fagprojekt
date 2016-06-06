@@ -1,6 +1,7 @@
 package competition.fagprojekt;
 
 import ch.idsia.benchmark.mario.environments.Environment;
+import java.util.List;
 
 /**
  * Created by max on 27/04/16.
@@ -16,5 +17,13 @@ public class BUtil {
                 a[Environment.MARIO_KEY_RIGHT] ? "X" : "_",
                 a[Environment.MARIO_KEY_DOWN] ? "X" : "_",
                 a[Environment.MARIO_KEY_SPEED] ? "X" : "_" );
+    }
+
+    public static void printPath(List<ActionUnit> path) {
+        for (ActionUnit au : path) {
+            for (boolean[] b: au.actions) {
+                System.out.println(BUtil.actionToString(b));
+            }
+        }
     }
 }
