@@ -20,16 +20,17 @@ public class JumpPathfinder
     }
 
     public ActionUnit searchAStar(Vec2i start, Vec2f startVelocity, Vec2i end) {
+        return searchAStar(WorldSpace.cellToFloat(start), startVelocity, WorldSpace.cellToFloat(end));
+    }
+
+    // TODO: Search from Vec2f position, instead of Cell
+    public ActionUnit searchAStar(Vec2f start, Vec2f startVelocity, Vec2f end) {
         Queue<JumpPathNode> open = new PriorityQueue<>();
         // No closed list, as every point is unique
 
-        Vec2f endFloat = WorldSpace.cellToFloat(end);
-
         // Setup start node
         JumpPathNode current = new JumpPathNode(
-                new SimMario(WorldSpace.cellToFloat(start),
-                startVelocity.clone(),
-                worldSpace)
+                new SimMario(start, startVelocity, worldSpace)
         );
 
         boolean hasFoundEnd = false;
@@ -39,7 +40,7 @@ public class JumpPathfinder
                 break;
             current = open.poll();
 
-            Vec2f endDist = Vec2f.subtract(endFloat, current.simMario.body.position);
+            Vec2f endDist = Vec2f.subtract(end, current.simMario.body.position);
             if (Math.abs(endDist.x) < 6f && endDist.y < 1.001f && endDist.y > -6f) {
                 hasFoundEnd = true;
                 break;
@@ -60,7 +61,7 @@ public class JumpPathfinder
         return path;
     }
 
-    List<JumpPathNode> getNeighbours(JumpPathNode parent, Vec2i end) {
+    List<JumpPathNode> getNeighbours(JumpPathNode parent, Vec2f end) {
         // Left, Right, Down, Jump, Speed
         final boolean[][] possibleActions = {
                 { false, false, false, false, false },
@@ -91,7 +92,7 @@ public class JumpPathfinder
             newSimMario.move(action);
 
             // Heuristic is in cell distance, score is in frames? Problem?
-            float heuristic = Vec2f.subtract(WorldSpace.cellToFloat(end), newSimMario.body.position).magnitude();
+            float heuristic = Vec2f.subtract(end, newSimMario.body.position).magnitude();
             float score = 1 + parent.scoreTo;
 
             JumpPathNode n = new JumpPathNode(newSimMario, parent, action, score, heuristic);
