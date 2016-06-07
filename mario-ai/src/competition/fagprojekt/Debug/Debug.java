@@ -4,11 +4,13 @@ import ch.idsia.benchmark.mario.engine.GlobalOptions;
 import ch.idsia.benchmark.mario.engine.LevelScene;
 import ch.idsia.benchmark.mario.engine.MarioVisualComponent;
 import ch.idsia.benchmark.mario.environments.MarioEnvironment;
+import competition.fagprojekt.SimMario;
 import competition.fagprojekt.Vec2f;
 import competition.fagprojekt.Vec2i;
 import competition.fagprojekt.WorldSpace;
 
 import java.awt.*;
+import java.util.List.*;
 import java.util.ArrayList;
 
 /**
@@ -19,6 +21,7 @@ public class Debug
     private static Debug _instance;
 
     private LevelScene _level;
+    private WorldSpace _worldSpace;
 
     public Vec2i debugCell = new Vec2i(5, 10);
 
@@ -30,16 +33,16 @@ public class Debug
     // everything else.
     private ArrayList<DebugGfx> _graphicsThisFrame = new ArrayList<>();
 
-    private Debug(LevelScene levelScene) {
+    private Debug(LevelScene levelScene, WorldSpace worldSpace) {
         _level = levelScene;
+        _worldSpace = worldSpace;
+    }
+
+    public static void initialize(LevelScene levelScene, WorldSpace worldSpace) {
+        _instance = new Debug(levelScene, worldSpace);
     }
 
     public static Debug getInstance() {
-        if(_instance != null)
-            return _instance;
-
-        LevelScene levelScene = MarioEnvironment.getInstance().getLevelScene();
-        _instance = new Debug(levelScene);
         return _instance;
     }
 
@@ -88,6 +91,16 @@ public class Debug
         drawLine(p1, p2, color);
         drawLine(p2, p3, color);
         drawLine(p3, p0, color);
+    }
+
+    public void drawActions(Vec2f startPosition, Vec2f startVelocity, java.util.List<boolean[]> actions, Color color) {
+        Vec2f lastPosition = startPosition.clone();
+        SimMario mario = new SimMario(startPosition, startVelocity, _worldSpace);
+        for(boolean[] a : actions) {
+            mario.move(a);
+            drawLine(lastPosition, mario.body.position, color);
+            lastPosition = mario.body.position.clone();
+        }
     }
 
     public Vec2i toScreenPixel(Vec2f floatPos) {

@@ -22,6 +22,13 @@ public class Vec2i {
         return new Vec2i(a.x - b.x, a.y - b.y);
     }
 
+    public int sqrMagnitude() {
+        return x * x + y * y;
+    }
+    public float magnitude() {
+        return (float)Math.sqrt(sqrMagnitude());
+    }
+
     @Override
     public boolean equals(Object other) {
         if(!(other instanceof Vec2i))

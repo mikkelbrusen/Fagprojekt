@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class BUtil {
     public static String actionToString(boolean[] a) {
-        if(a.length != Environment.numberOfKeys)
+        if(a.length < 5)
             return "";
 
         return String.format("W=%s A=%s D=%s S=%s K=%s",
