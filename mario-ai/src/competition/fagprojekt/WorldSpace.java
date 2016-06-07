@@ -120,14 +120,14 @@ public class WorldSpace
         return type;
     }
 
-    void printWorldSpace()
+    public void printWorldSpace()
     {
-         for(int i = 0; i < 20; i++) { // Row = Y
+         for(int i = 0; i < 16; i++) { // Row = Y
             String line = String.format("%2d:", i);
             for(int j = 0; j < length; j++) { // Col = X
                 Cell c = cells[i][j];
                 String v = c == null ? "-1" :
-                        (c.type == CellType.Empty ? "0" :
+                        (c.type == CellType.Empty || c.type == CellType.Coin ? "0" :
                                 (c.type == CellType.Walkable ? "X" : "1"));
 
                 line += v + " ";
