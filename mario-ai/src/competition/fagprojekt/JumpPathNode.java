@@ -34,10 +34,6 @@ public class JumpPathNode implements Comparable<JumpPathNode>
         System.arraycopy(action, 0, this.action, 0, action.length);
     }
 
-    public Vec2i getCellPosition() {
-        return WorldSpace.floatToCell(simMario.body.position);
-    }
-
     @Override
     public int compareTo(JumpPathNode o) {
         return (scoreTo + heuristic) > (o.scoreTo + o.heuristic) ? 1 : -1;
