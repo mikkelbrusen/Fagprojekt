@@ -10,6 +10,7 @@ public class PathNode implements Comparable<PathNode> {
     public int scoreTo;
     public Vec2f marioVelocity;
     public ActionUnit actions;
+    public Fitness fitness;
 
     public PathNode(Vec2i position) {
         this.position = position;
@@ -17,6 +18,7 @@ public class PathNode implements Comparable<PathNode> {
         this.scoreTo = 0;
         this.marioVelocity = new Vec2f(0f, 0f);
         this.actions = new ActionUnit();
+        this.fitness = new Fitness();
     }
 
     public PathNode(Vec2i position, PathNode parent, int scoreTo, Vec2f marioVelocity) {
@@ -25,14 +27,11 @@ public class PathNode implements Comparable<PathNode> {
         this.scoreTo = scoreTo;
         this.marioVelocity = marioVelocity;
         this.actions = new ActionUnit();
-    }
-
-    public int getHeuristic() {
-        return position.x;
+        this.fitness = new Fitness();
     }
 
     @Override
     public int compareTo(PathNode o) {
-        return (scoreTo + getHeuristic()) > (o.scoreTo + o.getHeuristic()) ? 1 : -1;
+        return (fitness.getFitness() > o.fitness.getFitness() ) ? 1 : -1;
     }
 }

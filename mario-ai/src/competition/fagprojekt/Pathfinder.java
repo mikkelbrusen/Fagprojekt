@@ -36,7 +36,7 @@ public class Pathfinder {
                 break;
             }
 
-            for (PathNode n : getNeighbours(current)) {
+            for (PathNode n : getNeighbours(current,end)) {
                 if (!closed.contains(n.position)) {
                     open.add(n);
                 }
@@ -57,7 +57,7 @@ public class Pathfinder {
         return path;
     }
 
-    List<PathNode> getNeighbours(PathNode parent) {
+    List<PathNode> getNeighbours(PathNode parent, Vec2i end) {
         List<PathNode> neighbours = new ArrayList<>();
 
         Vec2i pos = parent.position;
@@ -67,14 +67,14 @@ public class Pathfinder {
             if (!isWalkable(p.x, p.y))
                 continue;
 
-            neighbours.add(createNode(p,parent,false));
+            neighbours.add(createNode(p,parent,false, end));
         }
 
         for(Vec2i p : getJumpables(floatPos, parent.marioVelocity)) {
             if (!isWalkable(p.x, p.y))
                 continue;
 
-            neighbours.add(createNode(p,parent,true));
+            neighbours.add(createNode(p,parent,true, end));
         }
 
         if (isEmpty(pos.x, pos.y + 1)) { // Falling
@@ -88,7 +88,7 @@ public class Pathfinder {
         return neighbours;
     }
 
-    public PathNode createNode(Vec2i p, PathNode parent, boolean isJump){
+    public PathNode createNode(Vec2i p, PathNode parent, boolean isJump, Vec2i end){
         // Calculate run actions
         int dir = p.x < parent.position.x ? -1 : 1;
         int runFrames = framesToRunTo(parent.position, parent.marioVelocity, p);
@@ -100,7 +100,9 @@ public class Pathfinder {
         node.marioVelocity.x = newV.x;
         node.parent = parent;
 
-        int scoreForEdge = 0;
+        int scoreForEdge;
+        int heuristic = (end.x - p.x);
+
         if(!isJump){
             scoreForEdge = runFrames; // TODO: Score run edge
 
@@ -132,7 +134,8 @@ public class Pathfinder {
             Collections.reverse(node.actions.actions);
         }
 
-        node.scoreTo = parent.scoreTo + scoreForEdge;
+        node.fitness.scoreTo = parent.fitness.scoreTo + scoreForEdge;
+        node.fitness.heuristic = heuristic;
         return node;
     }
 
