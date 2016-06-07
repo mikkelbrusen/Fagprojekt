@@ -19,12 +19,11 @@ public class JumpPathfinder
         this.marioMove = marioMove;
     }
 
-    public ActionUnit searchAStar(Vec2i start, Vec2f startVelocity, Vec2i end) {
+    public JumpPath searchAStar(Vec2i start, Vec2f startVelocity, Vec2i end) {
         return searchAStar(WorldSpace.cellToFloat(start), startVelocity, WorldSpace.cellToFloat(end));
     }
 
-    // TODO: Search from Vec2f position, instead of Cell
-    public ActionUnit searchAStar(Vec2f start, Vec2f startVelocity, Vec2f end) {
+    public JumpPath searchAStar(Vec2f start, Vec2f startVelocity, Vec2f end) {
         Queue<JumpPathNode> open = new PriorityQueue<>();
         // No closed list, as every point is unique
 
@@ -52,12 +51,14 @@ public class JumpPathfinder
         if (!hasFoundEnd)
             return null;
 
-        ActionUnit path = new ActionUnit();
+        JumpPath path = new JumpPath();
+        path.velocity=current.simMario.body.velocity.clone();
+
         while (current.parent != null) {
-            path.add(current.action);
+            path.addAction(current.action);
             current = current.parent;
         }
-        Collections.reverse(path.actions);
+        Collections.reverse(path.actionUnit.actions);
         return path;
     }
 
