@@ -34,8 +34,9 @@ public class JumpPathfinder
 
         boolean hasFoundEnd = false;
         open.add(current);
-        int iterations = 0;
-        while (!open.isEmpty() && iterations < MAX_SEARCH_ITERATIONS) {
+        for(int i = 0; i < MAX_SEARCH_ITERATIONS; i++) {
+            if (open.isEmpty())
+                break;
             current = open.poll();
 
             Vec2f endDist = Vec2f.subtract(endFloat, current.simMario.body.position);
@@ -44,11 +45,7 @@ public class JumpPathfinder
                 break;
             }
 
-            for (JumpPathNode n : getNeighbours(current, end)) {
-                open.add(n);
-            }
-
-            iterations++;
+            open.addAll(getNeighbours(current, end));
         }
 
         if (!hasFoundEnd)
