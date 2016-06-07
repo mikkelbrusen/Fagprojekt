@@ -48,6 +48,25 @@ public class SimMario
         this.worldSpace = worldSpace;
     }
 
+    public SimMario clone() {
+        SimMario newSimMario = new SimMario(body.position, body.velocity, worldSpace);
+
+        newSimMario.facing = facing;
+
+        newSimMario.sliding = sliding;
+        newSimMario.ducking = ducking;
+        newSimMario.onGround = onGround;
+        newSimMario.mayJump = mayJump;
+
+        newSimMario.jumpTime = jumpTime;
+        newSimMario.runTime = runTime;
+
+        newSimMario.xJumpSpeed = xJumpSpeed;
+        newSimMario.yJumpSpeed = yJumpSpeed;
+
+        return newSimMario;
+    }
+
     public void move(boolean[] keys)
     {
         /*
@@ -298,8 +317,9 @@ public class SimMario
 
         Cell cell = worldSpace.getCell(x, y);
         //System.out.println(String.format("SimMario = (%f, %f)", this.x, this.y));
-        System.out.println(String.format("(%d, %d): %s", x, y,
-                cell == null ? "Null" : cell.type.toString()));
+        //System.out.println(String.format("(%d, %d): %s", x, y,
+                //cell == null ? "Null" : cell.type.toString()));
+
         return cell != null && !worldSpace.isPassable(cell.type);
     }
 }
