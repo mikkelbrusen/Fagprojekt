@@ -16,6 +16,8 @@ import java.util.List;
 public class BowserAgent extends BasicMarioAIAgent implements Agent
 {
     WorldSpace worldSpace;
+    JumpPathfinder jumpPathfinder;
+    JumpTable jumpTable;
     Pathfinder pathfinder;
     MarioMove marioMove;
 
@@ -33,7 +35,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
     {
         Debug debug = Debug.getInstance();
 
-        worldSpace.printWorldSpace();
+       // worldSpace.printWorldSpace();
 
         if(worldSpace.rightMostWalkables.isEmpty())
             currentActions.add(MarioMove.newAction());
@@ -135,7 +137,9 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
     {
         worldSpace = new WorldSpace();
         marioMove = new MarioMove();
-        pathfinder = new Pathfinder(worldSpace, marioMove);
+        jumpPathfinder = new JumpPathfinder(worldSpace,marioMove);
+        jumpTable = new JumpTable(jumpPathfinder);
+        pathfinder = new Pathfinder(worldSpace, marioMove,jumpTable);
 
         Debug.initialize(MarioEnvironment.getInstance().getLevelScene(), worldSpace);
     }

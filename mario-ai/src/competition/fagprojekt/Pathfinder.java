@@ -9,10 +9,12 @@ import java.util.List;
 public class Pathfinder {
     WorldSpace worldSpace;
     MarioMove marioMove;
+    JumpTable jumpTable;
 
-    public Pathfinder(WorldSpace worldSpace, MarioMove marioMove) {
+    public Pathfinder(WorldSpace worldSpace, MarioMove marioMove, JumpTable jumpTable) {
         this.worldSpace = worldSpace;
         this.marioMove = marioMove;
+        this.jumpTable = jumpTable;
     }
 
     // We have to return a list of moves, where a move
@@ -63,18 +65,38 @@ public class Pathfinder {
         Vec2i pos = parent.position;
         Vec2f floatPos = WorldSpace.cellToFloat(pos);
 
+
         for(Vec2i p : getWalkables(pos)) {
             if (!isWalkable(p.x, p.y))
                 continue;
-
+            //System.out.println("Vel: "+parent.marioVelocity.x);
             neighbours.add(createNode(p,parent,false, end));
         }
 
-        for(Vec2i p : getJumpables(floatPos, parent.marioVelocity)) {
+        /*for(Vec2i p : getJumpables(floatPos, parent.marioVelocity)) {
             if (!isWalkable(p.x, p.y))
                 continue;
 
             neighbours.add(createNode(p,parent,true, end));
+        }*/
+
+        int xOffset = jumpTable.xRange/2;
+        int yOffset = jumpTable.yRange/2;
+        int velIndex = (int)(parent.marioVelocity.x/jumpTable.stepSize);
+        for (int i = 0; i < jumpTable.jumpPathTable.length; i++) {
+            for (int j = 0; j < jumpTable.jumpPathTable[0].length; j++) {
+                JumpPath jp = jumpTable.jumpPathTable[i][j][velIndex];
+                if(jp!=null){
+                    System.out.println(i);
+                    Vec2i p = new Vec2i(i-xOffset,j-yOffset);
+
+                    //System.out.println(String.format("P.x = %d - P.y = %d",p.x,p.y));
+                    if(isWalkable(p.x,p.y)){
+                        PathNode node = new PathNode(p, parent, jp.actionUnit.actions.size() ,jp.velocity);
+                        neighbours.add(node);
+                    }
+                }
+            }
         }
 
         if (isEmpty(pos.x, pos.y + 1)) { // Falling
@@ -171,14 +193,18 @@ public class Pathfinder {
     // dir (left = -1, right = 1) for frames frames
     static float xVelocityAfter(Vec2f v0, int frames, int dir) {
         float vx = v0.x;
-        for(int i = 0; i < frames; i++)
-            vx += MarioMove.RunAcceleration * Math.pow(MarioMove.GroundInertia, i + 1);
+        for(int i = 0; i < frames; i++) {
+            vx += MarioMove.RunAcceleration;
+            vx *= MarioMove.GroundInertia;
+        }
         return vx;
     }
     static float yVelocityAfterFalling(Vec2f v0, int frames) {
         float vy = v0.y;
-        for(int i = 0; i < frames; i++)
-            vy += MarioMove.Gravity * Math.pow(MarioMove.FallInertia, i + 1);
+        for(int i = 0; i < frames; i++) {
+            vy *= MarioMove.FallInertia;
+            vy += MarioMove.Gravity;
+        }
         return vy;
     }
     static float yVelocityAfterJumping(Vec2f v0, int frames) {
@@ -210,6 +236,8 @@ public class Pathfinder {
                     targets.add(p1);
             }
         }
+        
+        
 
         return targets;
     }
