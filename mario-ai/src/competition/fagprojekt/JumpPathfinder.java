@@ -24,6 +24,10 @@ public class JumpPathfinder
     }
 
     public JumpPath searchAStar(Vec2f start, Vec2f startVelocity, Vec2f end) {
+        return searchAStar(start, startVelocity, end, false);
+    }
+
+    public JumpPath searchAStar(Vec2f start, Vec2f startVelocity, Vec2f end, boolean takeBest) {
         Queue<JumpPathNode> open = new PriorityQueue<>();
         // No closed list, as every point is unique
 
@@ -53,9 +57,13 @@ public class JumpPathfinder
         }
 
         if (!hasFoundEnd) {
+            if (!takeBest)
+                return null;
+
             current = bestSeen;
             System.out.println("Didn't find end, taking best");
         }
+
 
         JumpPath path = new JumpPath();
         path.velocity=current.simMario.body.velocity.clone();
