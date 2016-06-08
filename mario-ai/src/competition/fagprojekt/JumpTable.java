@@ -21,8 +21,11 @@ public class JumpTable {
         for (int i = xMin; i < xMax; i++) {
             for (int j = yMin; j < yMax; j++) {
                 for (int k = 0; k < intervals; k++) {
-                    Vec2i start = new Vec2i(0,0);
-                    Vec2i end = new  Vec2i(i,j);
+                    Vec2f start = new Vec2i(0, 0).toVec2f();
+                    Vec2f end = new Vec2i(i, j).toVec2f();
+                    start.x += 0.5f * WorldSpace.CellWidth;
+                    end.x += 0.5f * WorldSpace.CellWidth;
+
                     Vec2f velocity = new Vec2f((-0.5f * intervals + k) * stepSize,0);
 
                     JumpPath path = jumpPathfinder.searchAStar(start,velocity,end);
