@@ -5,7 +5,7 @@ package competition.fagprojekt;
  */
 public class JumpTable {
     final static float maxSpeed = 20f;
-    public final static int intervals = 20;
+    public final static int intervals = 40;
     public final static float stepSize = maxSpeed / intervals;
 
     int xRange = 14;
@@ -23,13 +23,20 @@ public class JumpTable {
                 for (int k = 0; k < intervals; k++) {
                     Vec2i start = new Vec2i(0,0);
                     Vec2i end = new  Vec2i(i,j);
-                    Vec2f velocity = new Vec2f(k*stepSize,0);
+                    Vec2f velocity = new Vec2f((-0.5f * intervals + k) * stepSize,0);
 
                     JumpPath path = jumpPathfinder.searchAStar(start,velocity,end);
                     jumpPathTable[i+xRange/2][j+yRange/2][k] = path;
                 }
             }
         }
+    }
+
+    public int getVelocityIdx(float v) {
+        //int velIndex = (int)(v.x / jumpTable.stepSize);
+        float t = (v - -maxSpeed) / (maxSpeed - -maxSpeed);
+        int idx = (int)t * intervals;
+        return idx;
     }
 
     public JumpPath findPath(int x, int y, float velX) {

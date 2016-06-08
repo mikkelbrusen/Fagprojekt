@@ -83,7 +83,7 @@ public class Pathfinder {
 
         int xOffset = jumpTable.xRange/2;
         int yOffset = jumpTable.yRange/2;
-        int velIndex = (int)(parent.marioVelocity.x/jumpTable.stepSize);
+        int velIndex = jumpTable.getVelocityIdx(parent.marioVelocity.x);
         for (int i = 0; i < jumpTable.jumpPathTable.length; i++) {
             for (int j = 0; j < jumpTable.jumpPathTable[0].length; j++) {
                 JumpPath jp = jumpTable.jumpPathTable[i][j][velIndex];
