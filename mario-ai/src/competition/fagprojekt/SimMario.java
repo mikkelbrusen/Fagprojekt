@@ -230,8 +230,8 @@ public class SimMario
         }
 
         // Pulled from Mario
-        float width = 4;
-        float height = 24;
+        final float width = 4; // Half of Mario's width
+        final float height = 24;
 
         boolean collide = false;
         if (ya > 0)
