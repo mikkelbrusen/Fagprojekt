@@ -29,6 +29,10 @@ public class Vec2i {
         return (float)Math.sqrt(sqrMagnitude());
     }
 
+    public Vec2f toVec2f() {
+        return WorldSpace.cellToFloat(this);
+    }
+
     @Override
     public boolean equals(Object other) {
         if(!(other instanceof Vec2i))
