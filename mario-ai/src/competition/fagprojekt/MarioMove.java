@@ -2,7 +2,6 @@ package competition.fagprojekt;
 
 import ch.idsia.benchmark.mario.engine.sprites.Mario;
 import ch.idsia.benchmark.mario.environments.Environment;
-import com.sun.tools.doclint.Env;
 
 public class MarioMove {
 
