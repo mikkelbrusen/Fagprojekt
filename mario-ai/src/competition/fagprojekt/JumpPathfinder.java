@@ -66,7 +66,8 @@ public class JumpPathfinder
 
 
         JumpPath path = new JumpPath();
-        path.velocity=current.simMario.body.velocity.clone();
+        path.velocity = current.simMario.body.velocity.clone();
+        path.actionUnit.endPosition = current.simMario.body.position.clone();
 
         while (current.parent != null) {
             path.addAction(current.action);

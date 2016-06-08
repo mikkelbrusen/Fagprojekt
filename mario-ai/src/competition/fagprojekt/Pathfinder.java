@@ -93,6 +93,7 @@ public class Pathfinder {
                     if(isWalkable(p.x,p.y)){
                         PathNode node = new PathNode(p, parent, jp.actionUnit.actions.size(), heuristic, jp.velocity);
                         node.actions = jp.actionUnit;
+                        node.actions.endPosition = p.toVec2f();
                         neighbours.add(node);
                     }
                 }
@@ -131,6 +132,7 @@ public class Pathfinder {
             //PathNode node = new PathNode(p, parent, scoreForEdge, newV);
             for(int i = 0; i < runFrames; i++)
                 node.actions.add(MarioMove.moveAction(dir, false));
+            node.actions.endPosition = end.toVec2f();
 
         } else {  // Is jump
             float y0f = parent.position.y * WorldSpace.CellHeight;

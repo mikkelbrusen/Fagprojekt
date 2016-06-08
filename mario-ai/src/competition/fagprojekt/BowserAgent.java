@@ -52,6 +52,14 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
                 } else {
                     for(ActionUnit unit : path) // TODO: Carry out one action unit, before recalculating. At least.
                         currentActions.addAll(unit.actions);
+
+                    System.out.printf("========== %s -> %s ==========\n", marioMove.lastCell, targetPos);
+                    for (ActionUnit unit : path) {
+                        System.out.printf("Unit to %s:\n", unit.endPosition == null ? "(x, x)" : unit.endPosition.toCell());
+                        for (boolean[] a : unit.actions)
+                            System.out.printf("  %s\n", BUtil.actionToString(a));
+                    }
+
                     break;
                 }
             }

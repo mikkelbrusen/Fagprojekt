@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class ActionUnit {
     public List<boolean[]> actions = new ArrayList<>();
+    public Vec2f endPosition;
 
     public ActionUnit() {
     }
