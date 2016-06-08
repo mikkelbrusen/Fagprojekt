@@ -32,6 +32,8 @@ public class JumpPathfinder
                 new SimMario(start, startVelocity, worldSpace)
         );
 
+        JumpPathNode bestSeen = null;
+
         boolean hasFoundEnd = false;
         open.add(current);
         for(int i = 0; i < MAX_SEARCH_ITERATIONS; i++) {
@@ -39,8 +41,10 @@ public class JumpPathfinder
                 break;
             current = open.poll();
 
-            Vec2f endDist = Vec2f.subtract(end, current.simMario.body.position);
-            if (Math.abs(endDist.x) < 6f && endDist.y < 1.001f && endDist.y > -6f) {
+            if (bestSeen == null || bestSeen.parent == null || current.compareTo(bestSeen) < 0)
+                bestSeen = current;
+
+            if (isEnd(current, end)) {
                 hasFoundEnd = true;
                 break;
             }
@@ -48,8 +52,10 @@ public class JumpPathfinder
             open.addAll(getNeighbours(current, end));
         }
 
-        if (!hasFoundEnd)
-            return null;
+        if (!hasFoundEnd) {
+            current = bestSeen;
+            System.out.println("Didn't find end, taking best");
+        }
 
         JumpPath path = new JumpPath();
         path.velocity=current.simMario.body.velocity.clone();
@@ -88,18 +94,52 @@ public class JumpPathfinder
         for (boolean[] action : possibleActions) {
             if (parent.stoppedJumping && action[Environment.MARIO_KEY_JUMP])
                 continue;
+            if (!action[Environment.MARIO_KEY_SPEED])
+                continue;
 
             SimMario newSimMario = parent.simMario.clone();
             newSimMario.move(action);
 
+            Vec2f p = newSimMario.body.position.clone();
+            Vec2f v = newSimMario.body.velocity.clone();
+
             // Heuristic is in cell distance, score is in frames? Problem?
-            float heuristic = Vec2f.subtract(end, newSimMario.body.position).magnitude();
             float score = 1 + parent.scoreTo;
+
+            // TODO: Maybe wrap into single function
+            // Don't stop jumping the second we reach the correct height
+            // (dist.y is lowest here)
+            Vec2f dist = Vec2f.subtract(end, Vec2f.add(p, v));
+            if (action[Environment.MARIO_KEY_JUMP])
+                dist.y *= 0.5f;
+
+            float heuristic = dist.magnitude();
+
+            // Encourage falling if below
+            if (!action[Environment.MARIO_KEY_JUMP] && p.y < end.y) // Above
+                heuristic -= 2f;
+
+            // Discard impossible options
+            final float nudge = 1f; // Room of error for floating calculations
+            if (p.y - nudge > end.y && v.y > 0f) // Below and moving down
+                heuristic += 10000f; // Impossible to recover from
 
             JumpPathNode n = new JumpPathNode(newSimMario, parent, action, score, heuristic);
             neighbours.add(n);
         }
 
         return neighbours;
+    }
+
+    // TODO: Now that we use the best found path if this never returns true,
+    // maybe we should just always search the full iterations and take the
+    // best possible found.
+    boolean isEnd(JumpPathNode node, Vec2f end) {
+        Vec2f p = node.simMario.body.position.clone();
+        Vec2f v = node.simMario.body.velocity.clone();
+        Vec2f d = Vec2f.subtract(end, Vec2f.add(p, v));
+        return Math.abs(d.x) < 6f && // Close in x
+                d.y < 1.001f && // Nudge for some SimMario imprecision
+                d.y > -6f; // Else slightly above
     }
 }

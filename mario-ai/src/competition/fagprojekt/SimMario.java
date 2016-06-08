@@ -230,8 +230,8 @@ public class SimMario
         }
 
         // Pulled from Mario
-        float width = 4;
-        float height = 24;
+        final float width = 4; // Half of Mario's width
+        final float height = 24;
 
         boolean collide = false;
         if (ya > 0)
@@ -273,18 +273,18 @@ public class SimMario
             if (xa < 0)
             {
                 x = (int) ((x - width) / 16) * 16 + width;
-                xa = 0;
+                this.xa = 0;
             }
             if (xa > 0)
             {
                 x = (int) ((x + width) / 16 + 1) * 16 - width - 1;
-                xa = 0;
+                this.xa = 0;
             }
             if (ya < 0)
             {
                 y = (int) ((y - height) / 16) * 16 + height;
                 jumpTime = 0;
-                ya = 0;
+                this.ya = 0;
             }
             if (ya > 0)
             {
@@ -313,7 +313,7 @@ public class SimMario
         int y = (int) (_y / 16);
         */
 
-        if (x == (int) (this.x / 16) && y == (int) (this.y / 16)) return false;
+        if (x == (int)(this.x / 16) && y == (int)(this.y / 16)) return false;
 
         Cell cell = worldSpace.getCell(x, y);
         //System.out.println(String.format("SimMario = (%f, %f)", this.x, this.y));

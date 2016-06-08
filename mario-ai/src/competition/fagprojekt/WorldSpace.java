@@ -87,7 +87,8 @@ public class WorldSpace
 
     public boolean isPassable(CellType ct) {
         return (ct == CellType.Empty ||
-                ct == CellType.Coin);
+                ct == CellType.Coin ||
+                ct == CellType.Walkable);
     }
 
     public Cell getCell(int x, int y) {
