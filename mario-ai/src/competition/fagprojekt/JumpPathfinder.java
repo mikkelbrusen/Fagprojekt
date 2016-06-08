@@ -129,6 +129,9 @@ public class JumpPathfinder
         return neighbours;
     }
 
+    // TODO: Now that we use the best found path if this never returns true,
+    // maybe we should just always search the full iterations and take the
+    // best possible found.
     boolean isEnd(JumpPathNode node, Vec2f end) {
         Vec2f p = node.simMario.body.position.clone();
         Vec2f v = node.simMario.body.velocity.clone();
