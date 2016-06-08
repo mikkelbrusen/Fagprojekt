@@ -7,9 +7,10 @@ import java.util.List;
  */
 public class JumpPath {
     ActionUnit actionUnit;
-    Vec2f velocity;
+    Vec2f velocity = new Vec2f(0, 0);
 
     public JumpPath(){
+        actionUnit = new ActionUnit();
     }
 
     public void addAction(boolean[] action){actionUnit.add(action);}
