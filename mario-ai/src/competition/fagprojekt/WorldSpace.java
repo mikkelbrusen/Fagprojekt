@@ -25,8 +25,6 @@ public class WorldSpace
 
     public void integrateObservation(Environment env) {
 
-        // TODO: Possibly extend the cells array
-
         // Mario's position in world space, in cell units
         Vec2i marioWorldPos = getMarioCellPos(env);
 
@@ -75,7 +73,7 @@ public class WorldSpace
         }
     }
 
-    private void expandWorldSpace() {
+    public void expandWorldSpace() {
         length = 2 * length;
         copyCells = cells;
         cells = new Cell[height][length];
@@ -97,27 +95,19 @@ public class WorldSpace
         return null; // Maybe log a warning here? Might not matter
     }
 
-
-
-    // All ids can be found GeneralizerLevenScene
-    CellType getCellType(byte[][] levelObs, int x, int y)
-    {
+    // All ids can be found GeneralizerLevelScene
+    CellType getCellType(byte[][] levelObs, int x, int y) { return intToCellType(levelObs[y][x]);}
+    CellType intToCellType(int n) {
         CellType type;
-        /*
-         *  typeid:
-         *  -60: Box
-         */
-        int v = levelObs[y][x];
-        switch (v) {
+        switch (n) {
             case 0:     type = CellType.Empty;
-                        break;
+                break;
 
             case 2:     type = CellType.Coin;
-                        break;
+                break;
 
             default:    type = CellType.Solid;
         }
-
         return type;
     }
 
@@ -157,5 +147,11 @@ public class WorldSpace
         return new Vec2i(
                 (int)(p.x / CellWidth),
                 (int)(p.y / CellHeight));
+    }
+
+    public Vec2i getSize() {
+        return new Vec2i(
+                cells[0].length,
+                cells.length);
     }
 }

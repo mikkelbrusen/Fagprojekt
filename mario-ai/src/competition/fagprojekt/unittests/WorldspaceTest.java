@@ -5,6 +5,7 @@ import ch.idsia.benchmark.tasks.BasicTask;
 import ch.idsia.benchmark.tasks.ReplayTask;
 import ch.idsia.tools.MarioAIOptions;
 import competition.fagprojekt.CellType;
+import competition.fagprojekt.Vec2i;
 import competition.fagprojekt.WorldSpace;
 import junit.framework.TestCase;
 import org.testng.annotations.AfterTest;
@@ -33,11 +34,23 @@ public class WorldspaceTest extends TestCase{
 
         assertNotNull(env);
         env.reset(marioAIOptions);
-
         WorldSpace worldspace = new WorldSpace();
         worldspace.integrateObservation(env);
-        worldspace.printWorldSpace();
+//        worldspace.printWorldSpace();
 
+        assertEquals(100, worldspace.getSize().x);
         assertEquals(worldspace.getCell(0,13).type, CellType.Walkable);
+
+        worldspace.expandWorldSpace();
+
+        assertEquals(200, worldspace.getSize().x);
+        assertEquals(worldspace.getCell(0,13).type, CellType.Walkable);
+
+
+        Vec2i vec = WorldSpace.getMarioCellPos(env);
+        System.out.printf("%d - %d", vec.x, vec.y);
+
+
+
     }
 }
