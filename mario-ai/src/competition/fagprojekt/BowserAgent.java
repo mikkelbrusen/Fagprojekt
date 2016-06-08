@@ -71,7 +71,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         Vec2f p0 = marioMove.lastFloatPos;
         Vec2f v0 = marioMove.velocity;
 
-
+        /*
         int w = 20;
         int h = 20;
         for(int i = 0; i < w; i++) {
@@ -86,12 +86,11 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
                 debug.drawCell(p1, color);
             }
         }
-
+        */
 
         debug.update();
 
         debug.drawCell(marioMove.lastCell);
-
         for(Vec2i rightMost : worldSpace.rightMostWalkables)
             debug.drawCell(rightMost, Color.gray);
 
@@ -122,11 +121,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         }
 
         if(currentActions != null) {
-            List<boolean[]> debugActions = new ArrayList<>();
-            for (int i = 0; i < 24; i++) {
-                debugActions.add(MarioMove.moveAction(1, i < MarioMove.MaxJumpFrames));
-            }
-            debug.drawActions(marioMove.lastFloatPos, marioMove.velocity, debugActions, Color.green);
+            debug.drawActions(marioMove.lastFloatPos, marioMove.velocity, currentActions, Color.magenta);
         }
 
         return action;
