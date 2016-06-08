@@ -88,12 +88,11 @@ public class Pathfinder {
             for (int j = 0; j < jumpTable.jumpPathTable[0].length; j++) {
                 JumpPath jp = jumpTable.jumpPathTable[i][j][velIndex];
                 if(jp!=null){
-                    System.out.println(i);
-                    Vec2i p = new Vec2i(i-xOffset,j-yOffset);
+                    Vec2i p = new Vec2i(parent.position.x+i-xOffset,parent.position.y+j-yOffset);
 
-                    //System.out.println(String.format("P.x = %d - P.y = %d",p.x,p.y));
                     if(isWalkable(p.x,p.y)){
                         PathNode node = new PathNode(p, parent, jp.actionUnit.actions.size(), heuristic, jp.velocity);
+                        node.actions = jp.actionUnit;
                         neighbours.add(node);
                     }
                 }
