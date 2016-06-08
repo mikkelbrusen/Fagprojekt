@@ -7,9 +7,9 @@ public class Fitness {
     int scoreTo;
     int heuristic;
 
-    public Fitness() {
-        this.scoreTo = 0;
-        this.heuristic = 0;
+    public Fitness(int scoreTo, int heuristic) {
+        this.scoreTo = scoreTo;
+        this.heuristic = heuristic;
     }
 
     public int getFitness() {

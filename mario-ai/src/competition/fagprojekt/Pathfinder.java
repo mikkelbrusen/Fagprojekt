@@ -65,6 +65,7 @@ public class Pathfinder {
         Vec2i pos = parent.position;
         Vec2f floatPos = WorldSpace.cellToFloat(pos);
 
+        int heuristic = end.x - pos.x;
 
         for(Vec2i p : getWalkables(pos)) {
             if (!isWalkable(p.x, p.y))
@@ -92,7 +93,7 @@ public class Pathfinder {
 
                     //System.out.println(String.format("P.x = %d - P.y = %d",p.x,p.y));
                     if(isWalkable(p.x,p.y)){
-                        PathNode node = new PathNode(p, parent, jp.actionUnit.actions.size() ,jp.velocity);
+                        PathNode node = new PathNode(p, parent, jp.actionUnit.actions.size(), heuristic, jp.velocity);
                         neighbours.add(node);
                     }
                 }
@@ -104,7 +105,7 @@ public class Pathfinder {
             newV.y = yVelocityAfterFalling(parent.marioVelocity, 1);
 
             int scoreForFalling = 10;
-            neighbours.add(new PathNode(new Vec2i(pos.x, pos.y + 1), parent, scoreForFalling, newV));
+            neighbours.add(new PathNode(new Vec2i(pos.x, pos.y + 1), parent, scoreForFalling, heuristic, newV));
         }
 
         return neighbours;
