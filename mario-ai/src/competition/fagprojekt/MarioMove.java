@@ -79,6 +79,23 @@ public class MarioMove {
         return -1; // TODO: What to return here? Implicit check for possibility?
     }
 
+    public static float xPositionAfterRun(float x0, float v0, int frames) {
+        float x = x0;
+        float v = v0;
+        for (int i = 0; i < frames; i++) {
+            // Accelerate sideways
+            v += RunAcceleration;
+
+            // Move
+            x += v;
+
+            // Apply inertia
+            v *= GroundInertia;
+        }
+
+        return x;
+    }
+
     public static Body1D bodyAfterJumpAndFall(float y, int jumpFrames, int totalFrames) {
         Body1D yBody = new Body1D(y, 0); // Jumping reset vertical velocity, so we can ignore it as input
         for(int i = 0; i < totalFrames; i++) {
