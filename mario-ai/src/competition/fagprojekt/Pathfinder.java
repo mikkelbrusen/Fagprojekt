@@ -99,7 +99,7 @@ public class Pathfinder {
                 }
             }
         }
-
+        /*
         if (isEmpty(pos.x, pos.y + 1)) { // Falling
             Vec2f newV = parent.marioVelocity.clone();
             newV.y = yVelocityAfterFalling(parent.marioVelocity, 1);
@@ -107,7 +107,7 @@ public class Pathfinder {
             int scoreForFalling = 10;
             neighbours.add(new PathNode(new Vec2i(pos.x, pos.y + 1), parent, scoreForFalling, heuristic, newV));
         }
-
+        */
         return neighbours;
     }
 
