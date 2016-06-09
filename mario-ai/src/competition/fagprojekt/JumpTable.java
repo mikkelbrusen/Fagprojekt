@@ -20,6 +20,8 @@ public class JumpTable implements Serializable{
 
     public static final String JUMP_TABLE_PATH = "jumptable.ser";
 
+    WorldSpace worldSpace;
+
     public static JumpTable getJumpTable(JumpPathfinder jumpPathfinder, boolean forceSerialize) {
         if (forceSerialize) {
             return serializeJumpTable(jumpPathfinder);
@@ -29,6 +31,10 @@ public class JumpTable implements Serializable{
     }
 
     private JumpTable(JumpPathfinder jumpPathfinder) {
+        worldSpace = jumpPathfinder.getWorldSpace();
+
+        Vec2i marioOffset = new Vec2i(xMax, yMax);
+
         jumpPathTable = new JumpPath[xRange][yRange][intervals];
         for (int i = xMin; i < xMax; i++) {
             for (int j = yMin; j < yMax; j++) {
@@ -37,11 +43,28 @@ public class JumpTable implements Serializable{
                     Vec2f end = new Vec2i(i, j).toVec2f();
                     start.x += 0.5f * WorldSpace.CellWidth;
                     end.x += 0.5f * WorldSpace.CellWidth;
+                    start = Vec2f.add(start, marioOffset.toVec2f());
+                    end = Vec2f.add(end, marioOffset.toVec2f());
 
                     Vec2f velocity = new Vec2f((-0.5f * intervals + k) * stepSize,0);
 
-                    JumpPath path = jumpPathfinder.searchAStar(start,velocity,end);
+                    // Insert block below
+                    Vec2i cellPosBelow = end.toCell();
+                    cellPosBelow.y += 1;
+                    Cell cellBelow = worldSpace.getCell(cellPosBelow.x, cellPosBelow.y);
+                    if (cellBelow != null)
+                        worldSpace.setCellType(cellPosBelow, CellType.Solid);
+                    else
+                        worldSpace.setCell(cellPosBelow, new Cell(CellType.Solid));
+
+                    JumpPath path = jumpPathfinder.searchAStar(start, velocity, end);
                     jumpPathTable[i+xRange/2][j+yRange/2][k] = path;
+
+                    // Remove block below
+                    if (cellBelow != null)
+                        worldSpace.setCellType(cellPosBelow, cellBelow.type);
+                    else
+                        worldSpace.setCell(cellPosBelow, null);
                 }
             }
         }
@@ -96,8 +119,8 @@ public class JumpTable implements Serializable{
         final int yOffset = yRange / 2;
         int vIx = getVelocityIdx(velX);
         boolean isBad =
-                x < xMin || x > xMax ||
-                y < yMin || y > yMax ||
+                x < xMin || x >= xMax ||
+                y < yMin || y >= yMax ||
                 vIx < 0 || vIx >= intervals;
 
         if (debug) {

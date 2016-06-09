@@ -2,10 +2,11 @@ package competition.fagprojekt;
 
 import ch.idsia.benchmark.mario.environments.Environment;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WorldSpace
+public class WorldSpace implements Serializable
 {
     // Cells are square, but this allows for any rectagular shape
     final static float CellWidth = 16f;
@@ -93,6 +94,14 @@ public class WorldSpace
         if(0 <= y && y < cells.length && 0 <= x && x < cells[0].length)
             return cells[y][x];
         return null; // Maybe log a warning here? Might not matter
+    }
+
+    public void setCellType(Vec2i p, CellType type) {
+        getCell(p.x, p.y).type = type;
+    }
+
+    public void setCell(Vec2i p, Cell cell) {
+        cells[p.y][p.x] = cell;
     }
 
     // All ids can be found GeneralizerLevelScene

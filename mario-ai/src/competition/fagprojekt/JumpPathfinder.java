@@ -157,4 +157,8 @@ public class JumpPathfinder
                 d.y < 1.001f && // Nudge for some SimMario imprecision
                 d.y > -6f; // Else slightly above
     }
+
+    public WorldSpace getWorldSpace() {
+        return worldSpace;
+    }
 }
