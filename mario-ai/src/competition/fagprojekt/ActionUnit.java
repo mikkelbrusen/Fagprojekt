@@ -20,12 +20,4 @@ public class ActionUnit {
     public void add(boolean[] action) {
         actions.add(action);
     }
-
-    public void reverseActionDirections(){
-        for (boolean[] a: actions) {
-            boolean temp = a[Environment.MARIO_KEY_LEFT];
-            a[Environment.MARIO_KEY_LEFT] = a[Environment.MARIO_KEY_RIGHT];
-            a[Environment.MARIO_KEY_RIGHT] = temp;
-        }
-    }
 }
