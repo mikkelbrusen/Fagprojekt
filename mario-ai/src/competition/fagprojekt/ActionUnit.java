@@ -14,6 +14,7 @@ import java.util.List;
 public class ActionUnit implements Serializable{
     public List<boolean[]> actions = new ArrayList<>();
     public Vec2f endPosition;
+    public Vec2f endVelocity;
 
     public ActionUnit() {
     }
@@ -26,6 +27,8 @@ public class ActionUnit implements Serializable{
         ActionUnit unit = new ActionUnit();
         if (endPosition != null)
             unit.endPosition = endPosition.clone();
+        if (endVelocity != null)
+            unit.endVelocity = endVelocity.clone();
         unit.actions.addAll(actions);
         return unit;
     }

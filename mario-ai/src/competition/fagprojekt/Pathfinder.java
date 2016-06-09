@@ -94,6 +94,7 @@ public class Pathfinder {
                         PathNode node = new PathNode(p, parent, jp.actionUnit.actions.size(), heuristic, jp.velocity);
                         node.actions = jp.actionUnit;
                         node.actions.endPosition = p.toVec2f();
+                        node.actions.endVelocity = jp.velocity.clone();
                         neighbours.add(node);
                     }
                 }
@@ -133,6 +134,7 @@ public class Pathfinder {
             for(int i = 0; i < runFrames; i++)
                 node.actions.add(MarioMove.moveAction(dir, false));
             node.actions.endPosition = end.toVec2f();
+            node.actions.endVelocity = newV.clone();
 
         } else {  // Is jump
             float y0f = parent.position.y * WorldSpace.CellHeight;
