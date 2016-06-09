@@ -2,6 +2,7 @@ package competition.fagprojekt;
 
 import ch.idsia.benchmark.mario.environments.Environment;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
  * A collection of actions.
  * One ActionUnit will contain the actions, for moving from one cell to another.
  */
-public class ActionUnit {
+public class ActionUnit implements Serializable{
     public List<boolean[]> actions = new ArrayList<>();
     public Vec2f endPosition;
 

@@ -20,9 +20,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
     JumpTable jumpTable;
     Pathfinder pathfinder;
     MarioMove marioMove;
-
     Vec2i targetPos;
-
     List<boolean[]> currentActions = new ArrayList<>();
 
     public BowserAgent()
@@ -141,7 +139,8 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         worldSpace = new WorldSpace();
         marioMove = new MarioMove();
         jumpPathfinder = new JumpPathfinder(worldSpace,marioMove);
-        jumpTable = new JumpTable(jumpPathfinder);
+        jumpTable = JumpTable.getJumpTable(jumpPathfinder, false);
+
         pathfinder = new Pathfinder(worldSpace, marioMove,jumpTable);
 
         Debug.initialize(MarioEnvironment.getInstance().getLevelScene(), worldSpace);

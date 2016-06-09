@@ -1,9 +1,11 @@
 package competition.fagprojekt;
 
+import java.io.*;
+
 /**
  * Created by Mikkel on 07/06/16.
  */
-public class JumpTable {
+public class JumpTable implements Serializable{
     final static float maxSpeed = 20f;
     public final static int intervals = 40;
     public final static float stepSize = maxSpeed / intervals;
@@ -16,7 +18,17 @@ public class JumpTable {
     int yMax = yRange/2;
     public JumpPath[][][] jumpPathTable;
 
-    public JumpTable(JumpPathfinder jumpPathfinder) {
+    public static final String JUMP_TABLE_PATH = "jumptable.ser";
+
+    public static JumpTable getJumpTable(JumpPathfinder jumpPathfinder, boolean forceSerialize) {
+        if (forceSerialize) {
+            return serializeJumpTable(jumpPathfinder);
+        }
+
+        return checkForSerializedFile(jumpPathfinder);
+    }
+
+    private JumpTable(JumpPathfinder jumpPathfinder) {
         jumpPathTable = new JumpPath[xRange][yRange][intervals];
         for (int i = xMin; i < xMax; i++) {
             for (int j = yMin; j < yMax; j++) {
@@ -40,6 +52,44 @@ public class JumpTable {
         float t = (v - -maxSpeed) / (maxSpeed - -maxSpeed);
         int idx = (int)t * (intervals-1);
         return idx;
+    }
+    public static JumpTable checkForSerializedFile(JumpPathfinder jumpPathfinder) {
+        File f = new File(JUMP_TABLE_PATH);
+        if(f.exists() && !f.isDirectory()) {
+            JumpTable jumpTable = null;
+            try {
+                FileInputStream fileIn = new FileInputStream(JUMP_TABLE_PATH);
+                ObjectInputStream in = new ObjectInputStream(fileIn);
+                jumpTable = (JumpTable) in.readObject();
+                in.close();
+                fileIn.close();
+            } catch(Exception e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+            System.out.println("Deserialized JumpTable");
+            return jumpTable;
+
+        } else {
+            return serializeJumpTable(jumpPathfinder);
+        }
+    }
+
+    public static JumpTable serializeJumpTable(JumpPathfinder jumpPathfinder) {
+        JumpTable jumpTable = new JumpTable(jumpPathfinder);
+        try {
+            FileOutputStream fileOut =
+                    new FileOutputStream(JUMP_TABLE_PATH);
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(jumpTable);
+            out.close();
+            fileOut.close();
+            System.out.printf("Serialized data is saved in " + JUMP_TABLE_PATH + "\n");
+            return jumpTable;
+        } catch(IOException i) {
+            i.printStackTrace();
+            return null;
+        }
     }
 
     public JumpPath findPath(int x, int y, float velX) {
