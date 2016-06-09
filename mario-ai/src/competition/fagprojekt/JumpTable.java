@@ -6,7 +6,7 @@ import java.io.*;
  * Created by Mikkel on 07/06/16.
  */
 public class JumpTable implements Serializable{
-    final static float maxSpeed = 20f;
+    final static float maxSpeed = 11f;
     public final static int intervals = 40;
     public final static float stepSize = maxSpeed / intervals;
 
