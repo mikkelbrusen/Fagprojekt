@@ -28,29 +28,27 @@ public class WorldspaceTest extends TestCase{
     }
 
     @Test
-    public void testCreateWorldspace_FR1() throws Exception {
+    public void testCreateWorldspace_FR1() {
         MarioAIOptions marioAIOptions = new MarioAIOptions("-vis off -rfw 100 -rfh 100");
         MarioEnvironment env = MarioEnvironment.getInstance();
+        WorldSpace worldspace = new WorldSpace();
 
         assertNotNull(env);
         env.reset(marioAIOptions);
-        WorldSpace worldspace = new WorldSpace();
         worldspace.integrateObservation(env);
 //        worldspace.printWorldSpace();
 
         assertEquals(100, worldspace.getSize().x);
-        assertEquals(worldspace.getCell(0,13).type, CellType.Walkable);
+        assertEquals(CellType.Walkable, worldspace.getCell(0,13).type);
 
         worldspace.expandWorldSpace();
 
         assertEquals(200, worldspace.getSize().x);
-        assertEquals(worldspace.getCell(0,13).type, CellType.Walkable);
+        assertEquals(CellType.Walkable, worldspace.getCell(0,13).type);
 
 
         Vec2i vec = WorldSpace.getMarioCellPos(env);
-        System.out.printf("%d - %d", vec.x, vec.y);
-
-
-
+        assertEquals(2, vec.x);
+        assertEquals(2, vec.y);
     }
 }
