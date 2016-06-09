@@ -24,6 +24,9 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
     Vec2i targetPos;
     ActionUnit currentUnit = new ActionUnit();
 
+    Body2D lastBody = new Body2D(new Vec2f(0, 0), new Vec2f(0, 0));
+    List<ActionUnit> lastPath = new ArrayList<>();
+
     public BowserAgent()
     {
         super("BowserAgent");
@@ -44,6 +47,9 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
                 if (path != null && !path.isEmpty()) {
                     targetPos = targetCell;
                     currentUnit = path.get(0).clone();
+
+                    lastBody = new Body2D(marioMove.lastFloatPos, marioMove.velocity);
+                    lastPath = path;
 
                     if (currentUnit.endPosition != null) {
                         Vec2i p1 = currentUnit.endPosition.toCell();
@@ -124,11 +130,18 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
             }
         }
 
-        /*
-        if(currentActions != null) {
-            debug.drawActions(marioMove.lastFloatPos, marioMove.velocity, currentActions, Color.magenta);
+        // Draw path via SimMario
+        SimMario debugMario = new SimMario(lastBody.position, lastBody.velocity, worldSpace);
+        Vec2f lastP = lastBody.position.clone();
+        for (ActionUnit unit : lastPath) {
+            for (boolean[] action : unit.actions) {
+                debugMario.move(action);
+
+                Color color = unit == lastPath.get(0) ? Color.blue : Color.magenta;
+                debug.drawLine(lastP, debugMario.body.position, color);
+                lastP = debugMario.body.position.clone();
+            }
         }
-        */
 
         return action;
     }
@@ -146,7 +159,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
     {
         worldSpace = new WorldSpace();
         marioMove = new MarioMove();
-        jumpPathfinder = new JumpPathfinder(worldSpace,marioMove);
+        jumpPathfinder = new JumpPathfinder(worldSpace, marioMove);
         jumpTable = JumpTable.getJumpTable(jumpPathfinder, false);
 
         pathfinder = new Pathfinder(worldSpace, marioMove,jumpTable);
