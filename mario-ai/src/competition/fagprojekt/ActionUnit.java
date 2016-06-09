@@ -21,4 +21,12 @@ public class ActionUnit implements Serializable{
     public void add(boolean[] action) {
         actions.add(action);
     }
+
+    public ActionUnit clone() {
+        ActionUnit unit = new ActionUnit();
+        if (endPosition != null)
+            unit.endPosition = endPosition.clone();
+        unit.actions.addAll(actions);
+        return unit;
+    }
 }

@@ -26,4 +26,10 @@ public class BUtil {
             }
         }
     }
+
+    public static void printActionUnit(ActionUnit unit) {
+        for (boolean[] b: unit.actions) {
+            System.out.println(BUtil.actionToString(b));
+        }
+    }
 }

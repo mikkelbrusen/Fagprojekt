@@ -48,11 +48,10 @@ public class JumpTable implements Serializable{
     }
 
     public int getVelocityIdx(float v) {
-        //int velIndex = (int)(v.x / jumpTable.stepSize);
         float t = (v - -maxSpeed) / (maxSpeed - -maxSpeed);
-        int idx = (int)(t * (float)(intervals-1));
-        return idx;
+        return (int)(t * (float)(intervals - 1));
     }
+
     public static JumpTable checkForSerializedFile(JumpPathfinder jumpPathfinder) {
         File f = new File(JUMP_TABLE_PATH);
         if(f.exists() && !f.isDirectory()) {
@@ -92,10 +91,26 @@ public class JumpTable implements Serializable{
         }
     }
 
-    public JumpPath findPath(int x, int y, float velX) {
-        if(xMin <= x && x <= xMax && yMin <= y && y <= yMax){
-            return jumpPathTable[x][y][(int)(velX/stepSize)];
+    public JumpPath findPathRelative(int x, int y, float velX, boolean debug) {
+        final int xOffset = xRange / 2;
+        final int yOffset = yRange / 2;
+        int vIx = getVelocityIdx(velX);
+        boolean isBad =
+                x < xMin || x > xMax ||
+                y < yMin || y > yMax ||
+                vIx < 0 || vIx >= intervals;
+
+        if (debug) {
+            System.out.printf("X=%d Y=%d V=%d\n", x + xOffset, y + yOffset, vIx);
         }
+
+        if (!isBad)
+            return jumpPathTable[x + xOffset][y + yOffset][vIx];
         return null;
+    }
+
+    public JumpPath findPathAbsolute(Vec2i pos, Vec2i origin, float velX, boolean debug) {
+        Vec2i relative = Vec2i.subtract(pos, origin);
+        return findPathRelative(relative.x, relative.y, velX, debug);
     }
 }

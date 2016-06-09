@@ -20,8 +20,9 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
     JumpTable jumpTable;
     Pathfinder pathfinder;
     MarioMove marioMove;
+
     Vec2i targetPos;
-    List<boolean[]> currentActions = new ArrayList<>();
+    ActionUnit currentUnit = new ActionUnit();
 
     public BowserAgent()
     {
@@ -35,23 +36,28 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
 
        // worldSpace.printWorldSpace();
 
-        if(worldSpace.rightMostWalkables.isEmpty())
-            currentActions.add(MarioMove.newAction());
-
-        if (currentActions == null || currentActions.isEmpty()) {
+        if (currentUnit.actions.isEmpty()) {
             System.out.println(debug.frameCount + ": Recalculating path");
 
             for(Vec2i targetCell : worldSpace.rightMostWalkables) {
-                targetPos = targetCell;
-                List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastCell, marioMove.velocity, targetPos);
-                if (path == null || path.isEmpty()) {
-                    currentActions.add(MarioMove.newAction()); // Do nothing
-                    System.out.println("No path: " + marioMove.lastCell + " -> " + targetPos);
-                } else {
-                    for(ActionUnit unit : path) // TODO: Carry out one action unit, before recalculating. At least.
-                        currentActions.addAll(unit.actions);
+                List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastCell, marioMove.velocity, targetCell);
+                if (path != null && !path.isEmpty()) {
+                    targetPos = targetCell;
+                    currentUnit = path.get(0).clone();
 
-                    System.out.printf("========== %s -> %s ==========\n", marioMove.lastCell, targetPos);
+                    if (currentUnit.endPosition != null) {
+                        Vec2i p1 = currentUnit.endPosition.toCell();
+                        Vec2i p0 = marioMove.lastCell.clone();
+
+                        JumpPath jumpPath = jumpTable.findPathAbsolute(p1, p0, marioMove.velocity.x, true);
+                        if (jumpPath != null) {
+                            System.out.printf("Found Path: %s -> %s\n", p0, p1);
+                            BUtil.printActionUnit(jumpPath.actionUnit);
+                        }
+                    }
+
+                    System.out.printf("Velocity: %s\n", marioMove.velocity);
+                    System.out.printf("========== %s -> %s ==========\n", marioMove.lastCell, targetCell);
                     for (ActionUnit unit : path) {
                         System.out.printf("Unit to %s:\n", unit.endPosition == null ? "(x, x)" : unit.endPosition.toCell());
                         for (boolean[] a : unit.actions)
@@ -63,11 +69,11 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
             }
         }
 
-        action = currentActions.get(0);
-        currentActions.remove(0);
+        if (currentUnit.actions.isEmpty())
+            currentUnit.actions.add(MarioMove.newAction());
 
-        Vec2f p0 = marioMove.lastFloatPos;
-        Vec2f v0 = marioMove.velocity;
+        action = currentUnit.actions.get(0);
+        currentUnit.actions.remove(0);
 
         /*
         int w = 20;
@@ -101,7 +107,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
             Vec2i c1 = debug.debugCell;
             System.out.println("DEBUG: " + c0 + " -> " + c1);
 
-            List<ActionUnit> path = pathfinder.searchAStar(c0, v0, c1);
+            List<ActionUnit> path = pathfinder.searchAStar(c0, marioMove.velocity, c1);
 
             float y0f = c0.y * WorldSpace.CellHeight;
             float y1f = c1.y * WorldSpace.CellHeight;
@@ -118,9 +124,11 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
             }
         }
 
+        /*
         if(currentActions != null) {
             debug.drawActions(marioMove.lastFloatPos, marioMove.velocity, currentActions, Color.magenta);
         }
+        */
 
         return action;
     }
