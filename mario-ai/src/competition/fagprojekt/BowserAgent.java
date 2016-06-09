@@ -43,7 +43,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
                 List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastCell, marioMove.velocity, targetCell);
                 if (path != null && !path.isEmpty()) {
                     targetPos = targetCell;
-                    currentUnit = path.get(0);
+                    currentUnit = path.get(0).clone();
 
                     if (currentUnit.endPosition != null) {
                         Vec2i p1 = currentUnit.endPosition.toCell();

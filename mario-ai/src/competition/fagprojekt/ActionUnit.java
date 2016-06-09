@@ -21,6 +21,14 @@ public class ActionUnit {
         actions.add(action);
     }
 
+    public ActionUnit clone() {
+        ActionUnit unit = new ActionUnit();
+        if (endPosition != null)
+            unit.endPosition = endPosition.clone();
+        unit.actions.addAll(actions);
+        return unit;
+    }
+
     public void reverseActionDirections(){
         for (boolean[] a: actions) {
             boolean temp = a[Environment.MARIO_KEY_LEFT];
