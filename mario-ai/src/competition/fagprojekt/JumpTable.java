@@ -50,7 +50,7 @@ public class JumpTable implements Serializable{
     public int getVelocityIdx(float v) {
         //int velIndex = (int)(v.x / jumpTable.stepSize);
         float t = (v - -maxSpeed) / (maxSpeed - -maxSpeed);
-        int idx = (int)t * (intervals-1);
+        int idx = (int)(t * (float)(intervals-1));
         return idx;
     }
     public static JumpTable checkForSerializedFile(JumpPathfinder jumpPathfinder) {
