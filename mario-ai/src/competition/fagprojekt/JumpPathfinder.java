@@ -53,7 +53,7 @@ public class JumpPathfinder
                 break;
             }
 
-            open.addAll(getNeighbours(current, end));
+            open.addAll(getNeighbours(current,start, end));
         }
 
         if (!hasFoundEnd) {
@@ -77,7 +77,7 @@ public class JumpPathfinder
         return path;
     }
 
-    List<JumpPathNode> getNeighbours(JumpPathNode parent, Vec2f end) {
+    List<JumpPathNode> getNeighbours(JumpPathNode parent, Vec2f start, Vec2f end) {
         // Left, Right, Down, Jump, Speed
         final boolean[][] possibleActions = {
                 { false, false, false, false, false },
@@ -127,6 +127,12 @@ public class JumpPathfinder
             // Encourage falling if below
             if (!action[Environment.MARIO_KEY_JUMP] && p.y < end.y) // Above
                 heuristic -= 2f;
+
+            // Encourage only moving in the direction of the target
+            if(start.x<end.x && action[Environment.MARIO_KEY_LEFT])
+                heuristic +=3f;
+            else if(start.x>end.x && action[Environment.MARIO_KEY_RIGHT])
+                heuristic +=3f;
 
             // Discard impossible options
             final float nudge = 1f; // Room of error for floating calculations
