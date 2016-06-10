@@ -32,6 +32,10 @@ public class JumpPathNode implements Comparable<JumpPathNode>
         this.stoppedJumping = parent.stoppedJumping || !action[Environment.MARIO_KEY_JUMP];
         this.action = new boolean[Environment.numberOfKeys];
         System.arraycopy(action, 0, this.action, 0, action.length);
+
+        // Enforce no more than 7 frames of jumps
+        if (action[Environment.MARIO_KEY_JUMP] && simMario.jumpTime == 0)
+            this.stoppedJumping = true;
     }
 
     @Override
