@@ -11,4 +11,12 @@ public class Body2D {
         this.position = position.clone();
         this.velocity = velocity.clone();
     }
+
+    public boolean equals(Object other) {
+        if (!(other instanceof Body2D)) {
+            return false;
+        }
+        Body2D rhs = (Body2D) other;
+        return this.position.equals(rhs.position) && this.velocity.equals(rhs.velocity);
+    }
 }

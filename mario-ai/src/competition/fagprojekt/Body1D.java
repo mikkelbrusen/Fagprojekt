@@ -8,4 +8,12 @@ public class Body1D {
         this.position = position;
         this.velocity = velocity;
     }
+
+    public boolean equals(Object other) {
+        if (!(other instanceof Body1D)) {
+            return false;
+        }
+        Body1D rhs = (Body1D) other;
+        return this.position == rhs.position && this.velocity == rhs.velocity;
+    }
 }
