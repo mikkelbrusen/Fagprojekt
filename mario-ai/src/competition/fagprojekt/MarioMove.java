@@ -13,16 +13,17 @@ public class MarioMove {
     public static final float JumpSpeed = -1.89f;
     public static final int MaxJumpFrames = 7;
 
-    public Vec2i lastCell = new Vec2i(0, 0);
-    public Vec2f lastFloatPos = new Vec2f(0, 0);
+    public Vec2i lastCell;
+    public Vec2f lastFloatPos;
 
-    public Vec2f velocity = new Vec2f(0, 0);
+    public Vec2f velocity;
 
     public void integrateObservation(Environment env) {
         Vec2i marioPos = WorldSpace.getMarioCellPos(env);
         Vec2f floatPos = WorldSpace.getMarioFloatPos(env);
 
-        velocity = Vec2f.subtract(floatPos, lastFloatPos);
+        velocity = lastFloatPos != null ? Vec2f.subtract(floatPos, lastFloatPos) : new Vec2f(0, 0);
+
         lastFloatPos = floatPos.clone();
         lastCell = marioPos.clone();
     }
