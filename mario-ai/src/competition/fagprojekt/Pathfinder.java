@@ -142,14 +142,7 @@ public class Pathfinder {
 
         for (int i = 0; i < runFrames; i++)
             node.actions.add(MarioMove.moveAction(dir, false));
-
-        scoreForEdge = runFrames; // TODO: Score run edge
-
-        //PathNode node = new PathNode(p, parent, scoreForEdge, newV);
-        for(int i = 0; i < runFrames; i++)
-            node.actions.add(MarioMove.moveAction(dir, false));
-        node.actions.endPosition = end.toVec2f();
-
+        
         node.actions.endPosition = node.endBody.position.clone();
         node.actions.endVelocity = node.endBody.velocity.clone();
 
