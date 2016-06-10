@@ -118,7 +118,7 @@ public class JumpPathfinder
             // TODO: Maybe wrap into single function
             // Don't stop jumping the second we reach the correct height
             // (dist.y is lowest here)
-            Vec2f dist = Vec2f.subtract(end, Vec2f.add(p, v));
+            Vec2f dist = Vec2f.subtract(end, p);
             if (action[Environment.MARIO_KEY_JUMP])
                 dist.y *= 0.5f;
 
@@ -150,12 +150,11 @@ public class JumpPathfinder
     // maybe we should just always search the full iterations and take the
     // best possible found.
     boolean isEnd(JumpPathNode node, Vec2f end) {
-        Vec2f p = node.simMario.body.position.clone();
-        Vec2f v = node.simMario.body.velocity.clone();
-        Vec2f d = Vec2f.subtract(end, Vec2f.add(p, v));
-        return Math.abs(d.x) < 6f && // Close in x
-                d.y < 1.001f && // Nudge for some SimMario imprecision
-                d.y > -6f; // Else slightly above
+        Vec2f p0 = node.simMario.body.position.clone();
+        Vec2f p1 = end.clone();
+        Vec2f d = Vec2f.subtract(p1, p0);
+        return Math.abs(d.x) < 4f && // Close in x
+                d.y > -4f; // Else slightly above
     }
 
     public WorldSpace getWorldSpace() {
