@@ -8,7 +8,6 @@ import java.util.List;
  */
 public class JumpPath implements Serializable{
     ActionUnit actionUnit;
-    Vec2f velocity = new Vec2f(0, 0);
 
     public JumpPath(){
         actionUnit = new ActionUnit();
