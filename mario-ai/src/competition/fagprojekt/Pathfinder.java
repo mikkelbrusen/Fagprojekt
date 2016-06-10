@@ -93,13 +93,15 @@ public class Pathfinder {
                 if(jp!=null){
                     Vec2i p = new Vec2i(parent.position.x+i-xOffset,parent.position.y+j-yOffset);
 
-                    if(isWalkable(p.x,p.y)){
-                        PathNode node = new PathNode(p, parent, jp.actionUnit.actions.size(), heuristic,
-                                jp.actionUnit.endPosition, jp.actionUnit.endVelocity);
+                    if(isWalkable(p.x, p.y)){
+                        Vec2f endPosition = jp.actionUnit.endPosition.clone();
+                        endPosition = Vec2f.add(endPosition, parent.endBody.position);
+
+                        int score = jp.actionUnit.actions.size();
+                        PathNode node = new PathNode(p, parent, score, heuristic,
+                                endPosition, jp.actionUnit.endVelocity);
 
                         node.actions = jp.actionUnit;
-                        node.actions.endPosition = p.toVec2f();
-                        node.actions.endVelocity = jp.velocity.clone();
                         neighbours.add(node);
                     }
                 }
