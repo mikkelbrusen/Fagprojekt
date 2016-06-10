@@ -20,11 +20,14 @@ public class Pathfinder {
     // We have to return a list of moves, where a move
     // is defined as the move from one position to the next
     // eg. a jump or a run from one cell to the next
-    public List<ActionUnit> searchAStar(Vec2i start, Vec2f startVelocity, Vec2i end) {
+    public List<ActionUnit> searchAStar(Vec2f start, Vec2f startVelocity, Vec2i end) {
         Queue<PathNode> open = new PriorityQueue<>();
         List<Vec2i> closed = new LinkedList<>(); // TODO: Should be hash table for best complexity, but we need to override hashCode() then
-        PathNode current = new PathNode(start.clone());
-        current.marioVelocity = startVelocity.clone();
+        PathNode current = new PathNode(start.toCell());
+        current.endBody.velocity = startVelocity.clone();
+        current.endBody.position = start.clone();
+        current.actions.endVelocity = startVelocity.clone();
+        current.actions.endPosition = start.clone();
 
         boolean hasFoundEnd = false;
         closed.add(current.position.clone());
@@ -71,7 +74,7 @@ public class Pathfinder {
             if (!isWalkable(p.x, p.y))
                 continue;
             //System.out.println("Vel: "+parent.marioVelocity.x);
-            neighbours.add(createNode(p,parent,false, end));
+            neighbours.add(createNode(p, parent, end));
         }
 
         /*for(Vec2i p : getJumpables(floatPos, parent.marioVelocity)) {
@@ -83,17 +86,22 @@ public class Pathfinder {
 
         int xOffset = jumpTable.xRange/2;
         int yOffset = jumpTable.yRange/2;
-        int velIndex = jumpTable.getVelocityIdx(parent.marioVelocity.x);
+        int velIndex = jumpTable.getVelocityIdx(parent.endBody.velocity.x);
         for (int i = 0; i < jumpTable.jumpPathTable.length; i++) {
             for (int j = 0; j < jumpTable.jumpPathTable[0].length; j++) {
                 JumpPath jp = jumpTable.jumpPathTable[i][j][velIndex];
                 if(jp!=null){
                     Vec2i p = new Vec2i(parent.position.x+i-xOffset,parent.position.y+j-yOffset);
 
-                    if(isWalkable(p.x,p.y)){
-                        PathNode node = new PathNode(p, parent, jp.actionUnit.actions.size(), heuristic, jp.velocity);
+                    if(isWalkable(p.x, p.y)){
+                        Vec2f endPosition = jp.actionUnit.endPosition.clone();
+                        endPosition = Vec2f.add(endPosition, parent.endBody.position);
+
+                        int score = jp.actionUnit.actions.size();
+                        PathNode node = new PathNode(p, parent, score, heuristic,
+                                endPosition, jp.actionUnit.endVelocity);
+
                         node.actions = jp.actionUnit;
-                        node.actions.endPosition = p.toVec2f();
                         neighbours.add(node);
                     }
                 }
@@ -111,63 +119,43 @@ public class Pathfinder {
         return neighbours;
     }
 
-    public PathNode createNode(Vec2i p, PathNode parent, boolean isJump, Vec2i end){
+    public PathNode createNode(Vec2i p, PathNode parent, Vec2i end){
+        // TODO: Use SimMario?
+        // TODO: Optimize, very ineffecient
+        Vec2f p0 = parent.endBody.position.clone();
+        Vec2f v0 = parent.endBody.velocity.clone();
+
         // Calculate run actions
         int dir = p.x < parent.position.x ? -1 : 1;
-        int runFrames = framesToRunTo(parent.position, parent.marioVelocity, p);
+        int runFrames = framesToRunTo(p0.x, v0.x, p.toVec2f().x);
 
-        Vec2f newV = parent.marioVelocity.clone();
-        newV.x = xVelocityAfter(parent.marioVelocity, runFrames, dir);
+        Vec2f newV = parent.actions.endVelocity;
+        newV.x = xVelocityAfter(newV, runFrames, dir);
 
         PathNode node = new PathNode(p);
-        node.marioVelocity.x = newV.x;
+        node.endBody.velocity.x = newV.x;
+        node.endBody.position.x = MarioMove.xPositionAfterRun(p0.x, v0.x, runFrames);
         node.parent = parent;
 
-        int scoreForEdge;
+        int scoreForEdge = runFrames; // TODO: Score run edge;
         int heuristic = (end.x - p.x);
 
-        if(!isJump){
-            scoreForEdge = runFrames; // TODO: Score run edge
+        for (int i = 0; i < runFrames; i++)
+            node.actions.add(MarioMove.moveAction(dir, false));
 
-            //PathNode node = new PathNode(p, parent, scoreForEdge, newV);
-            for(int i = 0; i < runFrames; i++)
-                node.actions.add(MarioMove.moveAction(dir, false));
-            node.actions.endPosition = end.toVec2f();
-
-        } else {  // Is jump
-            float y0f = parent.position.y * WorldSpace.CellHeight;
-            float y1f = p.y * WorldSpace.CellHeight;
-
-            int jumpFrames = MarioMove.minimumJumpFramesToEndAtHeight(y0f, y1f);
-            int fallFrames = jumpFrames; // TODO: Actually calculate these too
-
-            int framesNeeded = Math.max(jumpFrames + fallFrames, runFrames);
-
-            Body1D yBody = MarioMove.bodyAfterJumpAndFall(y0f, jumpFrames, framesNeeded);
-            newV.y = yBody.velocity;
-            node.marioVelocity.y =  newV.y;
-
-            scoreForEdge = framesNeeded; // TODO: Weight properly
-
-            boolean doJump;
-            for(int i = 0; i < framesNeeded; i++) {
-                doJump = i < jumpFrames;
-                int moveDir = dir * (i < runFrames ? 1 : 0); // Might not run for all frames
-                node.actions.add(MarioMove.moveAction(moveDir, doJump));
-            }
-            Collections.reverse(node.actions.actions);
-        }
+        node.actions.endPosition = node.endBody.position.clone();
+        node.actions.endVelocity = node.endBody.velocity.clone();
 
         node.fitness.scoreTo = parent.fitness.scoreTo + scoreForEdge;
         node.fitness.heuristic = heuristic;
+
         return node;
     }
 
     // TODO: Refactor, to maybe use sign of difference
-    static int framesToRunTo(Vec2i p0, Vec2f v0, Vec2i p1) {
-        float v = v0.x;
-        float x = p0.x * WorldSpace.CellWidth;
-        float x1 = p1.x * WorldSpace.CellWidth;
+    static int framesToRunTo(float x0, float v0, float x1) {
+        float v = v0;
+        float x = x0;
         int t = 0;
         if(x < x1) { // Moving right
             while(x < x1) {
@@ -186,7 +174,6 @@ public class Pathfinder {
             }
         }
 
-        // t == 0, if on the same cell
         return t;
     }
 

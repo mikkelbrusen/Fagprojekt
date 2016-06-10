@@ -43,7 +43,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
             System.out.println(debug.frameCount + ": Recalculating path");
 
             for(Vec2i targetCell : worldSpace.rightMostWalkables) {
-                List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastCell, marioMove.velocity, targetCell);
+                List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastFloatPos, marioMove.velocity, targetCell);
                 if (path != null && !path.isEmpty()) {
                     targetPos = targetCell;
                     currentUnit = path.get(0).clone();
@@ -106,29 +106,6 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
 
         if(targetPos != null)
             debug.drawCell(targetPos, Color.green);
-
-        // Debug pathfinding
-        if(DebugInput.keysPressed[DebugInput.KEY_K]) {
-            Vec2i c0 = marioMove.lastCell;
-            Vec2i c1 = debug.debugCell;
-            System.out.println("DEBUG: " + c0 + " -> " + c1);
-
-            List<ActionUnit> path = pathfinder.searchAStar(c0, marioMove.velocity, c1);
-
-            float y0f = c0.y * WorldSpace.CellHeight;
-            float y1f = c1.y * WorldSpace.CellHeight;
-            int jumpFrames = MarioMove.minimumJumpFramesToEndAtHeight(y0f, y1f);
-            System.out.println("JumpFrames: " + jumpFrames);
-
-            if(path != null) {
-                for(int i = 0; i < path.size(); i++) {
-                    ActionUnit aFrame = path.get(i);
-                    for(int j = 0; j < aFrame.actions.size(); j++) {
-                        System.out.println(i + ": " + BUtil.actionToString(aFrame.actions.get(j)));
-                    }
-                }
-            }
-        }
 
         // Draw path via SimMario
         SimMario debugMario = new SimMario(lastBody.position, lastBody.velocity, worldSpace);
