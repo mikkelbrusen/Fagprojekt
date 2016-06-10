@@ -143,7 +143,7 @@ public class Pathfinder {
         for (int i = 0; i < runFrames; i++)
             node.actions.add(MarioMove.moveAction(dir, false));
 
-        scoreForEdge = runFrames + 7; // TODO: Score run edge
+        scoreForEdge = runFrames; // TODO: Score run edge
 
         //PathNode node = new PathNode(p, parent, scoreForEdge, newV);
         for(int i = 0; i < runFrames; i++)
