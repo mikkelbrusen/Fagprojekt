@@ -39,29 +39,16 @@ public final class Main
 {
 public static void main(String[] args)
 {
-//        final String argsString = "-vis on";
     final MarioAIOptions marioAIOptions = new MarioAIOptions(args);
-//        final Environment environment = new MarioEnvironment();
-        marioAIOptions.setAgent(new BowserAgent());
-//        final Agent agent = new ForwardAgent();
-//        final Agent agent = marioAIOptions.getAgent();
-//        final Agent a = AgentsPool.loadAgent("ch.idsia.controllers.agents.controllers.ForwardJumpingAgent");
+    marioAIOptions.setAgent(new BowserAgent());
+    marioAIOptions.setLevelRandSeed(0);
+    marioAIOptions.setLevelDifficulty(1);
+
     final BasicTask basicTask = new BasicTask(marioAIOptions);
-//        for (int i = 0; i < 10; ++i)
-//        {
-//            int seed = 0;
-//            do
-//            {
-//                marioAIOptions.setLevelDifficulty(i);
-//                marioAIOptions.setLevelRandSeed(seed++);
-    marioAIOptions.setMarioInvulnerable(true);
+
     basicTask.setOptionsAndReset(marioAIOptions);
-//    basicTask.runSingleEpisode(1);
-    basicTask.doEpisodes(1,true,1);
-//    System.out.println(basicTask.getEnvironment().getEvaluationInfoAsString());
-//            } while (basicTask.getEnvironment().getEvaluationInfo().marioStatus != Environment.MARIO_STATUS_WIN);
-//        }
-//
+    basicTask.runSingleEpisode(1);
+
     System.exit(0);
 }
 
