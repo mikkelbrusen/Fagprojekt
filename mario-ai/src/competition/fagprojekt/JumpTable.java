@@ -19,11 +19,13 @@ public class JumpTable implements Serializable{
     public JumpPath[][][] jumpPathTable;
 
     public static final String JUMP_TABLE_PATH = "jumptable.ser";
+    public static boolean forceNextSerialization = true;
 
     WorldSpace worldSpace;
 
     public static JumpTable getJumpTable(JumpPathfinder jumpPathfinder, boolean forceSerialize) {
-        if (forceSerialize) {
+        if (forceNextSerialization) {
+            forceNextSerialization = false;
             return serializeJumpTable(jumpPathfinder);
         }
 
