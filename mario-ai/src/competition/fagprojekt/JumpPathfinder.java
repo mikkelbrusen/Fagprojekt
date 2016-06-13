@@ -154,7 +154,7 @@ public class JumpPathfinder
         Vec2f p1 = end.clone();
         Vec2f d = Vec2f.subtract(p1, p0);
         return Math.abs(d.x) < 4f && // Close in x
-                d.y > -4f; // Else slightly above
+                d.y < 4f && d.y >= -0.05; // Else slightly above
     }
 
     public WorldSpace getWorldSpace() {
