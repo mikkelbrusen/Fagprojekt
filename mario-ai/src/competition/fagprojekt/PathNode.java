@@ -16,10 +16,10 @@ public class PathNode implements Comparable<PathNode> {
         this.parent = null;
         this.endBody = new Body2D(new Vec2f(0, 0), new Vec2f(0, 0));
         this.actions = new ActionUnit();
-        this.fitness = new Fitness(0, 0);
+        this.fitness = new Fitness();
     }
 
-    public PathNode(Vec2i position, PathNode parent, int scoreTo, int heuristic, Vec2f endPosition, Vec2f endVelocity) {
+    public PathNode(Vec2i position, PathNode parent, float scoreTo, float heuristic, Vec2f endPosition, Vec2f endVelocity) {
         this.position = position;
         this.parent = parent;
         this.endBody = new Body2D(endPosition, endVelocity);

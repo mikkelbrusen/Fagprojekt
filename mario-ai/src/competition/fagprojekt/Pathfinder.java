@@ -68,7 +68,7 @@ public class Pathfinder {
         Vec2i pos = parent.position;
         Vec2f floatPos = WorldSpace.cellToFloat(pos);
 
-        int heuristic = end.x - pos.x;
+        float heuristic = end.x - pos.x;
 
         for(Vec2i p : getWalkables(pos)) {
             if (!isWalkable(p.x, p.y))

@@ -11,14 +11,12 @@ public class JumpPathNode implements Comparable<JumpPathNode>
     public JumpPathNode parent;
 
     public boolean stoppedJumping;
-    public float heuristic;
-    public float scoreTo;
+    public Fitness fitness;
     public boolean[] action;
 
     public JumpPathNode(SimMario simMario) {
         this.parent = null;
-        this.scoreTo = 0;
-        this.heuristic = 0;
+        this.fitness = new Fitness();
         this.simMario = simMario;
         this.stoppedJumping = false;
         this.action = new boolean[Environment.numberOfKeys];
@@ -26,8 +24,7 @@ public class JumpPathNode implements Comparable<JumpPathNode>
 
     public JumpPathNode(SimMario simMario, JumpPathNode parent, boolean[] action, float scoreTo, float heuristic) {
         this.parent = parent;
-        this.scoreTo = scoreTo;
-        this.heuristic = heuristic;
+        this.fitness = new Fitness(scoreTo, heuristic);
         this.simMario = simMario;
         this.stoppedJumping = parent.stoppedJumping || !action[Environment.MARIO_KEY_JUMP];
         this.action = new boolean[Environment.numberOfKeys];
@@ -40,6 +37,6 @@ public class JumpPathNode implements Comparable<JumpPathNode>
 
     @Override
     public int compareTo(JumpPathNode o) {
-        return (scoreTo + heuristic) > (o.scoreTo + o.heuristic) ? 1 : -1;
+        return this.fitness.getFitness() > o.fitness.getFitness() ? 1 : -1;
     }
 }

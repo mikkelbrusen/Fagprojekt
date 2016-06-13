@@ -113,7 +113,7 @@ public class JumpPathfinder
             Vec2f v = newSimMario.body.velocity.clone();
 
             // Heuristic is in cell distance, score is in frames? Problem?
-            float score = 1 + parent.scoreTo;
+            float score = 1 + parent.fitness.scoreTo;
 
             // TODO: Maybe wrap into single function
             // Don't stop jumping the second we reach the correct height
