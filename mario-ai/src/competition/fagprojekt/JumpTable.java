@@ -8,7 +8,7 @@ import java.io.*;
 public class JumpTable implements Serializable{
     final static float maxSpeed = 11f;
     public final static int intervals = 40;
-    public final static float stepSize = maxSpeed / intervals;
+    public final static float stepSize = maxSpeed / (float)intervals;
 
     int xRange = 14;
     int yRange = 8;
@@ -41,6 +41,15 @@ public class JumpTable implements Serializable{
         for (int i = xMin; i < xMax; i++) {
             for (int j = yMin; j < yMax; j++) {
                 for (int k = 0; k < intervals; k++) {
+                    boolean inMario =
+                        i == 0 && j == 0 ||
+                        i == 0 && j == -1;
+                    boolean walkable =
+                        i == 1 && j == 0 ||
+                        i == -1 && j == 0;
+                    if (inMario || walkable)
+                        continue;
+
                     Vec2f start = new Vec2i(0, 0).toVec2f();
                     Vec2f end = new Vec2i(i, j).toVec2f();
                     start.x += 0.5f * WorldSpace.CellWidth;
