@@ -61,7 +61,9 @@ public class WorldSpace implements Serializable
                                 rightMostWalkables.clear();
                             if(x >= maxWalkableX) {
                                 maxWalkableX = x;
-                                rightMostWalkables.add(new Vec2i(x, y));
+                                Vec2i p = new Vec2i(x, y);
+                                if (!rightMostWalkables.contains(p))
+                                    rightMostWalkables.add(p);
                             }
 
                             cellType = CellType.Walkable;
