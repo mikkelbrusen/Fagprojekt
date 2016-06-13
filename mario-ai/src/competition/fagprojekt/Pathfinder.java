@@ -127,14 +127,15 @@ public class Pathfinder {
 
         // Calculate run actions
         int dir = p.x < parent.position.x ? -1 : 1;
-        int runFrames = framesToRunTo(p0.x, v0.x, p.toVec2f().x);
+        int runFrames = framesToRunTo(p0.x, v0.x, p.toVec2f().x + 8f);
 
         Vec2f newV = parent.actions.endVelocity;
         newV.x = xVelocityAfter(newV, runFrames, dir);
 
         PathNode node = new PathNode(p);
-        node.endBody.velocity.x = newV.x;
+        node.endBody.velocity = newV.clone();
         node.endBody.position.x = MarioMove.xPositionAfterRun(p0.x, v0.x, runFrames);
+        node.endBody.position.y = p0.y;
         node.parent = parent;
 
         int scoreForEdge = runFrames; // TODO: Score run edge;
