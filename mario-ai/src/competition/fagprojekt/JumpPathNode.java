@@ -2,6 +2,10 @@ package competition.fagprojekt;
 
 import ch.idsia.benchmark.mario.environments.Environment;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Created by max on 06/06/16.
  */
@@ -33,6 +37,26 @@ public class JumpPathNode implements Comparable<JumpPathNode>
         // Enforce no more than 7 frames of jumps
         if (action[Environment.MARIO_KEY_JUMP] && simMario.jumpTime == 0)
             this.stoppedJumping = true;
+    }
+
+    public void printPath() {
+        List<String> strs = new ArrayList<String>();
+
+        JumpPathNode n = this;
+        while (n.parent != null) {
+            String str = "";
+            if (n.action[Environment.MARIO_KEY_LEFT]) str += "A ";
+            if (n.action[Environment.MARIO_KEY_RIGHT]) str += "D ";
+            if (n.action[Environment.MARIO_KEY_JUMP]) str += "W ";
+            if (n.action[Environment.MARIO_KEY_DOWN]) str += "S ";
+            if (n.action[Environment.MARIO_KEY_SPEED]) str += "+ ";
+            strs.add(str);
+            n = n.parent;
+        }
+
+        Collections.reverse(strs);
+        for (String str : strs)
+            System.out.println(str);
     }
 
     @Override
