@@ -323,7 +323,7 @@ public class SimMario
         //System.out.println(String.format("(%d, %d): %s", x, y,
                 //cell == null ? "Null" : cell.type.toString()));
 
-        return cell != null && !worldSpace.isPassable(cell.type);
+        return cell != null && !WorldSpace.isPassable(cell.type);
     }
 
     public static List<Vec2i> cellsBlocked(Vec2f p) {

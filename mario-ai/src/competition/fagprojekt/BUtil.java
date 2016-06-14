@@ -33,4 +33,24 @@ public class BUtil {
             System.out.println(BUtil.actionToString(b));
         }
     }
+
+    public static void printWorldSpace(WorldSpace worldSpace)
+    {
+        Vec2i tableSize = worldSpace.getSize();
+
+         for(int i = 0; i < 16; i++) { // Row = Y
+            String line = String.format("%2d:", i);
+            for(int j = 0; j < tableSize.x; j++) { // Col = X
+                Cell c = worldSpace.getCell(j, i);
+                String v = c == null ? "." :
+                    c.type == CellType.Empty || c.type == CellType.Coin ? "0" :
+                    c.type == CellType.Walkable ? "X" : "1";
+
+                line += v + " ";
+            }
+            System.out.println(line);
+        }
+
+        System.out.println();
+    }
 }

@@ -4,6 +4,7 @@ import ch.idsia.benchmark.mario.environments.Environment;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class WorldSpace implements Serializable
@@ -12,17 +13,15 @@ public class WorldSpace implements Serializable
     final static float CELL_WIDTH = 16f;
     final static float CELL_HEIGHT = 16f;
 
-    public static int length = 50;
-    static int height = 100;
+    private Vec2i tableSize = new Vec2i(50, 100);
 
-    Cell[][] cells;
-    Cell[][] copyCells;
+    private Cell[][] cells;
 
-    int maxWalkableX = 0;
-    public List<Vec2i> rightMostWalkables = new ArrayList<>();
+    private int maxWalkableX = 0; // Largest x observed for a walkable
+    private List<Vec2i> rightMostWalkables = new ArrayList<>();
 
     public WorldSpace() {
-        cells = new Cell[height][length]; // TODO: Dynamic resizing
+        cells = new Cell[tableSize.y][tableSize.x]; // TODO: Dynamic resizing
     }
 
     public void integrateObservation(Environment env) {
@@ -35,39 +34,42 @@ public class WorldSpace implements Serializable
 
         byte[][] levelObs = env.getLevelSceneObservationZ(2);
 
-        if (marioWorldPos.x + levelObs[0].length >= length) {
+        if (marioWorldPos.x + levelObs[0].length >= tableSize.x) {
             expandWorldSpace();
         }
-        // TODO: Only perform observation check when reaching new x, for optimization
+
+        // Write observed level into WorldSpace
         for(int i = levelObs.length - 1; i >= 0; i--) { // Row = Y. Iterate bottom to top
             for(int j = 0; j < levelObs[0].length; j++) { // Col = X
                 int y = i - marioOffsetY + marioWorldPos.y;
                 int x = j - marioOffsetX + marioWorldPos.x;
 
-                if(x < 0 || y < 0)
-                    continue; // TODO: Make sure this is correct. We assume this is out of bounds
+                if(x < 0 || y < 0) // Out of bounds
+                    continue;
 
-                // TODO: Create method for converting int value to CellType
                 CellType cellType = getCellType(levelObs, j, i);
+
                 // Check if space is walkable
-                if(i != levelObs.length - 1) {
+                if (0 < i && i < levelObs.length - 1) { // Don't look OOB
                     CellType cellBelow = getCellType(levelObs, j, i + 1);
-                    if(i>0){
-                        CellType cellAbove = getCellType(levelObs, j, i - 1);
-                        if (isPassable(cellType) && !isPassable(cellBelow) && isPassable(cellAbove)) {
+                    CellType cellAbove = getCellType(levelObs, j, i - 1);
 
-                            // Update the right most walkable cells
-                            if(x > maxWalkableX)
-                                rightMostWalkables.clear();
-                            if(x >= maxWalkableX) {
-                                maxWalkableX = x;
-                                Vec2i p = new Vec2i(x, y);
-                                if (!rightMostWalkables.contains(p))
-                                    rightMostWalkables.add(p);
-                            }
+                    // A walkable is a passable cell, with a solid below and passable above
+                    if (isPassable(cellType) && !isPassable(cellBelow) && isPassable(cellAbove)) {
 
-                            cellType = CellType.Walkable;
+                        // Update the right most walkable cells
+                        if(x > maxWalkableX) {
+                            rightMostWalkables.clear();
                         }
+                        if(x >= maxWalkableX) {
+                            maxWalkableX = x;
+
+                            Vec2i p = new Vec2i(x, y);
+                            if (!rightMostWalkables.contains(p))
+                                rightMostWalkables.add(p);
+                        }
+
+                        cellType = CellType.Walkable;
                     }
                 }
 
@@ -76,26 +78,41 @@ public class WorldSpace implements Serializable
         }
     }
 
-    public void expandWorldSpace() {
-        length = 2 * length;
-        copyCells = cells;
-        cells = new Cell[height][length];
+    private void expandWorldSpace() {
+        tableSize.x = 2 * tableSize.x;
+        Cell[][] copyCells = cells;
+        cells = new Cell[tableSize.y][tableSize.x];
         for (int i = 0; i < cells.length; i++) {
             System.arraycopy(copyCells[i], 0, cells[i], 0, copyCells[i].length);
         }
-
     }
 
-    public boolean isPassable(CellType ct) {
-        return (ct == CellType.Empty ||
-                ct == CellType.Coin ||
-                ct == CellType.Walkable);
+    private CellType getCellType(byte[][] levelObs, int x, int y) {
+        return intToCellType(levelObs[y][x]);
     }
 
-    public Cell getCell(int x, int y) {
-        if(0 <= y && y < cells.length && 0 <= x && x < cells[0].length)
-            return cells[y][x];
-        return null; // Maybe log a warning here? Might not matter
+    // All ids can be found in GeneralizerLevelScene
+    private CellType intToCellType(int n) {
+        CellType type;
+        switch (n) {
+            case 0:
+                type = CellType.Empty;
+                break;
+
+            case 2:
+                type = CellType.Coin;
+                break;
+
+            default:
+                type = CellType.Solid;
+        }
+        return type;
+    }
+
+    public static boolean isPassable(CellType ct) {
+        return ct == CellType.Empty ||
+               ct == CellType.Coin ||
+               ct == CellType.Walkable;
     }
 
     public void setCellType(Vec2i p, CellType type) {
@@ -106,40 +123,21 @@ public class WorldSpace implements Serializable
         cells[p.y][p.x] = cell;
     }
 
-    // All ids can be found GeneralizerLevelScene
-    CellType getCellType(byte[][] levelObs, int x, int y) { return intToCellType(levelObs[y][x]);}
-    CellType intToCellType(int n) {
-        CellType type;
-        switch (n) {
-            case 0:     type = CellType.Empty;
-                break;
-
-            case 2:     type = CellType.Coin;
-                break;
-
-            default:    type = CellType.Solid;
-        }
-        return type;
+    public Cell getCell(int x, int y) {
+        if(0 <= y && y < cells.length && 0 <= x && x < cells[0].length)
+            return cells[y][x];
+        return null; // Maybe log a warning here? Might not matter
     }
 
-    public void printWorldSpace()
-    {
-         for(int i = 0; i < 16; i++) { // Row = Y
-            String line = String.format("%2d:", i);
-            for(int j = 0; j < length; j++) { // Col = X
-                Cell c = cells[i][j];
-                String v = c == null ? "." :
-                        (c.type == CellType.Empty || c.type == CellType.Coin ? "0" :
-                                (c.type == CellType.Walkable ? "X" : "1"));
-
-                line += v + " ";
-            }
-            System.out.println(line);
-        }
-
-        System.out.println();
+    public Vec2i getSize() {
+        return tableSize.clone();
     }
-    
+
+    public List<Vec2i> getRightMostWalkables() {
+        // Suggested best practice for returning lists without copying
+        return Collections.unmodifiableList(rightMostWalkables);
+    }
+
     public static Vec2i getMarioCellPos(Environment env) {
         Vec2f p = getMarioFloatPos(env);
         int x = (int)(p.x / CELL_WIDTH);
@@ -160,9 +158,8 @@ public class WorldSpace implements Serializable
                 (int)(p.y / CELL_HEIGHT));
     }
 
-    public Vec2i getSize() {
-        return new Vec2i(
-                cells[0].length,
-                cells.length);
+    // Test
+    public void testExpandWorldSpace() {
+        expandWorldSpace();
     }
 }

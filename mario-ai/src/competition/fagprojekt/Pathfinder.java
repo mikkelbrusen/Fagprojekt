@@ -107,7 +107,7 @@ public class Pathfinder {
                 for (Vec2i c : jp.collisionCells) {
                     Vec2i cp = Vec2i.add(c, p0);
                     Cell cell = worldSpace.getCell(cp.x, cp.y);
-                    if (cell != null && !worldSpace.isPassable(cell.type)) {
+                    if (cell != null && !WorldSpace.isPassable(cell.type)) {
                         anyCollision = true;
                         break;
                     }

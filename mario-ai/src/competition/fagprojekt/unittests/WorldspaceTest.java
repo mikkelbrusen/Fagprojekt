@@ -41,7 +41,7 @@ public class WorldspaceTest extends TestCase{
         assertEquals(100, worldspace.getSize().x);
         assertEquals(CellType.Walkable, worldspace.getCell(0,13).type);
 
-        worldspace.expandWorldSpace();
+        worldspace.testExpandWorldSpace();
 
         assertEquals(200, worldspace.getSize().x);
         assertEquals(CellType.Walkable, worldspace.getCell(0,13).type);
