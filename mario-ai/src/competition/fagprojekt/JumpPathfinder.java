@@ -176,6 +176,8 @@ public class JumpPathfinder
             else if(start.x > end.x && action[Environment.MARIO_KEY_RIGHT])
                 heuristic += 3f;
 
+            heuristic += newSimMario.body.velocity.x;
+
             if (!isUp && p.y - 1.01f > end.y)
                 heuristic += 100000;
 
