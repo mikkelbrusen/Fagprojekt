@@ -26,8 +26,6 @@ public class Pathfinder {
         Queue<PathNode> open = new PriorityQueue<>();
         List<Vec2i> closed = new LinkedList<>(); // TODO: Should be hash table for best complexity, but we need to override hashCode() then
         PathNode current = new PathNode(start.toCell());
-        current.endBody.velocity = startVelocity.clone();
-        current.endBody.position = start.clone();
         current.actions.endVelocity = startVelocity.clone();
         current.actions.endPosition = start.clone();
 
@@ -99,7 +97,9 @@ public class Pathfinder {
             for (int j = 0; j < jumpTable.jumpPathTable[0].length; j++) {
                 Vec2i p0 = parent.position.clone();
                 Vec2i p1 = new Vec2i(p0.x + i - xOffset, p0.y + j - yOffset);
-                JumpPath jp = jumpTable.findPathRelative(i - xOffset, j - yOffset, parent.endBody.velocity.x, false);
+                JumpPath jp = jumpTable.findPathRelative(i - xOffset, j - yOffset,
+                        parent.actions.endVelocity.x, false);
+
                 if (jp == null)
                     continue;
 
@@ -120,7 +120,7 @@ public class Pathfinder {
                     continue;
 
                 Vec2f endPosition = jp.actionUnit.endPosition.clone();
-                endPosition = Vec2f.add(endPosition, parent.endBody.position);
+                endPosition = Vec2f.add(endPosition, parent.actions.endPosition);
 
                 int score = jp.actionUnit.actions.size();
                 PathNode node = new PathNode(p1, parent, score, heuristic,
@@ -128,6 +128,7 @@ public class Pathfinder {
 
                 node.actions = jp.actionUnit.clone();
                 node.actions.endPosition = endPosition.clone();
+                //node.actions.endVelocity = jp.actionUnit.endVelocity.clone();
 
                 neighbours.add(node);
             }
@@ -147,8 +148,8 @@ public class Pathfinder {
     public PathNode createNode(Vec2i p, PathNode parent, Vec2i end){
         // TODO: Use SimMario?
         // TODO: Optimize, very ineffecient
-        Vec2f p0 = parent.endBody.position.clone();
-        Vec2f v0 = parent.endBody.velocity.clone();
+        Vec2f p0 = parent.actions.endPosition.clone();
+        Vec2f v0 = parent.actions.endVelocity.clone();
         Vec2f p1 = p.toVec2f();
         p1.x += 0.5f * WorldSpace.CellWidth;
 
@@ -160,9 +161,9 @@ public class Pathfinder {
         newV.x = xVelocityAfter(newV, runFrames, dir);
 
         PathNode node = new PathNode(p);
-        node.endBody.velocity = newV.clone();
-        node.endBody.position.x = MarioMove.xPositionAfterRun(p0.x, v0.x, dir, runFrames);
-        node.endBody.position.y = p0.y;
+        node.actions.endVelocity = newV.clone();
+        node.actions.endPosition.x = MarioMove.xPositionAfterRun(p0.x, v0.x, dir, runFrames);
+        node.actions.endPosition.y = p0.y;
         node.parent = parent;
 
         int scoreForEdge = runFrames; // TODO: Score run edge;
@@ -172,9 +173,6 @@ public class Pathfinder {
         for (int i = 0; i < runFrames; i++)
             node.actions.add(MarioMove.moveAction(dir, false));
         
-        node.actions.endPosition = node.endBody.position.clone();
-        node.actions.endVelocity = node.endBody.velocity.clone();
-
         node.fitness.scoreTo = parent.fitness.scoreTo + scoreForEdge;
         node.fitness.heuristic = heuristic;
 
