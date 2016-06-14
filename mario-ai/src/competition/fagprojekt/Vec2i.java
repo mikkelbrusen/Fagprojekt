@@ -1,5 +1,7 @@
 package competition.fagprojekt;
 
+import org.apache.commons.math3.util.MathUtils;
+
 import java.io.Serializable;
 
 public class Vec2i implements Serializable {
@@ -45,8 +47,13 @@ public class Vec2i implements Serializable {
     }
 
     @Override
+    public int hashCode() {
+        // Two randomly chosen primes
+        return 15187 * MathUtils.hash(x) + 35423 * MathUtils.hash(y);
+    }
+
+    @Override
     public String toString() {
         return String.format("(%d, %d)", x, y);
     }
-
 }

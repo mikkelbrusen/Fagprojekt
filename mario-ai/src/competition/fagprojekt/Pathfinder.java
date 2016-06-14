@@ -21,7 +21,7 @@ public class Pathfinder {
     // eg. a jump or a run from one cell to the next
     public List<ActionUnit> searchAStar(Vec2f start, Vec2f startVelocity, Vec2i end) {
         Queue<PathNode> open = new PriorityQueue<>();
-        List<Vec2i> closed = new LinkedList<>(); // TODO: Should be hash table for best complexity, but we need to override hashCode() then
+        HashSet<Vec2i> closed = new HashSet<>();
         PathNode current = new PathNode(start.toCell());
         current.actions.endVelocity = startVelocity.clone();
         current.actions.endPosition = start.clone();
