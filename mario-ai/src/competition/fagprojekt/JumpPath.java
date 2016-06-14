@@ -1,6 +1,7 @@
 package competition.fagprojekt;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -8,6 +9,7 @@ import java.util.List;
  */
 public class JumpPath implements Serializable{
     ActionUnit actionUnit;
+    List<Vec2i> collisionCells = new ArrayList<>();
 
     public JumpPath(){
         actionUnit = new ActionUnit();
@@ -19,4 +21,8 @@ public class JumpPath implements Serializable{
         return actionUnit.actions;
     }
 
+    public void printBlocked() {
+        for (Vec2i c : collisionCells)
+            System.out.printf("B: %s\n", c);
+    }
 }
