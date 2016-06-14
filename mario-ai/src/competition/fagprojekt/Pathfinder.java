@@ -168,7 +168,6 @@ public class Pathfinder {
 
         int scoreForEdge = runFrames; // TODO: Score run edge;
         float heuristic = (end.x - p1.x);
-        heuristic -= 1f;
 
         for (int i = 0; i < runFrames; i++)
             node.actions.add(MarioMove.moveAction(dir, false));
