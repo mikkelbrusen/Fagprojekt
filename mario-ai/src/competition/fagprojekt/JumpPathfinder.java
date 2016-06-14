@@ -170,6 +170,12 @@ public class JumpPathfinder
                 heuristic = framesX + framesY;
             }
 
+            // Encourage only moving in the direction of the target
+            if(start.x < end.x && action[Environment.MARIO_KEY_LEFT])
+                heuristic += 3f;
+            else if(start.x > end.x && action[Environment.MARIO_KEY_RIGHT])
+                heuristic += 3f;
+
             if (!isUp && p.y - 1.01f > end.y)
                 heuristic += 100000;
 
@@ -198,7 +204,7 @@ public class JumpPathfinder
         Vec2f p0 = node.simMario.body.position.clone();
         Vec2f p1 = end.clone();
         Vec2f d = Vec2f.subtract(p1, p0);
-        return Math.abs(d.x) < 2f && // Close in x
+        return Math.abs(d.x) < 1f && // Close in x
                 Math.abs(d.y) < 4f && // d.y == 0f) &&
                 node.simMario.onGround;
     }
