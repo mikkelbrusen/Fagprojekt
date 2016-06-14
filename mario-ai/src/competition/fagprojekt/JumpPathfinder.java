@@ -104,8 +104,8 @@ public class JumpPathfinder
             Vec2f cp = current.simMario.body.position.clone();
             cp.x -= start.x;
             cp.y -= start.y;
-            cp.x += 0.5f * WorldSpace.CellWidth;
-            cp.y += WorldSpace.CellHeight;
+            cp.x += 0.5f * WorldSpace.CELL_WIDTH;
+            cp.y += WorldSpace.CELL_HEIGHT;
             path.collisionCells.addAll(SimMario.cellsBlocked(cp));
 
             current = current.parent;

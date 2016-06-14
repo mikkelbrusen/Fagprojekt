@@ -1,8 +1,6 @@
 package competition.fagprojekt;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Mikkel on 07/06/16.
@@ -40,8 +38,8 @@ public class JumpTable implements Serializable{
         Vec2i marioOffset = new Vec2i(xMax, yMax);
 
         Vec2f start = new Vec2i(0, 0).toVec2f();
-        start.x += 0.5f * WorldSpace.CellWidth;
-        start.y += WorldSpace.CellHeight;
+        start.x += 0.5f * WorldSpace.CELL_WIDTH;
+        start.y += WorldSpace.CELL_HEIGHT;
         start = Vec2f.add(start, marioOffset.toVec2f());
 
         // Insert block below
@@ -66,15 +64,15 @@ public class JumpTable implements Serializable{
                         continue;
 
                     Vec2f end = new Vec2i(i, j).toVec2f();
-                    end.x += 0.5f * WorldSpace.CellWidth;
-                    end.y += WorldSpace.CellHeight;
+                    end.x += 0.5f * WorldSpace.CELL_WIDTH;
+                    end.y += WorldSpace.CELL_HEIGHT;
                     end = Vec2f.add(end, marioOffset.toVec2f());
 
                     Vec2f velocity = new Vec2f((-0.5f * intervals + k) * stepSize,0);
 
                     // Insert block below
                     Vec2i cellPosBelow = end.toCell();
-                    //cellPosBelow.y += 1; // Not needed because of +CellHeight
+                    //cellPosBelow.y += 1; // Not needed because of +CELL_HEIGHT
                     Cell cellBelow = worldSpace.getCell(cellPosBelow.x, cellPosBelow.y);
                     if (cellBelow != null)
                         worldSpace.setCellType(cellPosBelow, CellType.Solid);

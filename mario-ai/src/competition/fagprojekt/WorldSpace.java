@@ -8,9 +8,10 @@ import java.util.List;
 
 public class WorldSpace implements Serializable
 {
-    // Cells are square, but this allows for any rectagular shape
-    final static float CellWidth = 16f;
-    final static float CellHeight = 16f;
+    // Cells are square, but this allows for any rectangular shape
+    final static float CELL_WIDTH = 16f;
+    final static float CELL_HEIGHT = 16f;
+
     public static int length = 50;
     static int height = 100;
 
@@ -25,7 +26,6 @@ public class WorldSpace implements Serializable
     }
 
     public void integrateObservation(Environment env) {
-
         // Mario's position in world space, in cell units
         Vec2i marioWorldPos = getMarioCellPos(env);
 
@@ -142,8 +142,8 @@ public class WorldSpace implements Serializable
     
     public static Vec2i getMarioCellPos(Environment env) {
         Vec2f p = getMarioFloatPos(env);
-        int x = (int)(p.x / CellWidth);
-        int y = (int)(p.y / CellHeight);
+        int x = (int)(p.x / CELL_WIDTH);
+        int y = (int)(p.y / CELL_HEIGHT);
         return new Vec2i(x, y);
     }
     public static Vec2f getMarioFloatPos(Environment env) {
@@ -152,12 +152,12 @@ public class WorldSpace implements Serializable
     }
 
     public static Vec2f cellToFloat(Vec2i p) {
-        return new Vec2f(p.x * CellWidth, p.y * CellHeight);
+        return new Vec2f(p.x * CELL_WIDTH, p.y * CELL_HEIGHT);
     }
     public static Vec2i floatToCell(Vec2f p) {
         return new Vec2i(
-                (int)(p.x / CellWidth),
-                (int)(p.y / CellHeight));
+                (int)(p.x / CELL_WIDTH),
+                (int)(p.y / CELL_HEIGHT));
     }
 
     public Vec2i getSize() {

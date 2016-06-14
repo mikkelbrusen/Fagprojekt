@@ -1,8 +1,5 @@
 package competition.fagprojekt;
 
-import competition.fagprojekt.Debug.Debug;
-
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -151,7 +148,7 @@ public class Pathfinder {
         Vec2f p0 = parent.actions.endPosition.clone();
         Vec2f v0 = parent.actions.endVelocity.clone();
         Vec2f p1 = p.toVec2f();
-        p1.x += 0.5f * WorldSpace.CellWidth;
+        p1.x += 0.5f * WorldSpace.CELL_WIDTH;
 
         // Calculate run actions
         int dir = p.x < parent.position.x ? -1 : 1;
