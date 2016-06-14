@@ -21,12 +21,14 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
     Pathfinder pathfinder;
     MarioMove marioMove;
 
-    Vec2i targetPos;
     ActionUnit currentUnit = new ActionUnit();
 
+    // Debug
+    Vec2i targetPos;
     Body2D lastBody = new Body2D(new Vec2f(0, 0), new Vec2f(0, 0));
     List<ActionUnit> lastPath = new ArrayList<>();
 
+    // Anti-stuck
     Vec2f floatPosLastFrame = new Vec2f(0, 0);
     int standstillFrames = 0;
 
@@ -36,31 +38,9 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         reset();
     }
 
-    boolean doOnce = true;
     public boolean[] getAction()
     {
         Debug debug = Debug.getInstance();
-
-        if (doOnce) {
-            doOnce = false;
-            for (int y = jumpTable.yMin; y < jumpTable.yMax; y++) {
-                String line = "";
-                for (int x = jumpTable.xMin; x < jumpTable.xMax; x++) {
-                    String c = " .";
-                    JumpPath jp = jumpTable.findPathRelative(x, y, 0, false);
-                    if (jp != null)
-                        c = String.format("%2d", jp.actionUnit.actions.size());
-                    if (x == 0 && y == 0)
-                        c = " x";
-                    line += c + " ";
-                }
-                System.out.println(line);
-            }
-        }
-
-        //System.exit(0);
-
-       // worldSpace.printWorldSpace();
 
         if (currentUnit.actions.isEmpty()) {
             //System.out.println(debug.frameCount + ": Recalculating path");

@@ -173,4 +173,20 @@ public class JumpTable implements Serializable{
         Vec2i relative = Vec2i.subtract(pos, origin);
         return findPathRelative(relative.x, relative.y, velX, debug);
     }
+
+    public void printJumpTable(float v) {
+       for (int y = yMin; y < yMax; y++) {
+            String line = "";
+            for (int x = xMin; x < xMax; x++) {
+                String c = " .";
+                JumpPath jp = findPathRelative(x, y, v, false);
+                if (jp != null)
+                    c = String.format("%2d", jp.actionUnit.actions.size());
+                if (x == 0 && y == 0)
+                    c = " x";
+                line += c + " ";
+            }
+            System.out.println(line);
+        }
+    }
 }
