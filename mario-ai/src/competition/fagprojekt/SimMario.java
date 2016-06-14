@@ -1,5 +1,8 @@
 package competition.fagprojekt;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by max on 31/05/16.
  *
@@ -321,5 +324,34 @@ public class SimMario
                 //cell == null ? "Null" : cell.type.toString()));
 
         return cell != null && !worldSpace.isPassable(cell.type);
+    }
+
+    public static List<Vec2i> cellsBlocked(Vec2f p) {
+        /*
+        Point layout:
+        0   1
+
+
+        3 ! 2
+        */
+
+        final float w = 4f;
+        final float h = 24f;
+
+        Vec2f p0 = Vec2f.add(p, new Vec2f(-w + 1f, -h + 1f));
+        Vec2f p1 = Vec2f.add(p, new Vec2f(w - 1f, -h + 1f));
+        Vec2f p2 = Vec2f.add(p, new Vec2f(w - 1f, -1f));
+        Vec2f p3 = Vec2f.add(p, new Vec2f(-w + 1f, -1f));
+
+        List<Vec2i> points = new ArrayList<>();
+        points.add(p0.toCell());
+        if (!points.contains(p1.toCell()))
+            points.add(p1.toCell());
+        if (!points.contains(p2.toCell()))
+            points.add(p2.toCell());
+        if (!points.contains(p3.toCell()))
+            points.add(p3.toCell());
+
+        return points;
     }
 }

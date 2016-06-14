@@ -80,12 +80,47 @@ public class MarioMove {
         return -1; // TODO: What to return here? Implicit check for possibility?
     }
 
-    public static float xPositionAfterRun(float x0, float v0, int frames) {
+    public static int minimumFramesToMoveToY(float y0, float v0, int jumpFramesLeft, float y1) {
+        int lowest = 10000;
+        for (int i = 0; i <= jumpFramesLeft; i++) {
+            int frames = minimumFramesToMoveToYWithJumpFrames(y0, v0, i, y1);
+            lowest = Math.min(lowest, frames);
+        }
+        return lowest;
+    }
+    public static int minimumFramesToMoveToYWithJumpFrames(float y0, float v0, int jumpFrames, float y1) {
+        float y = y0;
+        float v = v0;
+        int d = (int)Math.signum(y1 - y0);
+
+        int framesUsed = 0;
+        while ((d == 1 && y < y1) || (d == -1 && y > y1))
+        {
+            // If jumps left
+            if (jumpFrames > 0) {
+                v = jumpFrames * -1.9f;
+                jumpFrames--;
+            }
+
+            y += v;
+            v *= MarioMove.FallInertia;
+            v += MarioMove.Gravity;
+
+            framesUsed++;
+
+            if (framesUsed > 100)
+                break;
+        }
+
+        return framesUsed;
+    }
+
+    public static float xPositionAfterRun(float x0, float v0, int dir, int frames) {
         float x = x0;
         float v = v0;
         for (int i = 0; i < frames; i++) {
             // Accelerate sideways
-            v += RunAcceleration;
+            v += RunAcceleration * (float)dir;
 
             // Move
             x += v;

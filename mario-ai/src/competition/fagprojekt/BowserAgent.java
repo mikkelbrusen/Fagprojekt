@@ -2,7 +2,6 @@ package competition.fagprojekt;
 
 import ch.idsia.agents.Agent;
 import ch.idsia.agents.controllers.BasicMarioAIAgent;
-import ch.idsia.benchmark.mario.engine.sprites.Mario;
 import ch.idsia.benchmark.mario.environments.Environment;
 import ch.idsia.benchmark.mario.environments.MarioEnvironment;
 import competition.fagprojekt.Debug.Debug;
@@ -12,6 +11,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class BowserAgent extends BasicMarioAIAgent implements Agent
 {
@@ -27,30 +27,54 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
     Body2D lastBody = new Body2D(new Vec2f(0, 0), new Vec2f(0, 0));
     List<ActionUnit> lastPath = new ArrayList<>();
 
+    Vec2f floatPosLastFrame = new Vec2f(0, 0);
+    int standstillFrames = 0;
+
     public BowserAgent()
     {
         super("BowserAgent");
         reset();
     }
 
+    boolean doOnce = true;
     public boolean[] getAction()
     {
         Debug debug = Debug.getInstance();
 
+        if (doOnce) {
+            doOnce = false;
+            for (int y = jumpTable.yMin; y < jumpTable.yMax; y++) {
+                String line = "";
+                for (int x = jumpTable.xMin; x < jumpTable.xMax; x++) {
+                    String c = " .";
+                    JumpPath jp = jumpTable.findPathRelative(x, y, 0, false);
+                    if (jp != null)
+                        c = String.format("%2d", jp.actionUnit.actions.size());
+                    if (x == 0 && y == 0)
+                        c = " x";
+                    line += c + " ";
+                }
+                System.out.println(line);
+            }
+        }
+
+        //System.exit(0);
+
        // worldSpace.printWorldSpace();
 
         if (currentUnit.actions.isEmpty()) {
-            System.out.println(debug.frameCount + ": Recalculating path");
+            //System.out.println(debug.frameCount + ": Recalculating path");
 
             for(Vec2i targetCell : worldSpace.rightMostWalkables) {
                 List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastFloatPos, marioMove.velocity, targetCell);
                 if (path != null && !path.isEmpty()) {
-                    targetPos = targetCell;
+                    targetPos = targetCell.clone();
                     currentUnit = path.get(0).clone();
 
                     lastBody = new Body2D(marioMove.lastFloatPos, marioMove.velocity);
                     lastPath = path;
 
+                    /*
                     if (currentUnit.endPosition != null) {
                         Vec2i p1 = currentUnit.endPosition.toCell();
                         Vec2i p0 = marioMove.lastCell.clone();
@@ -61,17 +85,21 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
                             BUtil.printActionUnit(jumpPath.actionUnit);
                         }
                     }
+                    */
 
                     System.out.printf("Velocity: %s\n", marioMove.velocity);
-                    System.out.printf("========== %s -> %s ==========\n", marioMove.lastCell, targetCell);
+                    System.out.printf("========== %s -> %s ==========\n", marioMove.lastFloatPos.toCell(), targetCell);
                     for (ActionUnit unit : path) {
-                        System.out.printf("Unit to %s:\n", unit.endPosition == null ? "(x, x)" : unit.endPosition.toCell());
+                        Vec2i dp = unit.endPosition == null ? new Vec2i(0, 0) : Vec2i.add(marioMove.lastCell, unit.endPosition.toCell());
+                        System.out.printf("Unit to %s:\n", unit.endPosition == null ? "(x, x)" : dp);
                         for (boolean[] a : unit.actions)
                             System.out.printf("  %s\n", BUtil.actionToString(a));
                     }
 
                     break;
                 }
+                else
+                    pathfinder.lastPathCells.clear();
             }
         }
 
@@ -80,23 +108,6 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
 
         action = currentUnit.actions.get(0);
         currentUnit.actions.remove(0);
-
-        /*
-        int w = 20;
-        int h = 20;
-        for(int i = 0; i < w; i++) {
-            for(int j = 0; j < h; j++) {
-                int x = marioMove.lastCell.x - (w / 2) + j;
-                int y = marioMove.lastCell.y - (h / 2) + i;
-                Vec2i p1 = new Vec2i(x, y);
-
-                Color color = marioMove.canJumpToCell(p0, v0, p1)
-                        ? Color.blue : Color.black;
-
-                debug.drawCell(p1, color);
-            }
-        }
-        */
 
         debug.update();
 
@@ -118,6 +129,34 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
                 debug.drawLine(lastP, debugMario.body.position, color);
                 lastP = debugMario.body.position.clone();
             }
+        }
+
+        if (currentUnit.actions.isEmpty() && DebugInput.keysPressed[DebugInput.KEY_K]) {
+            Vec2i targetCell = debug.debugCell;
+            List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastFloatPos, marioMove.velocity, targetCell);
+            if (path != null && !path.isEmpty()) {
+                for (ActionUnit unit : path)
+                    currentUnit.actions.addAll(unit.actions);
+            }
+        }
+
+        for (Vec2i c : pathfinder.lastPathCells)
+            debug.drawCell(c, Color.ORANGE);
+
+        // Anti-stuck
+        if (floatPosLastFrame.equals(marioMove.lastFloatPos))
+            standstillFrames++;
+        else
+            standstillFrames = 0;
+        floatPosLastFrame = marioMove.lastFloatPos.clone();
+
+        if (standstillFrames > 24) {
+            Random rng = new Random((int)marioMove.lastFloatPos.x);
+            for (int i = 0; i < 5; i++) {
+                int dir = rng.nextInt() % 2 == 0 ? -1 : 1;
+                currentUnit.actions.add(MarioMove.moveAction(dir, true));
+            }
+            standstillFrames = 0;
         }
 
         return action;

@@ -1,6 +1,8 @@
 package competition.fagprojekt;
 
-public class Vec2i {
+import java.io.Serializable;
+
+public class Vec2i implements Serializable {
     public int x;
     public int y;
 

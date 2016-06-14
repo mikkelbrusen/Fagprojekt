@@ -128,7 +128,7 @@ public class WorldSpace implements Serializable
             String line = String.format("%2d:", i);
             for(int j = 0; j < length; j++) { // Col = X
                 Cell c = cells[i][j];
-                String v = c == null ? "-1" :
+                String v = c == null ? "." :
                         (c.type == CellType.Empty || c.type == CellType.Coin ? "0" :
                                 (c.type == CellType.Walkable ? "X" : "1"));
 

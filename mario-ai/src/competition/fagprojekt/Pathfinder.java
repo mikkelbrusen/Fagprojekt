@@ -11,6 +11,8 @@ public class Pathfinder {
     MarioMove marioMove;
     JumpTable jumpTable;
 
+    List<Vec2i> lastPathCells = new ArrayList<>(); // Debug
+
     public Pathfinder(WorldSpace worldSpace, MarioMove marioMove, JumpTable jumpTable) {
         this.worldSpace = worldSpace;
         this.marioMove = marioMove;
@@ -24,8 +26,6 @@ public class Pathfinder {
         Queue<PathNode> open = new PriorityQueue<>();
         List<Vec2i> closed = new LinkedList<>(); // TODO: Should be hash table for best complexity, but we need to override hashCode() then
         PathNode current = new PathNode(start.toCell());
-        current.endBody.velocity = startVelocity.clone();
-        current.endBody.position = start.clone();
         current.actions.endVelocity = startVelocity.clone();
         current.actions.endPosition = start.clone();
 
@@ -51,9 +51,10 @@ public class Pathfinder {
         if (!hasFoundEnd)
             return null;
 
+        lastPathCells.clear();
         List<ActionUnit> path = new ArrayList<>();
         while (current.parent != null) {
-            Debug.getInstance().drawCell(current.position, Color.green);
+            lastPathCells.add(current.position);
 
             path.add(current.actions);
             current = current.parent;
@@ -64,47 +65,72 @@ public class Pathfinder {
 
     List<PathNode> getNeighbours(PathNode parent, Vec2i end) {
         List<PathNode> neighbours = new ArrayList<>();
-
         Vec2i pos = parent.position;
-        Vec2f floatPos = WorldSpace.cellToFloat(pos);
 
         float heuristic = end.x - pos.x;
 
         for(Vec2i p : getWalkables(pos)) {
             if (!isWalkable(p.x, p.y))
                 continue;
-            //System.out.println("Vel: "+parent.marioVelocity.x);
             neighbours.add(createNode(p, parent, end));
         }
 
-        /*for(Vec2i p : getJumpables(floatPos, parent.marioVelocity)) {
+        /*
+        for (JumpPath jp : jumpTable.getAllJumpsFrom(parent.endBody.position, parent.endBody.velocity.x)) {
+            Vec2i p = jp.actionUnit.endPosition.toCell();
             if (!isWalkable(p.x, p.y))
                 continue;
 
-            neighbours.add(createNode(p,parent,true, end));
-        }*/
+            int score = jp.actionUnit.actions.size();
 
-        int xOffset = jumpTable.xRange/2;
-        int yOffset = jumpTable.yRange/2;
-        int velIndex = jumpTable.getVelocityIdx(parent.endBody.velocity.x);
+            PathNode node = new PathNode(p, parent, score, heuristic,
+                jp.actionUnit.endPosition, jp.actionUnit.endVelocity);
+
+            node.actions = jp.actionUnit;
+            neighbours.add(node);
+        }
+        */
+
+        int xOffset = jumpTable.xRange / 2;
+        int yOffset = jumpTable.yRange / 2;
         for (int i = 0; i < jumpTable.jumpPathTable.length; i++) {
             for (int j = 0; j < jumpTable.jumpPathTable[0].length; j++) {
-                JumpPath jp = jumpTable.jumpPathTable[i][j][velIndex];
-                if(jp!=null){
-                    Vec2i p = new Vec2i(parent.position.x+i-xOffset,parent.position.y+j-yOffset);
+                Vec2i p0 = parent.position.clone();
+                Vec2i p1 = new Vec2i(p0.x + i - xOffset, p0.y + j - yOffset);
+                JumpPath jp = jumpTable.findPathRelative(i - xOffset, j - yOffset,
+                        parent.actions.endVelocity.x, false);
 
-                    if(isWalkable(p.x, p.y)){
-                        Vec2f endPosition = jp.actionUnit.endPosition.clone();
-                        endPosition = Vec2f.add(endPosition, parent.endBody.position);
+                if (jp == null)
+                    continue;
 
-                        int score = jp.actionUnit.actions.size();
-                        PathNode node = new PathNode(p, parent, score, heuristic,
-                                endPosition, jp.actionUnit.endVelocity);
+                if(!isWalkable(p1.x, p1.y))
+                    continue;
 
-                        node.actions = jp.actionUnit;
-                        neighbours.add(node);
+                boolean anyCollision = false;
+                for (Vec2i c : jp.collisionCells) {
+                    Vec2i cp = Vec2i.add(c, p0);
+                    Cell cell = worldSpace.getCell(cp.x, cp.y);
+                    if (cell != null && !worldSpace.isPassable(cell.type)) {
+                        anyCollision = true;
+                        break;
                     }
                 }
+
+                if (anyCollision)
+                    continue;
+
+                Vec2f endPosition = jp.actionUnit.endPosition.clone();
+                endPosition = Vec2f.add(endPosition, parent.actions.endPosition);
+
+                int score = jp.actionUnit.actions.size();
+                PathNode node = new PathNode(p1, parent, score, heuristic,
+                        endPosition, jp.actionUnit.endVelocity);
+
+                node.actions = jp.actionUnit.clone();
+                node.actions.endPosition = endPosition.clone();
+                //node.actions.endVelocity = jp.actionUnit.endVelocity.clone();
+
+                neighbours.add(node);
             }
         }
         /*
@@ -122,30 +148,30 @@ public class Pathfinder {
     public PathNode createNode(Vec2i p, PathNode parent, Vec2i end){
         // TODO: Use SimMario?
         // TODO: Optimize, very ineffecient
-        Vec2f p0 = parent.endBody.position.clone();
-        Vec2f v0 = parent.endBody.velocity.clone();
+        Vec2f p0 = parent.actions.endPosition.clone();
+        Vec2f v0 = parent.actions.endVelocity.clone();
+        Vec2f p1 = p.toVec2f();
+        p1.x += 0.5f * WorldSpace.CellWidth;
 
         // Calculate run actions
         int dir = p.x < parent.position.x ? -1 : 1;
-        int runFrames = framesToRunTo(p0.x, v0.x, p.toVec2f().x);
+        int runFrames = framesToRunTo(p0.x, v0.x, p1.x);
 
-        Vec2f newV = parent.actions.endVelocity;
+        Vec2f newV = v0.clone();
         newV.x = xVelocityAfter(newV, runFrames, dir);
 
         PathNode node = new PathNode(p);
-        node.endBody.velocity.x = newV.x;
-        node.endBody.position.x = MarioMove.xPositionAfterRun(p0.x, v0.x, runFrames);
+        node.actions.endVelocity = newV.clone();
+        node.actions.endPosition.x = MarioMove.xPositionAfterRun(p0.x, v0.x, dir, runFrames);
+        node.actions.endPosition.y = p0.y;
         node.parent = parent;
 
         int scoreForEdge = runFrames; // TODO: Score run edge;
-        int heuristic = (end.x - p.x);
+        float heuristic = (end.x - p1.x);
 
         for (int i = 0; i < runFrames; i++)
             node.actions.add(MarioMove.moveAction(dir, false));
         
-        node.actions.endPosition = node.endBody.position.clone();
-        node.actions.endVelocity = node.endBody.velocity.clone();
-
         node.fitness.scoreTo = parent.fitness.scoreTo + scoreForEdge;
         node.fitness.heuristic = heuristic;
 
@@ -153,7 +179,7 @@ public class Pathfinder {
     }
 
     // TODO: Refactor, to maybe use sign of difference
-    static int framesToRunTo(float x0, float v0, float x1) {
+    public static int framesToRunTo(float x0, float v0, float x1) {
         float v = v0;
         float x = x0;
         int t = 0;
@@ -183,7 +209,7 @@ public class Pathfinder {
     static float xVelocityAfter(Vec2f v0, int frames, int dir) {
         float vx = v0.x;
         for(int i = 0; i < frames; i++) {
-            vx += MarioMove.RunAcceleration;
+            vx += MarioMove.RunAcceleration * (float)dir;
             vx *= MarioMove.GroundInertia;
         }
         return vx;

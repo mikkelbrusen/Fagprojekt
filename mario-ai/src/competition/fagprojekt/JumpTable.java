@@ -1,6 +1,8 @@
 package competition.fagprojekt;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Mikkel on 07/06/16.
@@ -8,7 +10,7 @@ import java.io.*;
 public class JumpTable implements Serializable{
     final static float maxSpeed = 11f;
     public final static int intervals = 40;
-    public final static float stepSize = maxSpeed / intervals;
+    public final static float stepSize = maxSpeed / (float)intervals;
 
     int xRange = 14;
     int yRange = 8;
@@ -37,22 +39,42 @@ public class JumpTable implements Serializable{
 
         Vec2i marioOffset = new Vec2i(xMax, yMax);
 
+        Vec2f start = new Vec2i(0, 0).toVec2f();
+        start.x += 0.5f * WorldSpace.CellWidth;
+        start.y += WorldSpace.CellHeight;
+        start = Vec2f.add(start, marioOffset.toVec2f());
+
+        // Insert block below
+        Vec2i cellPosBelowStart = start.toCell();
+        Cell cellBelowStart = worldSpace.getCell(cellPosBelowStart.x, cellPosBelowStart.y);
+        if (cellBelowStart != null)
+            worldSpace.setCellType(cellPosBelowStart, CellType.Solid);
+        else
+            worldSpace.setCell(cellPosBelowStart, new Cell(CellType.Solid));
+
         jumpPathTable = new JumpPath[xRange][yRange][intervals];
         for (int i = xMin; i < xMax; i++) {
             for (int j = yMin; j < yMax; j++) {
                 for (int k = 0; k < intervals; k++) {
-                    Vec2f start = new Vec2i(0, 0).toVec2f();
+                    boolean inMario =
+                        i == 0 && j == 0 ||
+                        i == 0 && j == -1;
+                    boolean walkable =
+                        i == 1 && j == 0 ||
+                        i == -1 && j == 0;
+                    if (inMario || walkable)
+                        continue;
+
                     Vec2f end = new Vec2i(i, j).toVec2f();
-                    start.x += 0.5f * WorldSpace.CellWidth;
                     end.x += 0.5f * WorldSpace.CellWidth;
-                    start = Vec2f.add(start, marioOffset.toVec2f());
+                    end.y += WorldSpace.CellHeight;
                     end = Vec2f.add(end, marioOffset.toVec2f());
 
                     Vec2f velocity = new Vec2f((-0.5f * intervals + k) * stepSize,0);
 
                     // Insert block below
                     Vec2i cellPosBelow = end.toCell();
-                    cellPosBelow.y += 1;
+                    //cellPosBelow.y += 1; // Not needed because of +CellHeight
                     Cell cellBelow = worldSpace.getCell(cellPosBelow.x, cellPosBelow.y);
                     if (cellBelow != null)
                         worldSpace.setCellType(cellPosBelow, CellType.Solid);
@@ -76,6 +98,12 @@ public class JumpTable implements Serializable{
                         worldSpace.setCell(cellPosBelow, null);
                 }
             }
+
+            // Remove block below
+            if (cellBelowStart != null)
+                worldSpace.setCellType(cellPosBelowStart, cellBelowStart.type);
+            else
+                worldSpace.setCell(cellPosBelowStart, null);
         }
     }
 
@@ -133,7 +161,7 @@ public class JumpTable implements Serializable{
                 vIx < 0 || vIx >= intervals;
 
         if (debug) {
-            System.out.printf("X=%d Y=%d V=%d\n", x + xOffset, y + yOffset, vIx);
+            //System.out.printf("X=%d Y=%d V=%d\n", x + xOffset, y + yOffset, vIx);
         }
 
         if (!isBad)

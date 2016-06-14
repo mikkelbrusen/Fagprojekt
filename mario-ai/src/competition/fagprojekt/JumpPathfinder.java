@@ -24,10 +24,33 @@ public class JumpPathfinder
     }
 
     public JumpPath searchAStar(Vec2f start, Vec2f startVelocity, Vec2f end) {
-        return searchAStar(start, startVelocity, end, false);
+        Vec2f upTarget = end.clone();
+        upTarget.y -= 16f;
+        JumpPath upPath = searchAStar(start, startVelocity, end, false, true, true);
+        if (upPath == null) {
+            //searchAStar(start, startVelocity, end, false, true);
+            return null;
+        }
+
+        boolean onGround = start.equals(end);
+        JumpPath downPath = searchAStar(upPath.actionUnit.endPosition, upPath.actionUnit.endVelocity, end, false, false, onGround);
+        if (downPath == null) {
+            searchAStar(upPath.actionUnit.endPosition, upPath.actionUnit.endVelocity, end, false, false, onGround);
+            return null;
+        }
+
+        JumpPath endPath = new JumpPath();
+        endPath.actionUnit.endVelocity = downPath.actionUnit.endVelocity.clone();
+        endPath.actionUnit.endPosition = downPath.actionUnit.endPosition.clone();
+        endPath.actionUnit.actions.addAll(upPath.getActions());
+        endPath.actionUnit.actions.addAll(downPath.getActions());
+        endPath.collisionCells.addAll(upPath.collisionCells);
+        //endPath.collisionCells.addAll(downPath.collisionCells);
+
+        return endPath;
     }
 
-    public JumpPath searchAStar(Vec2f start, Vec2f startVelocity, Vec2f end, boolean takeBest) {
+    public JumpPath searchAStar(Vec2f start, Vec2f startVelocity, Vec2f end, boolean takeBest, boolean isUp, boolean onGround) {
         Queue<JumpPathNode> open = new PriorityQueue<>();
         // No closed list, as every point is unique
 
@@ -35,6 +58,11 @@ public class JumpPathfinder
         JumpPathNode current = new JumpPathNode(
                 new SimMario(start, startVelocity, worldSpace)
         );
+        if (!isUp) {
+            current.stoppedJumping = true;
+            current.simMario.jumpTime = 0;
+            current.simMario.onGround = onGround;
+        }
 
         JumpPathNode bestSeen = null;
 
@@ -48,12 +76,14 @@ public class JumpPathfinder
             if (bestSeen == null || bestSeen.parent == null || current.compareTo(bestSeen) < 0)
                 bestSeen = current;
 
-            if (isEnd(current, end)) {
+            if (isUp && isEndUp(current, end) ||
+                    !isUp && isEnd(current, end))
+            {
                 hasFoundEnd = true;
                 break;
             }
 
-            open.addAll(getNeighbours(current,start, end));
+            open.addAll(getNeighbours(current,start, end, isUp));
         }
 
         if (!hasFoundEnd) {
@@ -64,20 +94,28 @@ public class JumpPathfinder
             System.out.println("Didn't find end, taking best");
         }
 
-
         JumpPath path = new JumpPath();
         path.actionUnit.endPosition = current.simMario.body.position.clone();
         path.actionUnit.endVelocity = current.simMario.body.velocity.clone();
 
         while (current.parent != null) {
             path.addAction(current.action);
+
+            Vec2f cp = current.simMario.body.position.clone();
+            cp.x -= start.x;
+            cp.y -= start.y;
+            cp.x += 0.5f * WorldSpace.CellWidth;
+            cp.y += WorldSpace.CellHeight;
+            path.collisionCells.addAll(SimMario.cellsBlocked(cp));
+
             current = current.parent;
         }
+
         Collections.reverse(path.actionUnit.actions);
         return path;
     }
 
-    List<JumpPathNode> getNeighbours(JumpPathNode parent, Vec2f start, Vec2f end) {
+    List<JumpPathNode> getNeighbours(JumpPathNode parent, Vec2f start, Vec2f end, boolean isUp) {
         // Left, Right, Down, Jump, Speed
         final boolean[][] possibleActions = {
                 { false, false, false, false, false },
@@ -119,25 +157,29 @@ public class JumpPathfinder
             // Don't stop jumping the second we reach the correct height
             // (dist.y is lowest here)
             Vec2f dist = Vec2f.subtract(end, p);
-            if (action[Environment.MARIO_KEY_JUMP])
-                dist.y *= 0.5f;
 
-            float heuristic = dist.magnitude();
+            float heuristic = dist.sqrMagnitude();
 
-            // Encourage falling if below
-            if (!action[Environment.MARIO_KEY_JUMP] && p.y < end.y) // Above
-                heuristic -= 2f;
+            if (isUp) {
+                int framesX = Pathfinder.framesToRunTo(p.x, v.x, end.x);
+
+                int jumpFrames = newSimMario.jumpTime;
+                int framesY = MarioMove.minimumFramesToMoveToY(p.y, v.y, jumpFrames, end.y);
+
+                //heuristic = Math.max(framesX, framesY);
+                heuristic = framesX + framesY;
+            }
 
             // Encourage only moving in the direction of the target
-            if(start.x<end.x && action[Environment.MARIO_KEY_LEFT])
-                heuristic +=3f;
-            else if(start.x>end.x && action[Environment.MARIO_KEY_RIGHT])
-                heuristic +=3f;
+            if(start.x < end.x && action[Environment.MARIO_KEY_LEFT])
+                heuristic += 3f;
+            else if(start.x > end.x && action[Environment.MARIO_KEY_RIGHT])
+                heuristic += 3f;
 
-            // Discard impossible options
-            final float nudge = 1f; // Room of error for floating calculations
-            if (p.y - nudge > end.y && v.y > 0f) // Below and moving down
-                heuristic += 10000f; // Impossible to recover from
+            heuristic += newSimMario.body.velocity.x;
+
+            if (!isUp && p.y - 1.01f > end.y)
+                heuristic += 100000;
 
             JumpPathNode n = new JumpPathNode(newSimMario, parent, action, score, heuristic);
             neighbours.add(n);
@@ -149,12 +191,24 @@ public class JumpPathfinder
     // TODO: Now that we use the best found path if this never returns true,
     // maybe we should just always search the full iterations and take the
     // best possible found.
+    boolean isEndUp(JumpPathNode node, Vec2f end) {
+        Vec2f p0 = node.simMario.body.position.clone();
+        Vec2f v0 = node.simMario.body.velocity.clone();
+        Vec2f p1 = end.clone();
+        Vec2f d = Vec2f.subtract(p1, p0);
+        return Math.abs(d.x) < 16f &&
+                d.y > -8f &&
+                //d.y > -6f && d.y < 16f &&
+                Math.abs(v0.y) < 8f; // End of jump
+    }
+
     boolean isEnd(JumpPathNode node, Vec2f end) {
         Vec2f p0 = node.simMario.body.position.clone();
         Vec2f p1 = end.clone();
         Vec2f d = Vec2f.subtract(p1, p0);
-        return Math.abs(d.x) < 4f && // Close in x
-                d.y < 4f && d.y >= -0.05; // Else slightly above
+        return Math.abs(d.x) < 1f && // Close in x
+                Math.abs(d.y) < 4f && // d.y == 0f) &&
+                node.simMario.onGround;
     }
 
     public WorldSpace getWorldSpace() {

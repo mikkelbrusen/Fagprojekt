@@ -13,8 +13,8 @@ import java.util.List;
  */
 public class ActionUnit implements Serializable{
     public List<boolean[]> actions = new ArrayList<>();
-    public Vec2f endPosition;
-    public Vec2f endVelocity;
+    public Vec2f endPosition = new Vec2f(0, 0);
+    public Vec2f endVelocity = new Vec2f(0, 0);
 
     public ActionUnit() {
     }
