@@ -24,13 +24,18 @@ public class JumpPathfinder
     }
 
     public JumpPath searchAStar(Vec2f start, Vec2f startVelocity, Vec2f end) {
-        JumpPath upPath = searchAStar(start, startVelocity, end, false, true);
-        if (upPath == null)
+        Vec2f upTarget = end.clone();
+        upTarget.y -= 16f;
+        JumpPath upPath = searchAStar(start, startVelocity, end, false, true, true);
+        if (upPath == null) {
+            //searchAStar(start, startVelocity, end, false, true);
             return null;
+        }
 
-        JumpPath downPath = searchAStar(upPath.actionUnit.endPosition, upPath.actionUnit.endVelocity, end, false, false);
+        boolean onGround = start.equals(end);
+        JumpPath downPath = searchAStar(upPath.actionUnit.endPosition, upPath.actionUnit.endVelocity, end, false, false, onGround);
         if (downPath == null) {
-            searchAStar(upPath.actionUnit.endPosition, upPath.actionUnit.endVelocity, end, false, false);
+            searchAStar(upPath.actionUnit.endPosition, upPath.actionUnit.endVelocity, end, false, false, onGround);
             return null;
         }
 
@@ -43,7 +48,7 @@ public class JumpPathfinder
         return endPath;
     }
 
-    public JumpPath searchAStar(Vec2f start, Vec2f startVelocity, Vec2f end, boolean takeBest, boolean isUp) {
+    public JumpPath searchAStar(Vec2f start, Vec2f startVelocity, Vec2f end, boolean takeBest, boolean isUp, boolean onGround) {
         Queue<JumpPathNode> open = new PriorityQueue<>();
         // No closed list, as every point is unique
 
@@ -54,6 +59,7 @@ public class JumpPathfinder
         if (!isUp) {
             current.stoppedJumping = true;
             current.simMario.jumpTime = 0;
+            current.simMario.onGround = onGround;
         }
 
         JumpPathNode bestSeen = null;
@@ -94,6 +100,7 @@ public class JumpPathfinder
             path.addAction(current.action);
             current = current.parent;
         }
+
         Collections.reverse(path.actionUnit.actions);
         return path;
     }
@@ -143,8 +150,15 @@ public class JumpPathfinder
 
             float heuristic = dist.sqrMagnitude();
 
-            if (isUp)
-                heuristic = Vec2f.subtract(end, Vec2f.add(p, v)).sqrMagnitude();
+            if (isUp) {
+                int framesX = Pathfinder.framesToRunTo(p.x, v.x, end.x);
+
+                int jumpFrames = newSimMario.jumpTime;
+                int framesY = MarioMove.minimumFramesToMoveToY(p.y, v.y, jumpFrames, end.y);
+
+                //heuristic = Math.max(framesX, framesY);
+                heuristic = framesX + framesY;
+            }
 
             if (!isUp && p.y - 1.01f > end.y)
                 heuristic += 100000;
@@ -164,18 +178,19 @@ public class JumpPathfinder
         Vec2f v0 = node.simMario.body.velocity.clone();
         Vec2f p1 = end.clone();
         Vec2f d = Vec2f.subtract(p1, p0);
-        return Math.abs(d.x) < 0.8f * WorldSpace.CellWidth &&
-                d.y > 10f && d.y < 32f &&
-                Math.abs(v0.y) < 4f; // End of jump
+        return Math.abs(d.x) < 16f &&
+                d.y > -8f &&
+                //d.y > -6f && d.y < 16f &&
+                Math.abs(v0.y) < 8f; // End of jump
     }
 
     boolean isEnd(JumpPathNode node, Vec2f end) {
         Vec2f p0 = node.simMario.body.position.clone();
         Vec2f p1 = end.clone();
         Vec2f d = Vec2f.subtract(p1, p0);
-        return Math.abs(d.x) < 4f && // Close in x
-               //Math.abs(d.y) < 4f &&
-               node.simMario.onGround;
+        return Math.abs(d.x) < 2f && // Close in x
+                Math.abs(d.y) < 4f && // d.y == 0f) &&
+                node.simMario.onGround;
     }
 
     public WorldSpace getWorldSpace() {
