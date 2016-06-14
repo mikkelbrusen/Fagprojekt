@@ -40,88 +40,38 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
 
     public boolean[] getAction()
     {
-        Debug debug = Debug.getInstance();
-
         if (currentUnit.actions.isEmpty()) {
             //System.out.println(debug.frameCount + ": Recalculating path");
 
             for(Vec2i targetCell : worldSpace.rightMostWalkables) {
                 List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastFloatPos, marioMove.velocity, targetCell);
                 if (path != null && !path.isEmpty()) {
-                    targetPos = targetCell.clone();
+                    targetPos = targetCell.clone(); // Debug
                     currentUnit = path.get(0).clone();
 
+                    // Debug
                     lastBody = new Body2D(marioMove.lastFloatPos, marioMove.velocity);
                     lastPath = path;
 
-                    /*
-                    if (currentUnit.endPosition != null) {
-                        Vec2i p1 = currentUnit.endPosition.toCell();
-                        Vec2i p0 = marioMove.lastCell.clone();
-
-                        JumpPath jumpPath = jumpTable.findPathAbsolute(p1, p0, marioMove.velocity.x, true);
-                        if (jumpPath != null) {
-                            System.out.printf("Found Path: %s -> %s\n", p0, p1);
-                            BUtil.printActionUnit(jumpPath.actionUnit);
-                        }
-                    }
-                    */
-
-                    System.out.printf("Velocity: %s\n", marioMove.velocity);
-                    System.out.printf("========== %s -> %s ==========\n", marioMove.lastFloatPos.toCell(), targetCell);
-                    for (ActionUnit unit : path) {
-                        Vec2i dp = unit.endPosition == null ? new Vec2i(0, 0) : Vec2i.add(marioMove.lastCell, unit.endPosition.toCell());
-                        System.out.printf("Unit to %s:\n", unit.endPosition == null ? "(x, x)" : dp);
-                        for (boolean[] a : unit.actions)
-                            System.out.printf("  %s\n", BUtil.actionToString(a));
-                    }
+                    //printFoundPath(path);
 
                     break;
                 }
-                else
+                else {
+                    // Debug
                     pathfinder.lastPathCells.clear();
+                    lastPath.clear();
+                }
             }
         }
 
+        // Fallback
         if (currentUnit.actions.isEmpty())
             currentUnit.actions.add(MarioMove.newAction());
 
+        // Consume next action
         action = currentUnit.actions.get(0);
         currentUnit.actions.remove(0);
-
-        debug.update();
-
-        debug.drawCell(marioMove.lastCell);
-        for(Vec2i rightMost : worldSpace.rightMostWalkables)
-            debug.drawCell(rightMost, Color.gray);
-
-        if(targetPos != null)
-            debug.drawCell(targetPos, Color.green);
-
-        // Draw path via SimMario
-        SimMario debugMario = new SimMario(lastBody.position, lastBody.velocity, worldSpace);
-        Vec2f lastP = lastBody.position.clone();
-        for (ActionUnit unit : lastPath) {
-            for (boolean[] action : unit.actions) {
-                debugMario.move(action);
-
-                Color color = unit == lastPath.get(0) ? Color.blue : Color.magenta;
-                debug.drawLine(lastP, debugMario.body.position, color);
-                lastP = debugMario.body.position.clone();
-            }
-        }
-
-        if (currentUnit.actions.isEmpty() && DebugInput.keysPressed[DebugInput.KEY_K]) {
-            Vec2i targetCell = debug.debugCell;
-            List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastFloatPos, marioMove.velocity, targetCell);
-            if (path != null && !path.isEmpty()) {
-                for (ActionUnit unit : path)
-                    currentUnit.actions.addAll(unit.actions);
-            }
-        }
-
-        for (Vec2i c : pathfinder.lastPathCells)
-            debug.drawCell(c, Color.ORANGE);
 
         // Anti-stuck
         if (floatPosLastFrame.equals(marioMove.lastFloatPos))
@@ -157,7 +107,6 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         marioMove = new MarioMove();
         jumpPathfinder = new JumpPathfinder(worldSpace, marioMove);
         jumpTable = JumpTable.getJumpTable(jumpPathfinder, false);
-
         pathfinder = new Pathfinder(worldSpace, marioMove,jumpTable);
 
         Debug.initialize(MarioEnvironment.getInstance().getLevelScene(), worldSpace);
@@ -169,6 +118,49 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
     }
     public void keyReleased(KeyEvent e) {
         DebugInput.keyReleased(e);
+    }
+
+    void updateDebug() {
+        Debug debug = Debug.getInstance();
+
+        debug.update();
+
+        debug.drawCell(marioMove.lastCell);
+        for(Vec2i rightMost : worldSpace.rightMostWalkables)
+            debug.drawCell(rightMost, Color.gray);
+
+        if(targetPos != null)
+            debug.drawCell(targetPos, Color.green);
+
+        // Draw path via SimMario
+        SimMario debugMario = new SimMario(lastBody.position, lastBody.velocity, worldSpace);
+        Vec2f lastP = lastBody.position.clone();
+        for (ActionUnit unit : lastPath) {
+            for (boolean[] action : unit.actions) {
+                debugMario.move(action);
+
+                Color color = unit == lastPath.get(0) ? Color.blue : Color.magenta;
+                debug.drawLine(lastP, debugMario.body.position, color);
+                lastP = debugMario.body.position.clone();
+            }
+        }
+
+        if (currentUnit.actions.isEmpty() && DebugInput.keysPressed[DebugInput.KEY_K]) {
+            Vec2i targetCell = debug.debugCell;
+            List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastFloatPos, marioMove.velocity, targetCell);
+            if (path != null && !path.isEmpty()) {
+                for (ActionUnit unit : path)
+                    currentUnit.actions.addAll(unit.actions);
+            }
+        }
+
+        for (Vec2i c : pathfinder.lastPathCells)
+            debug.drawCell(c, Color.ORANGE);
+    }
+
+    void printFoundPath(List<ActionUnit> path) {
+        System.out.printf("========== %s -> %s ==========\n", marioMove.lastFloatPos.toCell(), targetPos);
+        BUtil.printPath(path);
     }
 }
 

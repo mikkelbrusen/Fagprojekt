@@ -20,10 +20,11 @@ public class BUtil {
     }
 
     public static void printPath(List<ActionUnit> path) {
-        for (ActionUnit au : path) {
-            for (boolean[] b: au.actions) {
-                System.out.println(BUtil.actionToString(b));
-            }
+        for (ActionUnit unit : path) {
+            Vec2i dp = unit.endPosition == null ? new Vec2i(0, 0) : unit.endPosition.toCell();
+            System.out.printf("Unit to %s:\n", unit.endPosition == null ? "(x, x)" : dp);
+            for (boolean[] a : unit.actions)
+                System.out.printf("  %s\n", BUtil.actionToString(a));
         }
     }
 
