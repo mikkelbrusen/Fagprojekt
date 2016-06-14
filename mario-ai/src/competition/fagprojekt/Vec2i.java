@@ -37,6 +37,13 @@ public class Vec2i implements Serializable {
         return WorldSpace.cellToFloat(this);
     }
 
+    public Vec2f middleBottom() {
+        Vec2f p = toVec2f();
+        p.x += 0.5f * WorldSpace.CELL_WIDTH;
+        p.y += WorldSpace.CELL_HEIGHT;
+        return p;
+    }
+
     @Override
     public boolean equals(Object other) {
         if(!(other instanceof Vec2i))
