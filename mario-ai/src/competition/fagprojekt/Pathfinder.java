@@ -1,12 +1,11 @@
 package competition.fagprojekt;
 
 import java.util.*;
-import java.util.List;
 
 public class Pathfinder {
-    WorldSpace worldSpace;
-    MarioMove marioMove;
-    JumpTable jumpTable;
+    private WorldSpace worldSpace;
+    private MarioMove marioMove; // CHECK ME
+    private JumpTable jumpTable;
 
     List<Vec2i> lastPathCells = new ArrayList<>(); // Debug
 
@@ -16,19 +15,20 @@ public class Pathfinder {
         this.jumpTable = jumpTable;
     }
 
-    // We have to return a list of moves, where a move
-    // is defined as the move from one position to the next
-    // eg. a jump or a run from one cell to the next
+    // Returns a list of the actions needed, to move from start to end
     public List<ActionUnit> searchAStar(Vec2f start, Vec2f startVelocity, Vec2i end) {
         Queue<PathNode> open = new PriorityQueue<>();
-        HashSet<Vec2i> closed = new HashSet<>();
+        HashSet<Vec2i> closed = new HashSet<>(); // Constant time contains
+
+        // Create current
         PathNode current = new PathNode(start.toCell());
         current.actions.endVelocity = startVelocity.clone();
         current.actions.endPosition = start.clone();
 
-        boolean hasFoundEnd = false;
         closed.add(current.position.clone());
         open.add(current);
+
+        boolean hasFoundEnd = false;
         while (!open.isEmpty()) {
             current = open.poll();
             closed.add(current.position.clone());
@@ -48,15 +48,15 @@ public class Pathfinder {
         if (!hasFoundEnd)
             return null;
 
-        lastPathCells.clear();
-        List<ActionUnit> path = new ArrayList<>();
-        while (current.parent != null) {
-            lastPathCells.add(current.position);
+        lastPathCells.clear(); // Debug
 
-            path.add(current.actions);
+        List<ActionUnit> path = new LinkedList<>();
+        while (current.parent != null) {
+            lastPathCells.add(current.position); // Debug
+
+            path.add(0, current.actions); // Constant time
             current = current.parent;
         }
-        Collections.reverse(path);
         return path;
     }
 
@@ -64,8 +64,7 @@ public class Pathfinder {
         List<PathNode> neighbours = new ArrayList<>();
         Vec2i pos = parent.position;
 
-        float heuristic = end.x - pos.x;
-
+        // Add neighbours we can walk to
         for(Vec2i p : getWalkables(pos)) {
             if (!isWalkable(p.x, p.y))
                 continue;
@@ -103,23 +102,15 @@ public class Pathfinder {
                 if(!isWalkable(p1.x, p1.y))
                     continue;
 
-                boolean anyCollision = false;
-                for (Vec2i c : jp.collisionCells) {
-                    Vec2i cp = Vec2i.add(c, p0);
-                    Cell cell = worldSpace.getCell(cp.x, cp.y);
-                    if (cell != null && !WorldSpace.isPassable(cell.type)) {
-                        anyCollision = true;
-                        break;
-                    }
-                }
-
-                if (anyCollision)
+                if (jp.hasCollision(p0, worldSpace))
                     continue;
 
                 Vec2f endPosition = jp.actionUnit.endPosition.clone();
                 endPosition = Vec2f.add(endPosition, parent.actions.endPosition);
 
                 int score = jp.actionUnit.actions.size();
+                float heuristic = end.x - pos.x;
+
                 PathNode node = new PathNode(p1, parent, score, heuristic,
                         endPosition, jp.actionUnit.endVelocity);
 
@@ -130,15 +121,7 @@ public class Pathfinder {
                 neighbours.add(node);
             }
         }
-        /*
-        if (isEmpty(pos.x, pos.y + 1)) { // Falling
-            Vec2f newV = parent.marioVelocity.clone();
-            newV.y = yVelocityAfterFalling(parent.marioVelocity, 1);
 
-            int scoreForFalling = 10;
-            neighbours.add(new PathNode(new Vec2i(pos.x, pos.y + 1), parent, scoreForFalling, heuristic, newV));
-        }
-        */
         return neighbours;
     }
 

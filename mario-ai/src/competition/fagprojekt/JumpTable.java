@@ -1,6 +1,9 @@
 package competition.fagprojekt;
 
 import java.io.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by Mikkel on 07/06/16.
@@ -149,6 +152,7 @@ public class JumpTable implements Serializable{
         }
     }
 
+    // TODO: Remove debug parameter
     public JumpPath findPathRelative(int x, int y, float velX, boolean debug) {
         final int xOffset = xRange / 2;
         final int yOffset = yRange / 2;
@@ -158,18 +162,32 @@ public class JumpTable implements Serializable{
                 y < yMin || y >= yMax ||
                 vIx < 0 || vIx >= intervals;
 
-        if (debug) {
-            //System.out.printf("X=%d Y=%d V=%d\n", x + xOffset, y + yOffset, vIx);
-        }
+        if (isBad)
+            return null;
 
-        if (!isBad)
-            return jumpPathTable[x + xOffset][y + yOffset][vIx];
-        return null;
+        return jumpPathTable[x + xOffset][y + yOffset][vIx];
     }
 
     public JumpPath findPathAbsolute(Vec2i pos, Vec2i origin, float velX, boolean debug) {
         Vec2i relative = Vec2i.subtract(pos, origin);
         return findPathRelative(relative.x, relative.y, velX, debug);
+    }
+
+    // TODO: FIX: DOESNT FUCKNG WORK
+    public List<JumpPath> getRelativeJumpsForVelocity(float velocity) {
+        List<JumpPath> jumps = new LinkedList<>();
+        for (int i = xMin; i < xMax; i++) {
+            for (int j = yMin; j < yMax; j++) {
+                JumpPath jp = findPathRelative(i, j, velocity, false);
+
+                if (jp == null)
+                    continue;
+
+                jumps.add(jp);
+            }
+        }
+
+        return jumps;
     }
 
     public void printJumpTable(float v) {

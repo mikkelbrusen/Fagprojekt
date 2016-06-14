@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class JumpPath implements Serializable{
     ActionUnit actionUnit;
-    List<Vec2i> collisionCells = new ArrayList<>();
+    List<Vec2i> collisionCells = new ArrayList<>(); // TODO: Make private
 
     public JumpPath(){
         actionUnit = new ActionUnit();
@@ -19,6 +19,17 @@ public class JumpPath implements Serializable{
 
     public List<boolean[]> getActions(){
         return actionUnit.actions;
+    }
+
+    public boolean hasCollision(Vec2i origin, WorldSpace worldSpace) {
+         for (Vec2i c : collisionCells) {
+            Vec2i p1 = Vec2i.add(c, origin);
+            Cell cell = worldSpace.getCell(p1.x, p1.y);
+            if (cell != null && !WorldSpace.isPassable(cell.type)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void printBlocked() {
