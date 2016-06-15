@@ -58,8 +58,7 @@ public class JumpPathfinder
 
         if (!isUp) {
             // Ensure the down-path doesn't try jumping
-            current.stoppedJumping = true;
-            current.simMario.jumpTime = 0;
+            current.getSimMario().jumpTime = 0;
         }
 
         // If takeBest == true, this will be returned
@@ -72,7 +71,7 @@ public class JumpPathfinder
                 break;
             current = open.poll();
 
-            if (bestSeen.parent == null || current.compareTo(bestSeen) < 0)
+            if (bestSeen.getParent() == null || current.compareTo(bestSeen) < 0)
                 bestSeen = current;
 
             if (isEnd(current, end, isUp)) {
@@ -91,23 +90,23 @@ public class JumpPathfinder
             System.out.println("Didn't find end, taking best");
         }
 
-        ActionUnit actionUnit = new ActionUnit(current.simMario.body.position,
-                current.simMario.body.velocity);
+        ActionUnit actionUnit = new ActionUnit(current.getSimMario().body.position,
+                current.getSimMario().body.velocity);
 
         JumpPath path = new JumpPath(actionUnit);
 
-        while (current.parent != null) {
-            path.getActionUnit().push(current.action);
+        while (current.getParent() != null) {
+            path.getActionUnit().push(current.getAction());
 
             // TODO: Refactor and fix
-            Vec2f cp = current.simMario.body.position.clone();
+            Vec2f cp = current.getSimMario().body.position.clone();
             cp.x -= start.x;
             cp.y -= start.y;
             cp.x += 0.5f * WorldSpace.CELL_WIDTH;
             cp.y += WorldSpace.CELL_HEIGHT;
             path.addCollisionCells(SimMario.cellsBlocked(cp));
 
-            current = current.parent;
+            current = current.getParent();
         }
 
         return path;
@@ -138,7 +137,7 @@ public class JumpPathfinder
         List<JumpPathNode> neighbours = new ArrayList<>();
         for (boolean[] action : possibleActions) {
             // If the jump key has no effect, don't bother searching with it
-            if (parent.stoppedJumping && action[Environment.MARIO_KEY_JUMP])
+            if (parent.hasStoppedJumping() && action[Environment.MARIO_KEY_JUMP])
                 continue;
 
             // We only observe running actions
@@ -146,13 +145,13 @@ public class JumpPathfinder
                 continue;
 
             // Perform the action
-            SimMario newSimMario = parent.simMario.clone();
+            SimMario newSimMario = parent.getSimMario().clone();
             newSimMario.move(action);
 
             Vec2f p = newSimMario.body.position.clone();
             Vec2f v = newSimMario.body.velocity.clone();
 
-            float score = 1 + parent.fitness.scoreTo;
+            float score = 1 + parent.getFitness().scoreTo;
 
             // Calculate the heuristic
             Vec2f dist = Vec2f.subtract(end, p);
@@ -194,8 +193,8 @@ public class JumpPathfinder
     }
 
     boolean isEndUp(JumpPathNode node, Vec2f end) {
-        Vec2f p0 = node.simMario.body.position.clone();
-        Vec2f v0 = node.simMario.body.velocity.clone();
+        Vec2f p0 = node.getSimMario().body.position.clone();
+        Vec2f v0 = node.getSimMario().body.velocity.clone();
         Vec2f p1 = end.clone();
         Vec2f d = Vec2f.subtract(p1, p0);
         return Math.abs(d.x) < 16f && // Relatively close in x
@@ -204,12 +203,12 @@ public class JumpPathfinder
     }
 
     boolean isEndDown(JumpPathNode node, Vec2f end) {
-        Vec2f p0 = node.simMario.body.position.clone();
+        Vec2f p0 = node.getSimMario().body.position.clone();
         Vec2f p1 = end.clone();
         Vec2f d = Vec2f.subtract(p1, p0);
         return Math.abs(d.x) < 1f && // Close in x
                 Math.abs(d.y) < 4f && // To ensure not standing on another cell
-                node.simMario.onGround;
+                node.getSimMario().onGround;
     }
 
     public WorldSpace getWorldSpace() {

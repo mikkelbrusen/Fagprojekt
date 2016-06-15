@@ -11,31 +11,45 @@ import java.util.List;
  */
 public class JumpPathNode implements Comparable<JumpPathNode>
 {
-    public SimMario simMario;
-    public JumpPathNode parent;
-
-    public boolean stoppedJumping;
-    public Fitness fitness;
-    public boolean[] action;
+    private SimMario simMario;
+    private JumpPathNode parent;
+    private Fitness fitness;
+    private boolean[] action;
 
     public JumpPathNode(SimMario simMario, JumpPathNode parent, boolean[] action, float scoreTo, float heuristic) {
         this.parent = parent;
         this.fitness = new Fitness(scoreTo, heuristic);
         this.simMario = simMario;
-
-        // Move this into getter, remove field
-        this.stoppedJumping = parent != null && (parent.stoppedJumping || !action[Environment.MARIO_KEY_JUMP]);
-
         this.action = new boolean[Environment.numberOfKeys];
         System.arraycopy(action, 0, this.action, 0, action.length);
-
-        // Enforce no more than 7 frames of jumps
-        if (action[Environment.MARIO_KEY_JUMP] && simMario.jumpTime == 0)
-            this.stoppedJumping = true;
     }
 
     @Override
     public int compareTo(JumpPathNode o) {
         return this.fitness.getFitness() > o.fitness.getFitness() ? 1 : -1;
+    }
+
+    public SimMario getSimMario() {
+        return simMario;
+    }
+
+    public JumpPathNode getParent() {
+        return parent;
+    }
+
+    public boolean hasStoppedJumping() {
+        if (parent == null)
+            return false;
+        if (simMario.jumpTime == 0)
+            return true;
+        return parent.hasStoppedJumping() || !action[Environment.MARIO_KEY_JUMP];
+    }
+
+    public Fitness getFitness() {
+        return fitness;
+    }
+
+    public boolean[] getAction() {
+        return action;
     }
 }
