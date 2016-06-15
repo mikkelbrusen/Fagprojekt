@@ -11,7 +11,7 @@ public class JumpPathfinder
 {
     // As there is no closed list, we must limit the search.
     // If the end isn't found in this number of iterations, it's deemed impossible
-    final private int MAX_SEARCH_ITERATIONS = 2000;
+    final private int MAX_SEARCH_ITERATIONS = 5000;
 
     private WorldSpace worldSpace;
 
