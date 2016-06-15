@@ -63,7 +63,8 @@ public class JumpPathfinder
             current.simMario.jumpTime = 0;
         }
 
-        JumpPathNode bestSeen = current; // If takeBest == true, this will be returned
+        // If takeBest == true, this will be returned
+        JumpPathNode bestSeen = current;
 
         boolean hasFoundEnd = false;
         open.add(current);
@@ -75,14 +76,12 @@ public class JumpPathfinder
             if (bestSeen.parent == null || current.compareTo(bestSeen) < 0)
                 bestSeen = current;
 
-            if (isUp && isEndUp(current, end) ||
-                    !isUp && isEnd(current, end))
-            {
+            if (isEnd(current, end, isUp)) {
                 hasFoundEnd = true;
                 break;
             }
 
-            open.addAll(getNeighbours(current,start, end, isUp));
+            open.addAll(getNeighbours(current, start, end, isUp));
         }
 
         if (!hasFoundEnd) {
@@ -94,11 +93,13 @@ public class JumpPathfinder
         }
 
         JumpPath path = new JumpPath();
-        path.actionUnit = new ActionUnit(current.simMario.body.position, current.simMario.body.velocity);
+        path.actionUnit = new ActionUnit(current.simMario.body.position,
+                current.simMario.body.velocity);
 
         while (current.parent != null) {
             path.actionUnit.push(current.action);
 
+            // TODO: Refactor and fix
             Vec2f cp = current.simMario.body.position.clone();
             cp.x -= start.x;
             cp.y -= start.y;
@@ -185,9 +186,11 @@ public class JumpPathfinder
         return neighbours;
     }
 
-    // TODO: Now that we use the best found path if this never returns true,
-    // maybe we should just always search the full iterations and take the
-    // best possible found.
+    // The end criteria is different when searching up than when searching down
+    boolean isEnd(JumpPathNode node, Vec2f end, boolean isSearchingUp) {
+        return isSearchingUp ? isEndUp(node, end) : isEndDown(node, end);
+    }
+
     boolean isEndUp(JumpPathNode node, Vec2f end) {
         Vec2f p0 = node.simMario.body.position.clone();
         Vec2f v0 = node.simMario.body.velocity.clone();
@@ -199,7 +202,7 @@ public class JumpPathfinder
                 Math.abs(v0.y) < 8f; // End of jump
     }
 
-    boolean isEnd(JumpPathNode node, Vec2f end) {
+    boolean isEndDown(JumpPathNode node, Vec2f end) {
         Vec2f p0 = node.simMario.body.position.clone();
         Vec2f p1 = end.clone();
         Vec2f d = Vec2f.subtract(p1, p0);
