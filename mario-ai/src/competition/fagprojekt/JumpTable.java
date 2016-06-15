@@ -80,8 +80,13 @@ public class JumpTable implements Serializable{
 
                     // Subtract offset again
                     if (path != null) {
-                        path.getActionUnit().getEndPosition().x -= marioOffset.toVec2f().x;
-                        path.getActionUnit().getEndPosition().y -= marioOffset.toVec2f().y;
+                        Vec2f position = Vec2f.subtract(path.getActionUnit().getEndPosition(), getOffset());
+                        ActionUnit newUnit = new ActionUnit(position, path.getActionUnit().getEndVelocity());
+                        newUnit.addAll(path.getActions());
+                        JumpPath newPath = new JumpPath(newUnit);
+                        newPath.addCollisionCells(path.getCollisionCells());
+
+                        path = newPath;
                     }
 
                     jumpPathTable[i+xRange/2][j+yRange/2][k] = path;
