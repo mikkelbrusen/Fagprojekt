@@ -21,6 +21,7 @@ public class JumpPath implements Serializable{
         return actionUnit.actions;
     }
 
+    // Returns true if any collision cells, relative to origin, aren't passable
     public boolean hasCollision(Vec2i origin, WorldSpace worldSpace) {
          for (Vec2i c : collisionCells) {
             Vec2i p1 = Vec2i.add(c, origin);

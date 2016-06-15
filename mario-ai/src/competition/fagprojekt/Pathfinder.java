@@ -71,32 +71,17 @@ public class Pathfinder {
             neighbours.add(createWalkNode(p, parent, end));
         }
 
-        /*
-        for (JumpPath jp : jumpTable.getAllJumpsFrom(parent.endBody.position, parent.endBody.velocity.x)) {
-            Vec2i p = jp.actionUnit.endPosition.toCell();
-            if (!isWalkable(p.x, p.y))
-                continue;
-
-            int score = jp.actionUnit.actions.size();
-
-            PathNode node = new PathNode(p, parent, score, heuristic,
-                jp.actionUnit.endPosition, jp.actionUnit.endVelocity);
-
-            node.actions = jp.actionUnit;
-            neighbours.add(node);
-        }
-        */
-
+        // Check all possible jumps
         int xOffset = jumpTable.xRange / 2;
         int yOffset = jumpTable.yRange / 2;
         for (int i = 0; i < jumpTable.jumpPathTable.length; i++) {
             for (int j = 0; j < jumpTable.jumpPathTable[0].length; j++) {
-                Vec2i p0 = parent.position.clone();
-                Vec2i p1 = new Vec2i(p0.x + i - xOffset, p0.y + j - yOffset);
+                Vec2i p0 = parent.position.clone(); // Origin cell
+                Vec2i p1 = new Vec2i(p0.x + i - xOffset, p0.y + j - yOffset); // Target cell
                 JumpPath jp = jumpTable.findPathRelative(i - xOffset, j - yOffset,
                         parent.actions.endVelocity.x, false);
 
-                if (jp == null)
+                if (jp == null) // Only valid jumps
                     continue;
 
                 if(!isWalkable(p1.x, p1.y))
@@ -105,6 +90,7 @@ public class Pathfinder {
                 if (jp.hasCollision(p0, worldSpace))
                     continue;
 
+                // JumpPaths endPosition is relative
                 Vec2f endPosition = jp.actionUnit.endPosition.clone();
                 endPosition = Vec2f.add(endPosition, parent.actions.endPosition);
 
@@ -116,7 +102,6 @@ public class Pathfinder {
 
                 node.actions = jp.actionUnit.clone();
                 node.actions.endPosition = endPosition.clone();
-                //node.actions.endVelocity = jp.actionUnit.endVelocity.clone();
 
                 neighbours.add(node);
             }
