@@ -39,10 +39,7 @@ public class JumpTable implements Serializable{
 
         Vec2i marioOffset = new Vec2i(xMax, yMax);
 
-        Vec2f start = new Vec2i(0, 0).toVec2f();
-        start.x += 0.5f * WorldSpace.CELL_WIDTH;
-        start.y += WorldSpace.CELL_HEIGHT;
-        start = Vec2f.add(start, marioOffset.toVec2f());
+        Vec2f start = getOffset();
 
         // Insert block below
         Vec2i cellPosBelowStart = start.toCell();
@@ -66,9 +63,7 @@ public class JumpTable implements Serializable{
                         continue;
 
                     Vec2f end = new Vec2i(i, j).toVec2f();
-                    end.x += 0.5f * WorldSpace.CELL_WIDTH;
-                    end.y += WorldSpace.CELL_HEIGHT;
-                    end = Vec2f.add(end, marioOffset.toVec2f());
+                    end = Vec2f.add(end, getOffset());
 
                     Vec2f velocity = new Vec2f((-0.5f * intervals + k) * stepSize,0);
 
@@ -203,5 +198,11 @@ public class JumpTable implements Serializable{
             }
             System.out.println(line);
         }
+    }
+
+    public Vec2f getOffset() {
+        float x = (float)xMax + 0.5f; // Middle of middle table cell
+        float y = (float)yMax + 1f; // Bottom of middle table cell
+        return new Vec2f(x * WorldSpace.CELL_WIDTH, y * WorldSpace.CELL_HEIGHT);
     }
 }
