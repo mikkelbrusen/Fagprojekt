@@ -137,34 +137,34 @@ public class JumpPathfinder
 
         List<JumpPathNode> neighbours = new ArrayList<>();
         for (boolean[] action : possibleActions) {
+            // If the jump key has no effect, don't bother searching with it
             if (parent.stoppedJumping && action[Environment.MARIO_KEY_JUMP])
                 continue;
+
+            // We only observe running actions
             if (!action[Environment.MARIO_KEY_SPEED])
                 continue;
 
+            // Perform the action
             SimMario newSimMario = parent.simMario.clone();
             newSimMario.move(action);
 
             Vec2f p = newSimMario.body.position.clone();
             Vec2f v = newSimMario.body.velocity.clone();
 
-            // Heuristic is in cell distance, score is in frames? Problem?
             float score = 1 + parent.fitness.scoreTo;
 
-            // TODO: Maybe wrap into single function
-            // Don't stop jumping the second we reach the correct height
-            // (dist.y is lowest here)
+            // Calculate the heuristic
             Vec2f dist = Vec2f.subtract(end, p);
+            float heuristic = dist.sqrMagnitude(); // When searching down, the base is the sqrDistance
 
-            float heuristic = dist.sqrMagnitude();
-
+            // When searching  upwards, where interested in the Manhattan frame distance
             if (isUp) {
                 int framesX = Pathfinder.framesToRunTo(p.x, v.x, end.x);
 
                 int jumpFrames = newSimMario.jumpTime;
                 int framesY = MarioMove.minimumFramesToMoveToY(p.y, v.y, jumpFrames, end.y);
 
-                //heuristic = Math.max(framesX, framesY);
                 heuristic = framesX + framesY;
             }
 
@@ -174,8 +174,10 @@ public class JumpPathfinder
             else if(start.x > end.x && action[Environment.MARIO_KEY_RIGHT])
                 heuristic += 3f;
 
+            // Aim for a lower velocity
             heuristic += newSimMario.body.velocity.x;
 
+            // Discourage searching impossible jumps
             if (!isUp && p.y - 1.01f > end.y)
                 heuristic += 100000;
 
@@ -196,10 +198,9 @@ public class JumpPathfinder
         Vec2f v0 = node.simMario.body.velocity.clone();
         Vec2f p1 = end.clone();
         Vec2f d = Vec2f.subtract(p1, p0);
-        return Math.abs(d.x) < 16f &&
-                d.y > -8f &&
-                //d.y > -6f && d.y < 16f &&
-                Math.abs(v0.y) < 8f; // End of jump
+        return Math.abs(d.x) < 16f && // Relatively close in x
+                d.y > -8f && // Close in y
+                Math.abs(v0.y) < 8f; // Top of jump
     }
 
     boolean isEndDown(JumpPathNode node, Vec2f end) {
@@ -207,7 +208,7 @@ public class JumpPathfinder
         Vec2f p1 = end.clone();
         Vec2f d = Vec2f.subtract(p1, p0);
         return Math.abs(d.x) < 1f && // Close in x
-                Math.abs(d.y) < 4f && // d.y == 0f) &&
+                Math.abs(d.y) < 4f && // To ensure not standing on another cell
                 node.simMario.onGround;
     }
 
