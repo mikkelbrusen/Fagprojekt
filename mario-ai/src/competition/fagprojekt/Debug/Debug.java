@@ -2,15 +2,12 @@ package competition.fagprojekt.Debug;
 
 import ch.idsia.benchmark.mario.engine.GlobalOptions;
 import ch.idsia.benchmark.mario.engine.LevelScene;
-import ch.idsia.benchmark.mario.engine.MarioVisualComponent;
-import ch.idsia.benchmark.mario.environments.MarioEnvironment;
 import competition.fagprojekt.SimMario;
 import competition.fagprojekt.Vec2f;
 import competition.fagprojekt.Vec2i;
 import competition.fagprojekt.WorldSpace;
 
 import java.awt.*;
-import java.util.List.*;
 import java.util.ArrayList;
 
 /**
@@ -98,8 +95,8 @@ public class Debug
         SimMario mario = new SimMario(startPosition, startVelocity, _worldSpace);
         for(boolean[] a : actions) {
             mario.move(a);
-            drawLine(lastPosition, mario.position, color);
-            lastPosition = mario.position.clone();
+            drawLine(lastPosition, mario.getPosition(), color);
+            lastPosition = mario.getPosition().clone();
         }
     }
 

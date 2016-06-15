@@ -90,8 +90,8 @@ public class JumpPathfinder
             System.out.println("Didn't find end, taking best");
         }
 
-        ActionUnit actionUnit = new ActionUnit(current.getSimMario().position,
-                current.getSimMario().velocity);
+        ActionUnit actionUnit = new ActionUnit(current.getSimMario().getPosition(),
+                current.getSimMario().getVelocity());
 
         JumpPath path = new JumpPath(actionUnit);
 
@@ -99,7 +99,7 @@ public class JumpPathfinder
             path.getActionUnit().push(current.getAction());
 
             // TODO: Refactor and fix
-            Vec2f cp = current.getSimMario().position.clone();
+            Vec2f cp = current.getSimMario().getPosition().clone();
             cp.x -= start.x;
             cp.y -= start.y;
             cp.x += 0.5f * WorldSpace.CELL_WIDTH;
@@ -148,8 +148,8 @@ public class JumpPathfinder
             SimMario newSimMario = parent.getSimMario().clone();
             newSimMario.move(action);
 
-            Vec2f p = newSimMario.position.clone();
-            Vec2f v = newSimMario.velocity.clone();
+            Vec2f p = newSimMario.getPosition().clone();
+            Vec2f v = newSimMario.getVelocity().clone();
 
             float score = 1 + parent.getFitness().getScoreTo();
 
@@ -174,7 +174,7 @@ public class JumpPathfinder
                 heuristic += 3f;
 
             // Aim for a lower velocity
-            heuristic += newSimMario.velocity.x;
+            heuristic += newSimMario.getVelocity().x;
 
             // Discourage searching impossible jumps
             if (!isUp && p.y - 1.01f > end.y)
@@ -193,8 +193,8 @@ public class JumpPathfinder
     }
 
     boolean isEndUp(JumpPathNode node, Vec2f end) {
-        Vec2f p0 = node.getSimMario().position.clone();
-        Vec2f v0 = node.getSimMario().velocity.clone();
+        Vec2f p0 = node.getSimMario().getPosition().clone();
+        Vec2f v0 = node.getSimMario().getVelocity().clone();
         Vec2f p1 = end.clone();
         Vec2f d = Vec2f.subtract(p1, p0);
         return Math.abs(d.x) < 16f && // Relatively close in x
@@ -203,7 +203,7 @@ public class JumpPathfinder
     }
 
     boolean isEndDown(JumpPathNode node, Vec2f end) {
-        Vec2f p0 = node.getSimMario().position.clone();
+        Vec2f p0 = node.getSimMario().getPosition().clone();
         Vec2f p1 = end.clone();
         Vec2f d = Vec2f.subtract(p1, p0);
         return Math.abs(d.x) < 1f && // Close in x

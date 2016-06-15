@@ -34,16 +34,10 @@ public class SimMario
     float x, y;
     float xa, ya;
 
-    public Vec2f position;
-    public Vec2f velocity;
-
     WorldSpace worldSpace;
 
     public SimMario(Vec2f position, Vec2f velocity, WorldSpace worldSpace)
     {
-        this.position = position.clone();
-        this.velocity = velocity.clone();
-
         x = position.x;
         y = position.y;
         xa = velocity.x;
@@ -53,7 +47,7 @@ public class SimMario
     }
 
     public SimMario clone() {
-        SimMario newSimMario = new SimMario(position, velocity, worldSpace);
+        SimMario newSimMario = new SimMario(getPosition(), getVelocity(), worldSpace);
 
         newSimMario.facing = facing;
 
@@ -205,9 +199,6 @@ public class SimMario
         }
 
         // Carried
-
-        position = new Vec2f(x, y);
-        velocity = new Vec2f(xa, ya);
     }
 
     private boolean move(float xa, float ya)
@@ -354,5 +345,13 @@ public class SimMario
             points.add(p3.toCell());
 
         return points;
+    }
+
+    public Vec2f getPosition() {
+        return new Vec2f(x, y);
+    }
+
+    public Vec2f getVelocity() {
+        return new Vec2f(xa, ya);
     }
 }
