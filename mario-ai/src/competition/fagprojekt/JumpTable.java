@@ -37,7 +37,7 @@ public class JumpTable implements Serializable{
     private JumpTable(JumpPathfinder jumpPathfinder) {
         worldSpace = jumpPathfinder.getWorldSpace();
 
-        Vec2i marioOffset = new Vec2i(xMax, yMax);
+        System.out.println("Generating Jump Table...");
 
         Vec2f start = getOffset();
 
