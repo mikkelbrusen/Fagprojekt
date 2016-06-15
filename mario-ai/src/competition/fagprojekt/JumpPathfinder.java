@@ -11,14 +11,12 @@ public class JumpPathfinder
 {
     // As there is no closed list, we must limit the search.
     // If the end isn't found in this number of iterations, it's deemed impossible
-    final int MAX_SEARCH_ITERATIONS = 1000;
+    final private int MAX_SEARCH_ITERATIONS = 1000;
 
     private WorldSpace worldSpace;
-    private MarioMove marioMove;
 
-    public JumpPathfinder(WorldSpace worldSpace, MarioMove marioMove) {
+    public JumpPathfinder(WorldSpace worldSpace) {
         this.worldSpace = worldSpace;
-        this.marioMove = marioMove;
     }
 
     public JumpPath searchAStar(Vec2f start, Vec2f startVelocity, Vec2f end) {
