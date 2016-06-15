@@ -9,6 +9,8 @@ import java.util.*;
  */
 public class JumpPathfinder
 {
+    // As there is no closed list, we must limit the search.
+    // If the end isn't found in this number of iterations, it's deemed impossible
     final int MAX_SEARCH_ITERATIONS = 1000;
 
     private WorldSpace worldSpace;
@@ -29,13 +31,14 @@ public class JumpPathfinder
             return null; // If we can't find the first part, the jumps is impossible
         }
 
-        boolean onGround = start.equals(end);
-        JumpPath downPath = searchAStar(upPath.actionUnit.getEndPosition(), upPath.actionUnit.getEndVelocity(), end, false, false);
+        JumpPath downPath = searchAStar(upPath.actionUnit.getEndPosition(),
+                upPath.actionUnit.getEndVelocity(), end, false, false);
+
         if (downPath == null) {
-            searchAStar(upPath.actionUnit.getEndPosition(), upPath.actionUnit.getEndVelocity(), end, false, false);
-            return null;
+            return null; // Need both parts of the jump to be successful
         }
 
+        // Stitch the two paths together
         JumpPath endPath = new JumpPath();
         endPath.actionUnit = new ActionUnit(downPath.actionUnit.getEndPosition(), downPath.actionUnit.getEndVelocity());
         endPath.actionUnit.addAll(upPath.getActions());
@@ -55,11 +58,12 @@ public class JumpPathfinder
                 new SimMario(start, startVelocity, worldSpace)
         );
         if (!isUp) {
+            // Ensure the down-path doesn't try jumping
             current.stoppedJumping = true;
             current.simMario.jumpTime = 0;
         }
 
-        JumpPathNode bestSeen = null;
+        JumpPathNode bestSeen = current; // If takeBest == true, this will be returned
 
         boolean hasFoundEnd = false;
         open.add(current);
@@ -68,7 +72,7 @@ public class JumpPathfinder
                 break;
             current = open.poll();
 
-            if (bestSeen == null || bestSeen.parent == null || current.compareTo(bestSeen) < 0)
+            if (bestSeen.parent == null || current.compareTo(bestSeen) < 0)
                 bestSeen = current;
 
             if (isUp && isEndUp(current, end) ||
