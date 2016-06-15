@@ -68,7 +68,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
 
         // Fallback
         if (currentActions.isEmpty())
-            currentActions.add(MarioMove.newAction());
+            currentActions.add(MarioMove.emptyAction());
 
         // Consume next action
         action = currentActions.get(0);
@@ -106,7 +106,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
     {
         worldSpace = new WorldSpace();
         marioMove = new MarioMove();
-        jumpPathfinder = new JumpPathfinder(worldSpace, marioMove);
+        jumpPathfinder = new JumpPathfinder(worldSpace);
         jumpTable = JumpTable.getJumpTable(jumpPathfinder, false);
         pathfinder = new Pathfinder(worldSpace, marioMove,jumpTable);
 
