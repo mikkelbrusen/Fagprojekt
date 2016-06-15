@@ -1,7 +1,6 @@
 package competition.fagprojekt;
 
 import java.io.*;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -197,7 +196,7 @@ public class JumpTable implements Serializable{
                 String c = " .";
                 JumpPath jp = findPathRelative(x, y, v, false);
                 if (jp != null)
-                    c = String.format("%2d", jp.actionUnit.actions.size());
+                    c = String.format("%2d", jp.actionUnit.getActions().size());
                 if (x == 0 && y == 0)
                     c = " x";
                 line += c + " ";

@@ -18,7 +18,7 @@ public class JumpPath implements Serializable{
     public void addAction(boolean[] action){actionUnit.add(action);}
 
     public List<boolean[]> getActions(){
-        return actionUnit.actions;
+        return actionUnit.getActions();
     }
 
     // Returns true if any collision cells, relative to origin, aren't passable

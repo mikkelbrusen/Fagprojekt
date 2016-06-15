@@ -23,13 +23,13 @@ public class BUtil {
         for (ActionUnit unit : path) {
             Vec2i dp = unit.endPosition == null ? new Vec2i(0, 0) : unit.endPosition.toCell();
             System.out.printf("Unit to %s:\n", unit.endPosition == null ? "(x, x)" : dp);
-            for (boolean[] a : unit.actions)
+            for (boolean[] a : unit.getActions())
                 System.out.printf("  %s\n", BUtil.actionToString(a));
         }
     }
 
     public static void printActionUnit(ActionUnit unit) {
-        for (boolean[] b: unit.actions) {
+        for (boolean[] b: unit.getActions()) {
             System.out.println(BUtil.actionToString(b));
         }
     }

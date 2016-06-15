@@ -10,6 +10,7 @@ import competition.fagprojekt.Debug.DebugInput;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -21,7 +22,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
     Pathfinder pathfinder;
     MarioMove marioMove;
 
-    ActionUnit currentUnit = new ActionUnit();
+    List<boolean[]> currentActions = new LinkedList<>(); // Constant add/remove at ends
 
     // Debug
     Vec2i targetPos;
@@ -40,14 +41,14 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
 
     public boolean[] getAction()
     {
-        if (currentUnit.actions.isEmpty()) {
+        if (currentActions.isEmpty()) {
             //System.out.println(debug.frameCount + ": Recalculating path");
 
             for(Vec2i targetCell : worldSpace.getRightMostWalkables()) {
                 List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastFloatPos, marioMove.velocity, targetCell);
                 if (path != null && !path.isEmpty()) {
                     targetPos = targetCell.clone(); // Debug
-                    currentUnit = path.get(0).clone();
+                    currentActions.addAll(path.get(0).getActions());
 
                     // Debug
                     lastBody = new Body2D(marioMove.lastFloatPos, marioMove.velocity);
@@ -66,12 +67,12 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         }
 
         // Fallback
-        if (currentUnit.actions.isEmpty())
-            currentUnit.actions.add(MarioMove.newAction());
+        if (currentActions.isEmpty())
+            currentActions.add(MarioMove.newAction());
 
         // Consume next action
-        action = currentUnit.actions.get(0);
-        currentUnit.actions.remove(0);
+        action = currentActions.get(0);
+        currentActions.remove(0);
 
         // Anti-stuck
         if (floatPosLastFrame.equals(marioMove.lastFloatPos))
@@ -84,7 +85,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
             Random rng = new Random((int)marioMove.lastFloatPos.x);
             for (int i = 0; i < 5; i++) {
                 int dir = rng.nextInt() % 2 == 0 ? -1 : 1;
-                currentUnit.actions.add(MarioMove.moveAction(dir, true));
+                currentActions.add(MarioMove.moveAction(dir, true));
             }
             standstillFrames = 0;
         }
@@ -138,7 +139,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         SimMario debugMario = new SimMario(lastBody.position, lastBody.velocity, worldSpace);
         Vec2f lastP = lastBody.position.clone();
         for (ActionUnit unit : lastPath) {
-            for (boolean[] action : unit.actions) {
+            for (boolean[] action : unit.getActions()) {
                 debugMario.move(action);
 
                 Color color = unit == lastPath.get(0) ? Color.blue : Color.magenta;
@@ -147,12 +148,12 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
             }
         }
 
-        if (currentUnit.actions.isEmpty() && DebugInput.keysPressed[DebugInput.KEY_K]) {
+        if (currentActions.isEmpty() && DebugInput.keysPressed[DebugInput.KEY_K]) {
             Vec2i targetCell = debug.debugCell;
             List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastFloatPos, marioMove.velocity, targetCell);
             if (path != null && !path.isEmpty()) {
                 for (ActionUnit unit : path)
-                    currentUnit.actions.addAll(unit.actions);
+                    currentActions.addAll(unit.getActions());
             }
         }
 

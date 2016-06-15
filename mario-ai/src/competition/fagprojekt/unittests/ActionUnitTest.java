@@ -14,11 +14,11 @@ public class ActionUnitTest extends TestCase {
         ActionUnit au = new ActionUnit();
         boolean[] bs = {true, true, true, true};
 
-        assertEquals(0, au.actions.size());
+        assertEquals(0, au.getActions().size());
         au.add(bs);
         au.add(bs);
-        assertEquals(2, au.actions.size());
-        assertEquals(bs, au.actions.get(0));
+        assertEquals(2, au.getActions().size());
+        assertEquals(bs, au.getActions().get(0));
     }
 
 }

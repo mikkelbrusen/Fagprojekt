@@ -1,9 +1,9 @@
 package competition.fagprojekt;
 
-import ch.idsia.benchmark.mario.environments.Environment;
-
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -12,7 +12,7 @@ import java.util.List;
  * One ActionUnit will contain the actions for moving from one cell to another.
  */
 public class ActionUnit implements Serializable{
-    public List<boolean[]> actions = new ArrayList<>();
+    private List<boolean[]> actions = new LinkedList<>(); // Constant add and ends
     public Vec2f endPosition = new Vec2f(0, 0);
     public Vec2f endVelocity = new Vec2f(0, 0);
 
@@ -22,6 +22,15 @@ public class ActionUnit implements Serializable{
     public void add(boolean[] action) {
         actions.add(action);
     }
+    public void push(boolean[] action) {
+        actions.add(0, action);
+    }
+    public void addAll(List<boolean[]> actions) {
+        this.actions.addAll(actions);
+    }
+    public void pushAll(List<boolean[]> actions) {
+        this.actions.addAll(0, actions);
+    }
 
     public ActionUnit clone() {
         ActionUnit unit = new ActionUnit();
@@ -29,7 +38,11 @@ public class ActionUnit implements Serializable{
             unit.endPosition = endPosition.clone();
         if (endVelocity != null)
             unit.endVelocity = endVelocity.clone();
-        unit.actions.addAll(actions);
+        unit.addAll(getActions());
         return unit;
+    }
+
+    public List<boolean[]> getActions() {
+        return Collections.unmodifiableList(actions);
     }
 }

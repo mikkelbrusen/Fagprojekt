@@ -42,8 +42,8 @@ public class JumpPathfinder
         JumpPath endPath = new JumpPath();
         endPath.actionUnit.endVelocity = downPath.actionUnit.endVelocity.clone();
         endPath.actionUnit.endPosition = downPath.actionUnit.endPosition.clone();
-        endPath.actionUnit.actions.addAll(upPath.getActions());
-        endPath.actionUnit.actions.addAll(downPath.getActions());
+        endPath.actionUnit.addAll(upPath.getActions());
+        endPath.actionUnit.addAll(downPath.getActions());
         endPath.collisionCells.addAll(upPath.collisionCells);
         //endPath.collisionCells.addAll(downPath.collisionCells);
 
@@ -99,7 +99,7 @@ public class JumpPathfinder
         path.actionUnit.endVelocity = current.simMario.body.velocity.clone();
 
         while (current.parent != null) {
-            path.addAction(current.action);
+            path.actionUnit.push(current.action);
 
             Vec2f cp = current.simMario.body.position.clone();
             cp.x -= start.x;
@@ -111,7 +111,6 @@ public class JumpPathfinder
             current = current.parent;
         }
 
-        Collections.reverse(path.actionUnit.actions);
         return path;
     }
 

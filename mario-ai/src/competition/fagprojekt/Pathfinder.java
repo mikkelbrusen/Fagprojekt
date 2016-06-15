@@ -94,7 +94,7 @@ public class Pathfinder {
                 Vec2f endPosition = jp.actionUnit.endPosition.clone();
                 endPosition = Vec2f.add(endPosition, parent.actions.endPosition);
 
-                int score = jp.actionUnit.actions.size();
+                int score = jp.actionUnit.getActions().size();
                 float heuristic = end.x - pos.x;
 
                 PathNode node = new PathNode(p1, parent, score, heuristic,
