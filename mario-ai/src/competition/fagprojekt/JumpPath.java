@@ -18,8 +18,10 @@ public class JumpPath implements Serializable{
     }
 
     public void addCollisionCells(List<Vec2i> cells) {
-        for (Vec2i c : cells)
-            collisionCells.add(c.clone());
+        for (Vec2i c : cells) {
+            if (!collisionCells.contains(c))
+                collisionCells.add(c.clone());
+        }
     }
 
     // Returns true if any collision cells, relative to origin, aren't passable

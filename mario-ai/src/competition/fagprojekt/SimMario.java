@@ -355,8 +355,8 @@ public class SimMario
         return new Vec2f(xa, ya);
     }
 
-    public boolean getOnGround() {
-        return onGround;
+    public boolean getMayJump() {
+        return mayJump;
     }
 
     public int getJumpTime() {

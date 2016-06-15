@@ -11,7 +11,7 @@ public class JumpPathfinder
 {
     // As there is no closed list, we must limit the search.
     // If the end isn't found in this number of iterations, it's deemed impossible
-    final private int MAX_SEARCH_ITERATIONS = 1000;
+    final private int MAX_SEARCH_ITERATIONS = 2000;
 
     private WorldSpace worldSpace;
 
@@ -20,6 +20,9 @@ public class JumpPathfinder
     }
 
     public JumpPath searchAStar(Vec2f start, Vec2f startVelocity, Vec2f end) {
+        return searchAStar(start, startVelocity, end, false, false);
+
+        /*
         // First search to above the target cell
         Vec2f upTarget = end.clone();
         upTarget.y -= 16f;
@@ -45,9 +48,10 @@ public class JumpPathfinder
         //endPath.collisionCells.addAll(downPath.collisionCells);
 
         return endPath;
+        */
     }
 
-    public JumpPath searchAStar(Vec2f start, Vec2f startVelocity, Vec2f end, boolean takeBest, boolean isUp) {
+    private JumpPath searchAStar(Vec2f start, Vec2f startVelocity, Vec2f end, boolean takeBest, boolean isUp) {
         Queue<JumpPathNode> open = new PriorityQueue<>();
         // No closed list, as every point is unique
 
@@ -58,7 +62,7 @@ public class JumpPathfinder
 
         if (!isUp) {
             // Ensure the down-path doesn't try jumping
-            current.getSimMario().setJumpTime(0);
+            //current.getSimMario().setJumpTime(0);
         }
 
         // If takeBest == true, this will be returned
@@ -102,8 +106,6 @@ public class JumpPathfinder
             Vec2f cp = current.getSimMario().getPosition().clone();
             cp.x -= start.x;
             cp.y -= start.y;
-            cp.x += 0.5f * WorldSpace.CELL_WIDTH;
-            cp.y += WorldSpace.CELL_HEIGHT;
             path.addCollisionCells(SimMario.cellsBlocked(cp));
 
             current = current.getParent();
@@ -161,13 +163,13 @@ public class JumpPathfinder
             float heuristic = dist.sqrMagnitude(); // When searching down, the base is the sqrDistance
 
             // When searching  upwards, where interested in the Manhattan frame distance
-            if (isUp) {
+            if (!isUp || isUp) {
                 int framesX = Pathfinder.framesToRunTo(p.x, v.x, end.x);
 
                 int jumpFrames = newSimMario.getJumpTime();
                 int framesY = MarioMove.minimumFramesToMoveToY(p.y, v.y, jumpFrames, end.y);
 
-                heuristic = framesX + framesY;
+                heuristic = Math.max(framesX, framesY);
             }
 
             // Encourage only moving in the direction of the target
@@ -206,9 +208,9 @@ public class JumpPathfinder
         Vec2f p0 = node.getSimMario().getPosition().clone();
         Vec2f p1 = end.clone();
         Vec2f d = Vec2f.subtract(p1, p0);
-        return Math.abs(d.x) < 1f && // Close in x
+        return Math.abs(d.x) < 5f && // Close in x
                 Math.abs(d.y) < 4f && // To ensure not standing on another cell
-                node.getSimMario().getOnGround();
+                node.getSimMario().getMayJump();
     }
 
     public WorldSpace getWorldSpace() {
