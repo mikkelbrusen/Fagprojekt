@@ -24,21 +24,21 @@ public class Pathfinder {
         PathNode current = new PathNode(start.toCell(), null, 0, 0,
                 new ActionUnit(start, startVelocity));
 
-        closed.add(current.position.clone());
+        closed.add(current.cell.clone());
         open.add(current);
 
         boolean hasFoundEnd = false;
         while (!open.isEmpty()) {
             current = open.poll();
-            closed.add(current.position.clone());
+            closed.add(current.cell.clone());
 
-            if (current.position.equals(end)) {
+            if (current.cell.equals(end)) {
                 hasFoundEnd = true;
                 break;
             }
 
             for (PathNode n : getNeighbours(current,end)) {
-                if (!closed.contains(n.position)) {
+                if (!closed.contains(n.cell)) {
                     open.add(n);
                 }
             }
@@ -51,7 +51,7 @@ public class Pathfinder {
 
         List<ActionUnit> path = new LinkedList<>();
         while (current.parent != null) {
-            lastPathCells.add(current.position); // Debug
+            lastPathCells.add(current.cell); // Debug
 
             path.add(0, current.getActionUnit()); // Constant time
             current = current.parent;
@@ -61,7 +61,7 @@ public class Pathfinder {
 
     List<PathNode> getNeighbours(PathNode parent, Vec2i end) {
         List<PathNode> neighbours = new ArrayList<>();
-        Vec2i pos = parent.position;
+        Vec2i pos = parent.cell;
 
         // Add neighbours we can walk to
         for(Vec2i p : getWalkables(pos)) {
@@ -75,7 +75,7 @@ public class Pathfinder {
         int yOffset = jumpTable.yRange / 2;
         for (int i = 0; i < jumpTable.jumpPathTable.length; i++) {
             for (int j = 0; j < jumpTable.jumpPathTable[0].length; j++) {
-                Vec2i p0 = parent.position.clone(); // Origin cell
+                Vec2i p0 = parent.cell.clone(); // Origin cell
                 Vec2i p1 = new Vec2i(p0.x + i - xOffset, p0.y + j - yOffset); // Target cell
                 JumpPath jp = jumpTable.findPathRelative(i - xOffset, j - yOffset,
                         parent.getActionUnit().getEndVelocity().x, false);
@@ -116,7 +116,7 @@ public class Pathfinder {
         Vec2f p1 = targetCell.middleBottom();
 
         // Calculate run actions
-        int dir = targetCell.x < parent.position.x ? -1 : 1;
+        int dir = targetCell.x < parent.cell.x ? -1 : 1;
         int runFrames = framesToRunTo(p0.x, v0.x, p1.x);
 
         // Calculate new velocity
