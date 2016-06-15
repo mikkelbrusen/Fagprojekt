@@ -156,9 +156,10 @@ public class JumpPathfinder
         Vec2f p0 = node.getSimMario().getPosition().clone();
         Vec2f p1 = end.clone();
         Vec2f d = Vec2f.subtract(p1, p0);
-        return Math.abs(d.x) < 3f && // Close in x
+        return Math.abs(d.x) < 2f && // Close in x
                 Math.abs(d.y) < 4f && // To ensure not standing on another cell
-                node.getSimMario().getMayJump();
+                node.getSimMario().getMayJump() &&
+                node.getSimMario().getOnGround();
     }
 
     public WorldSpace getWorldSpace() {
