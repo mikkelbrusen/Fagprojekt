@@ -21,7 +21,7 @@ public class Pathfinder {
         HashSet<Vec2i> closed = new HashSet<>(); // Constant time contains
 
         // Create current
-        PathNode current = new PathNode(start.toCell());
+        PathNode current = new PathNode(start.toCell(), null, 0, 0, start, startVelocity);
         current.actions = new ActionUnit(start, startVelocity);
 
         closed.add(current.position.clone());
@@ -121,24 +121,22 @@ public class Pathfinder {
         int dir = targetCell.x < parent.position.x ? -1 : 1;
         int runFrames = framesToRunTo(p0.x, v0.x, p1.x);
 
+        // Calculate new velocity
         Vec2f newV = v0.clone();
         newV.x = xVelocityAfter(newV, runFrames, dir);
 
-        // TODO: Delete superfluous constructor
-        PathNode node = new PathNode(targetCell);
+        // Calculate new position
         float newX = MarioMove.xPositionAfterRun(p0.x, v0.x, dir, runFrames);
         Vec2f endPos = new Vec2f(newX, p0.y);
-        node.actions = new ActionUnit(endPos, newV);
-        node.parent = parent;
 
+        // Scoring
         int scoreForEdge = runFrames;
         float heuristic = (end.x - p1.x);
 
+        PathNode node = new PathNode(targetCell, parent, scoreForEdge, heuristic, endPos, newV);
+        node.actions = new ActionUnit(endPos, newV);
         for (int i = 0; i < runFrames; i++)
             node.actions.add(MarioMove.moveAction(dir, false));
-        
-        node.fitness.scoreTo = parent.fitness.scoreTo + scoreForEdge;
-        node.fitness.heuristic = heuristic;
 
         return node;
     }
