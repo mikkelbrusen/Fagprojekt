@@ -12,7 +12,7 @@ public class JumpPath implements Serializable{
     List<Vec2i> collisionCells = new ArrayList<>(); // TODO: Make private
 
     public JumpPath(){
-        actionUnit = new ActionUnit();
+        actionUnit = new ActionUnit(new Vec2f(0, 0), new Vec2f(0, 0));
     }
 
     public void addAction(boolean[] action){actionUnit.add(action);}

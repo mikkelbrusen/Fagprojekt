@@ -21,7 +21,7 @@ public class PathNodeTest extends TestCase{
 
         assertEquals(vec, pn.position);
         assertEquals(null, pn.parent);
-        assertEquals(0f, pn.actions.endVelocity.magnitude());
+        assertEquals(0f, pn.actions.getEndVelocity().magnitude());
         assertEquals(0, pn.actions.getActions().size());
         assertEquals(0, pn.fitness.getFitness());
 

@@ -21,8 +21,8 @@ public class BUtil {
 
     public static void printPath(List<ActionUnit> path) {
         for (ActionUnit unit : path) {
-            Vec2i dp = unit.endPosition == null ? new Vec2i(0, 0) : unit.endPosition.toCell();
-            System.out.printf("Unit to %s:\n", unit.endPosition == null ? "(x, x)" : dp);
+            Vec2i dp = unit.getEndPosition() == null ? new Vec2i(0, 0) : unit.getEndPosition().toCell();
+            System.out.printf("Unit to %s:\n", unit.getEndPosition() == null ? "(x, x)" : dp);
             for (boolean[] a : unit.getActions())
                 System.out.printf("  %s\n", BUtil.actionToString(a));
         }

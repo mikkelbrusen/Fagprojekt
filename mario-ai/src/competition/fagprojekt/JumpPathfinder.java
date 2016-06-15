@@ -33,15 +33,14 @@ public class JumpPathfinder
         }
 
         boolean onGround = start.equals(end);
-        JumpPath downPath = searchAStar(upPath.actionUnit.endPosition, upPath.actionUnit.endVelocity, end, false, false, onGround);
+        JumpPath downPath = searchAStar(upPath.actionUnit.getEndPosition(), upPath.actionUnit.getEndVelocity(), end, false, false, onGround);
         if (downPath == null) {
-            searchAStar(upPath.actionUnit.endPosition, upPath.actionUnit.endVelocity, end, false, false, onGround);
+            searchAStar(upPath.actionUnit.getEndPosition(), upPath.actionUnit.getEndVelocity(), end, false, false, onGround);
             return null;
         }
 
         JumpPath endPath = new JumpPath();
-        endPath.actionUnit.endVelocity = downPath.actionUnit.endVelocity.clone();
-        endPath.actionUnit.endPosition = downPath.actionUnit.endPosition.clone();
+        endPath.actionUnit = new ActionUnit(downPath.actionUnit.getEndPosition(), downPath.actionUnit.getEndVelocity());
         endPath.actionUnit.addAll(upPath.getActions());
         endPath.actionUnit.addAll(downPath.getActions());
         endPath.collisionCells.addAll(upPath.collisionCells);
@@ -95,8 +94,7 @@ public class JumpPathfinder
         }
 
         JumpPath path = new JumpPath();
-        path.actionUnit.endPosition = current.simMario.body.position.clone();
-        path.actionUnit.endVelocity = current.simMario.body.velocity.clone();
+        path.actionUnit = new ActionUnit(current.simMario.body.position, current.simMario.body.velocity);
 
         while (current.parent != null) {
             path.actionUnit.push(current.action);

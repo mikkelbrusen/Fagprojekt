@@ -13,10 +13,12 @@ import java.util.List;
  */
 public class ActionUnit implements Serializable{
     private List<boolean[]> actions = new LinkedList<>(); // Constant add and ends
-    public Vec2f endPosition = new Vec2f(0, 0);
-    public Vec2f endVelocity = new Vec2f(0, 0);
+    private Vec2f endPosition = new Vec2f(0, 0);
+    private Vec2f endVelocity = new Vec2f(0, 0);
 
-    public ActionUnit() {
+    public ActionUnit(Vec2f endPosition, Vec2f endVelocity) {
+        this.endPosition = endPosition.clone();
+        this.endVelocity = endVelocity.clone();
     }
 
     public void add(boolean[] action) {
@@ -33,16 +35,18 @@ public class ActionUnit implements Serializable{
     }
 
     public ActionUnit clone() {
-        ActionUnit unit = new ActionUnit();
-        if (endPosition != null)
-            unit.endPosition = endPosition.clone();
-        if (endVelocity != null)
-            unit.endVelocity = endVelocity.clone();
+        ActionUnit unit = new ActionUnit(endPosition, endVelocity);
         unit.addAll(getActions());
         return unit;
     }
 
     public List<boolean[]> getActions() {
         return Collections.unmodifiableList(actions);
+    }
+    public Vec2f getEndPosition() {
+        return endPosition.clone();
+    }
+    public Vec2f getEndVelocity() {
+        return endVelocity.clone();
     }
 }

@@ -1,6 +1,7 @@
 package competition.fagprojekt.unittests;
 
 import competition.fagprojekt.ActionUnit;
+import competition.fagprojekt.Vec2f;
 import junit.framework.TestCase;
 import org.testng.annotations.Test;
 
@@ -11,7 +12,7 @@ public class ActionUnitTest extends TestCase {
 
     @Test
     public void testActionUnit() {
-        ActionUnit au = new ActionUnit();
+        ActionUnit au = new ActionUnit(new Vec2f(0, 0), new Vec2f(0, 0));
         boolean[] bs = {true, true, true, true};
 
         assertEquals(0, au.getActions().size());

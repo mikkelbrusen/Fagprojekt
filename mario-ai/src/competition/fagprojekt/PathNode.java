@@ -1,8 +1,5 @@
 package competition.fagprojekt;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class PathNode implements Comparable<PathNode> {
     public Vec2i position;
     public PathNode parent;
@@ -13,17 +10,15 @@ public class PathNode implements Comparable<PathNode> {
     public PathNode(Vec2i position) {
         this.position = position.clone();
         this.parent = null;
-        this.actions = new ActionUnit();
+        this.actions = new ActionUnit(new Vec2f(0, 0), new Vec2f(0, 0));
         this.fitness = new Fitness();
     }
 
     public PathNode(Vec2i position, PathNode parent, float scoreTo, float heuristic, Vec2f endPosition, Vec2f endVelocity) {
         this.position = position.clone();
         this.parent = parent;
-        this.actions = new ActionUnit();
+        this.actions = new ActionUnit(endPosition, endVelocity);
         this.fitness = new Fitness(scoreTo, heuristic);
-        this.actions.endPosition = endPosition.clone();
-        this.actions.endVelocity = endVelocity.clone();
     }
 
     @Override
