@@ -136,6 +136,9 @@ public class JumpPathfinder
 
         List<JumpPathNode> neighbours = new ArrayList<>();
         for (boolean[] action : possibleActions) {
+            if (parent.getParent() == null && !action[Environment.MARIO_KEY_JUMP])
+                continue;
+
             // If the jump key has no effect, don't bother searching with it
             if (parent.hasStoppedJumping() && action[Environment.MARIO_KEY_JUMP])
                 continue;
@@ -172,9 +175,6 @@ public class JumpPathfinder
                 heuristic += 3f;
             else if(start.x > end.x && action[Environment.MARIO_KEY_RIGHT])
                 heuristic += 3f;
-
-            // Aim for a lower velocity
-            heuristic += newSimMario.getVelocity().x;
 
             // Discourage searching impossible jumps
             if (!isUp && p.y - 1.01f > end.y)
