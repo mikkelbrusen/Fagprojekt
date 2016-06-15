@@ -53,8 +53,9 @@ public class JumpPathfinder
 
         // Setup start node
         JumpPathNode current = new JumpPathNode(
-                new SimMario(start, startVelocity, worldSpace)
-        );
+                new SimMario(start, startVelocity, worldSpace),
+                null, MarioMove.emptyAction(), 0, 0);
+
         if (!isUp) {
             // Ensure the down-path doesn't try jumping
             current.stoppedJumping = true;
