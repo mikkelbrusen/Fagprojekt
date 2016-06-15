@@ -17,10 +17,13 @@ public class JumpPath implements Serializable{
         this.actionUnit = actionUnit.clone();
     }
 
+    public void addCollisionCell(Vec2i cell) {
+        if (!collisionCells.contains(cell))
+            collisionCells.add(cell.clone());
+    }
     public void addCollisionCells(List<Vec2i> cells) {
         for (Vec2i c : cells) {
-            if (!collisionCells.contains(c))
-                collisionCells.add(c.clone());
+            addCollisionCell(c);
         }
     }
 

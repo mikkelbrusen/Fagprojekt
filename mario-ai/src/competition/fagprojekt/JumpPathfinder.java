@@ -73,6 +73,7 @@ public class JumpPathfinder
             Vec2f cp = current.getSimMario().getPosition().clone();
             cp.x -= start.x;
             cp.y -= start.y;
+            cp.y += 2f; // Adjust for SimMario grounded
             path.addCollisionCells(SimMario.cellsBlocked(cp));
 
             current = current.getParent();
@@ -136,9 +137,9 @@ public class JumpPathfinder
 
             // Encourage only moving in the direction of the target
             if(start.x < end.x && action[Environment.MARIO_KEY_LEFT])
-                heuristic += 3f;
+                heuristic += 2f;
             else if(start.x > end.x && action[Environment.MARIO_KEY_RIGHT])
-                heuristic += 3f;
+                heuristic += 2f;
 
             // Discourage searching impossible jumps
             if (p.y - 1.01f > end.y)
@@ -155,7 +156,7 @@ public class JumpPathfinder
         Vec2f p0 = node.getSimMario().getPosition().clone();
         Vec2f p1 = end.clone();
         Vec2f d = Vec2f.subtract(p1, p0);
-        return Math.abs(d.x) < 5f && // Close in x
+        return Math.abs(d.x) < 3f && // Close in x
                 Math.abs(d.y) < 4f && // To ensure not standing on another cell
                 node.getSimMario().getMayJump();
     }

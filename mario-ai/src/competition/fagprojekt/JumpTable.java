@@ -13,7 +13,7 @@ public class JumpTable implements Serializable{
     public final static float stepSize = maxSpeed / (float)intervals;
 
     int xRange = 14;
-    int yRange = 8;
+    int yRange = 12;
     int xMin = -xRange/2;
     int xMax = xRange/2;
     int yMin = -yRange/2;
@@ -86,6 +86,13 @@ public class JumpTable implements Serializable{
                         JumpPath newPath = new JumpPath(newUnit);
                         newPath.addCollisionCells(path.getCollisionCells());
 
+                        // Filter collisions
+                        Vec2i p1 = new Vec2i(i, j);
+                        for (Vec2i c : path.getCollisionCells()) {
+                            if (canCollideWith(p1, c))
+                                newPath.addCollisionCell(c);
+                        }
+
                         path = newPath;
                     }
 
@@ -110,6 +117,22 @@ public class JumpTable implements Serializable{
     public int getVelocityIdx(float v) {
         float t = (v - -maxSpeed) / (maxSpeed - -maxSpeed);
         return (int)(t * (float)(intervals - 1));
+    }
+
+    static boolean canCollideWith(Vec2i end, Vec2i cell) {
+        // To the right of a right jump
+        if (end.x > 0 && cell.x > end.x)
+            return false;
+
+        // To the left of left jump
+        if (end.x < 0 && cell.x < end.x)
+            return false;
+
+        // Column below the origin cell
+        if (cell.x == 0 && cell.y >= 0)
+            return false;
+
+        return true;
     }
 
     public static JumpTable checkForSerializedFile(JumpPathfinder jumpPathfinder) {
