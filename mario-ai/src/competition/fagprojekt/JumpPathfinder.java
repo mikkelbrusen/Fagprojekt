@@ -11,31 +11,28 @@ public class JumpPathfinder
 {
     final int MAX_SEARCH_ITERATIONS = 1000;
 
-    WorldSpace worldSpace;
-    MarioMove marioMove;
+    private WorldSpace worldSpace;
+    private MarioMove marioMove;
 
     public JumpPathfinder(WorldSpace worldSpace, MarioMove marioMove) {
         this.worldSpace = worldSpace;
         this.marioMove = marioMove;
     }
 
-    public JumpPath searchAStar(Vec2i start, Vec2f startVelocity, Vec2i end) {
-        return searchAStar(WorldSpace.cellToFloat(start), startVelocity, WorldSpace.cellToFloat(end));
-    }
-
     public JumpPath searchAStar(Vec2f start, Vec2f startVelocity, Vec2f end) {
+        // First search to above the target cell
         Vec2f upTarget = end.clone();
         upTarget.y -= 16f;
-        JumpPath upPath = searchAStar(start, startVelocity, end, false, true, true);
+
+        JumpPath upPath = searchAStar(start, startVelocity, end, false, true);
         if (upPath == null) {
-            //searchAStar(start, startVelocity, end, false, true);
-            return null;
+            return null; // If we can't find the first part, the jumps is impossible
         }
 
         boolean onGround = start.equals(end);
-        JumpPath downPath = searchAStar(upPath.actionUnit.getEndPosition(), upPath.actionUnit.getEndVelocity(), end, false, false, onGround);
+        JumpPath downPath = searchAStar(upPath.actionUnit.getEndPosition(), upPath.actionUnit.getEndVelocity(), end, false, false);
         if (downPath == null) {
-            searchAStar(upPath.actionUnit.getEndPosition(), upPath.actionUnit.getEndVelocity(), end, false, false, onGround);
+            searchAStar(upPath.actionUnit.getEndPosition(), upPath.actionUnit.getEndVelocity(), end, false, false);
             return null;
         }
 
@@ -49,7 +46,7 @@ public class JumpPathfinder
         return endPath;
     }
 
-    public JumpPath searchAStar(Vec2f start, Vec2f startVelocity, Vec2f end, boolean takeBest, boolean isUp, boolean onGround) {
+    public JumpPath searchAStar(Vec2f start, Vec2f startVelocity, Vec2f end, boolean takeBest, boolean isUp) {
         Queue<JumpPathNode> open = new PriorityQueue<>();
         // No closed list, as every point is unique
 
@@ -60,7 +57,6 @@ public class JumpPathfinder
         if (!isUp) {
             current.stoppedJumping = true;
             current.simMario.jumpTime = 0;
-            current.simMario.onGround = onGround;
         }
 
         JumpPathNode bestSeen = null;
