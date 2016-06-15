@@ -58,7 +58,7 @@ public class JumpPathfinder
 
         if (!isUp) {
             // Ensure the down-path doesn't try jumping
-            current.getSimMario().jumpTime = 0;
+            current.getSimMario().setJumpTime(0);
         }
 
         // If takeBest == true, this will be returned
@@ -161,7 +161,7 @@ public class JumpPathfinder
             if (isUp) {
                 int framesX = Pathfinder.framesToRunTo(p.x, v.x, end.x);
 
-                int jumpFrames = newSimMario.jumpTime;
+                int jumpFrames = newSimMario.getJumpTime();
                 int framesY = MarioMove.minimumFramesToMoveToY(p.y, v.y, jumpFrames, end.y);
 
                 heuristic = framesX + framesY;
@@ -208,7 +208,7 @@ public class JumpPathfinder
         Vec2f d = Vec2f.subtract(p1, p0);
         return Math.abs(d.x) < 1f && // Close in x
                 Math.abs(d.y) < 4f && // To ensure not standing on another cell
-                node.getSimMario().onGround;
+                node.getSimMario().getOnGround();
     }
 
     public WorldSpace getWorldSpace() {

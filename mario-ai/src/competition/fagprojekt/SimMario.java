@@ -18,23 +18,23 @@ public class SimMario
     static final int KEY_SPEED = 4;
     static final int KEY_UP = 5;
 
-    int facing = 1;
+    private int facing = 1;
 
-    boolean sliding = false;
-    boolean ducking = false;
-    boolean onGround = true;
-    boolean mayJump = true;
+    private boolean sliding = false;
+    private boolean ducking = false;
+    private boolean onGround = true;
+    private boolean mayJump = true;
 
-    int jumpTime;
-    int runTime;
+    private int jumpTime;
+    private int runTime;
 
-    float xJumpSpeed;
-    float yJumpSpeed;
+    private float xJumpSpeed;
+    private float yJumpSpeed;
 
-    float x, y;
-    float xa, ya;
+    private float x, y;
+    private float xa, ya;
 
-    WorldSpace worldSpace;
+    private WorldSpace worldSpace;
 
     public SimMario(Vec2f position, Vec2f velocity, WorldSpace worldSpace)
     {
@@ -353,5 +353,16 @@ public class SimMario
 
     public Vec2f getVelocity() {
         return new Vec2f(xa, ya);
+    }
+
+    public boolean getOnGround() {
+        return onGround;
+    }
+
+    public int getJumpTime() {
+        return jumpTime;
+    }
+    public void setJumpTime(int jumpTime) {
+        this.jumpTime = jumpTime;
     }
 }

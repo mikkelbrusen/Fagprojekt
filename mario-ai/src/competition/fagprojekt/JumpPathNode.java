@@ -36,7 +36,7 @@ public class JumpPathNode implements Comparable<JumpPathNode>
     public boolean hasStoppedJumping() {
         if (parent == null)
             return false;
-        if (simMario.jumpTime == 0)
+        if (simMario.getJumpTime() == 0)
             return true;
         return parent.hasStoppedJumping() || !action[Environment.MARIO_KEY_JUMP];
     }
