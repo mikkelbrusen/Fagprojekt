@@ -90,17 +90,17 @@ public class Pathfinder {
                     continue;
 
                 // JumpPaths endPosition is relative
-                Vec2f endPosition = jp.actionUnit.getEndPosition().clone();
+                Vec2f endPosition = jp.getActionUnit().getEndPosition().clone();
                 endPosition = Vec2f.add(endPosition, parent.actions.getEndPosition());
 
-                int score = jp.actionUnit.getActions().size();
+                int score = jp.getActionUnit().getActions().size();
                 float heuristic = end.x - pos.x;
 
                 PathNode node = new PathNode(p1, parent, score, heuristic,
-                        endPosition, jp.actionUnit.getEndVelocity());
+                        endPosition, jp.getActionUnit().getEndVelocity());
 
-                node.actions = new ActionUnit(endPosition, jp.actionUnit.getEndVelocity());
-                node.actions.addAll(jp.actionUnit.getActions());
+                node.actions = new ActionUnit(endPosition, jp.getActionUnit().getEndVelocity());
+                node.actions.addAll(jp.getActionUnit().getActions());
 
                 neighbours.add(node);
             }

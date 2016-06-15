@@ -80,8 +80,8 @@ public class JumpTable implements Serializable{
 
                     // Subtract offset again
                     if (path != null) {
-                        path.actionUnit.getEndPosition().x -= marioOffset.toVec2f().x;
-                        path.actionUnit.getEndPosition().y -= marioOffset.toVec2f().y;
+                        path.getActionUnit().getEndPosition().x -= marioOffset.toVec2f().x;
+                        path.getActionUnit().getEndPosition().y -= marioOffset.toVec2f().y;
                     }
 
                     jumpPathTable[i+xRange/2][j+yRange/2][k] = path;
@@ -191,7 +191,7 @@ public class JumpTable implements Serializable{
                 String c = " .";
                 JumpPath jp = findPathRelative(x, y, v, false);
                 if (jp != null)
-                    c = String.format("%2d", jp.actionUnit.getActions().size());
+                    c = String.format("%2d", jp.getActionUnit().getActions().size());
                 if (x == 0 && y == 0)
                     c = " x";
                 line += c + " ";

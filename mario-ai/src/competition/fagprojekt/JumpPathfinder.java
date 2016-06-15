@@ -31,18 +31,18 @@ public class JumpPathfinder
             return null; // If we can't find the first part, the jumps is impossible
         }
 
-        JumpPath downPath = searchAStar(upPath.actionUnit.getEndPosition(),
-                upPath.actionUnit.getEndVelocity(), end, false, false);
+        JumpPath downPath = searchAStar(upPath.getActionUnit().getEndPosition(),
+                upPath.getActionUnit().getEndVelocity(), end, false, false);
 
         if (downPath == null) {
             return null; // Need both parts of the jump to be successful
         }
 
         // Stitch the two paths together
-        ActionUnit actionUnit = new ActionUnit(downPath.actionUnit.getEndPosition(), downPath.actionUnit.getEndVelocity());
+        ActionUnit actionUnit = new ActionUnit(downPath.getActionUnit().getEndPosition(), downPath.getActionUnit().getEndVelocity());
         JumpPath endPath = new JumpPath(actionUnit);
-        endPath.actionUnit.addAll(upPath.getActions());
-        endPath.actionUnit.addAll(downPath.getActions());
+        endPath.getActionUnit().addAll(upPath.getActions());
+        endPath.getActionUnit().addAll(downPath.getActions());
         endPath.addCollisionCells(upPath.getCollisionCells());
         //endPath.collisionCells.addAll(downPath.collisionCells);
 
@@ -98,7 +98,7 @@ public class JumpPathfinder
         JumpPath path = new JumpPath(actionUnit);
 
         while (current.parent != null) {
-            path.actionUnit.push(current.action);
+            path.getActionUnit().push(current.action);
 
             // TODO: Refactor and fix
             Vec2f cp = current.simMario.body.position.clone();

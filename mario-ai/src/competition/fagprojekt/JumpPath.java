@@ -10,7 +10,7 @@ import java.util.List;
  * Created by Mikkel on 07/06/16.
  */
 public class JumpPath implements Serializable{
-    ActionUnit actionUnit;
+    private ActionUnit actionUnit;
     private List<Vec2i> collisionCells = new LinkedList<>();
 
     public JumpPath(ActionUnit actionUnit) {
@@ -45,5 +45,9 @@ public class JumpPath implements Serializable{
 
     public List<Vec2i> getCollisionCells() {
         return Collections.unmodifiableList(collisionCells);
+    }
+
+    public ActionUnit getActionUnit() {
+        return actionUnit;
     }
 }
