@@ -151,7 +151,7 @@ public class JumpPathfinder
             Vec2f p = newSimMario.body.position.clone();
             Vec2f v = newSimMario.body.velocity.clone();
 
-            float score = 1 + parent.getFitness().scoreTo;
+            float score = 1 + parent.getFitness().getScoreTo();
 
             // Calculate the heuristic
             Vec2f dist = Vec2f.subtract(end, p);
