@@ -53,7 +53,7 @@ public class Pathfinder {
         while (current.parent != null) {
             lastPathCells.add(current.position); // Debug
 
-            path.add(0, current.actions); // Constant time
+            path.add(0, current.getActionUnit()); // Constant time
             current = current.parent;
         }
         return path;
@@ -78,7 +78,7 @@ public class Pathfinder {
                 Vec2i p0 = parent.position.clone(); // Origin cell
                 Vec2i p1 = new Vec2i(p0.x + i - xOffset, p0.y + j - yOffset); // Target cell
                 JumpPath jp = jumpTable.findPathRelative(i - xOffset, j - yOffset,
-                        parent.actions.getEndVelocity().x, false);
+                        parent.getActionUnit().getEndVelocity().x, false);
 
                 if (jp == null) // Only valid jumps
                     continue;
@@ -91,7 +91,7 @@ public class Pathfinder {
 
                 // JumpPaths endPosition is relative
                 Vec2f endPosition = jp.getActionUnit().getEndPosition().clone();
-                endPosition = Vec2f.add(endPosition, parent.actions.getEndPosition());
+                endPosition = Vec2f.add(endPosition, parent.getActionUnit().getEndPosition());
 
                 int score = jp.getActionUnit().getActions().size();
                 float heuristic = end.x - pos.x;
@@ -111,8 +111,8 @@ public class Pathfinder {
     public PathNode createWalkNode(Vec2i targetCell, PathNode parent, Vec2i end){
         // TODO: Use SimMario?
         // TODO: Optimize, very ineffecient
-        Vec2f p0 = parent.actions.getEndPosition().clone();
-        Vec2f v0 = parent.actions.getEndVelocity().clone();
+        Vec2f p0 = parent.getActionUnit().getEndPosition().clone();
+        Vec2f v0 = parent.getActionUnit().getEndVelocity().clone();
         Vec2f p1 = targetCell.middleBottom();
 
         // Calculate run actions

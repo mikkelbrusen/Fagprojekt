@@ -23,7 +23,7 @@ public class PathNodeTest extends TestCase{
         assertEquals(vec, pn.position);
         assertEquals(null, pn.parent);
         assertEquals(0f, pn.actions.getEndVelocity().magnitude());
-        assertEquals(0, pn.actions.getActions().size());
+        assertEquals(0, pn.actions.getActionUnit().size());
         assertEquals(0, pn.fitness.getFitness());
 
         PathNode pn2 = new PathNode(vec, pn, 17, 42, new Vec2f(3f, 4f), new Vec2f(2f, 2f));
@@ -32,7 +32,7 @@ public class PathNodeTest extends TestCase{
         assertEquals(vec, pn2.position);
         assertEquals(pn, pn2.parent);
         //assertTrue(pn2.endBody.equals(body));
-        assertEquals(0, pn2.actions.getActions().size());
+        assertEquals(0, pn2.actions.getActionUnit().size());
         assertEquals(17 + 42, pn2.fitness.getFitness());
 
         assertTrue(pn2.compareTo(pn) > 0);
