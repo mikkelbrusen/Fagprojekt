@@ -91,14 +91,14 @@ public class MarioMove {
     }
 
     // Returns an empty action
-    public static boolean[] newAction() {
+    public static boolean[] emptyAction() {
         return new boolean[Environment.numberOfKeys];
     }
 
     // Returns a an action where Mario moves in direction dir
     // and a jump if doJump == true
     public static boolean[] moveAction(int dir, boolean doJump) {
-        boolean[] a = newAction();
+        boolean[] a = emptyAction();
         a[Mario.KEY_SPEED] = true;
         a[Mario.KEY_RIGHT] = dir == 1;
         a[Mario.KEY_LEFT] = dir == -1;
