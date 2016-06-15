@@ -1,8 +1,8 @@
 package competition.fagprojekt;
 
 public class PathNode implements Comparable<PathNode> {
-    public Vec2i cell;
-    public PathNode parent;
+    private Vec2i cell;
+    private PathNode parent;
 
     private ActionUnit actionUnit;
     private Fitness fitness;
@@ -21,5 +21,13 @@ public class PathNode implements Comparable<PathNode> {
 
     public ActionUnit getActionUnit() {
         return actionUnit;
+    }
+
+    public Vec2i getCell() {
+        return cell.clone();
+    }
+
+    public PathNode getParent() {
+        return parent;
     }
 }
