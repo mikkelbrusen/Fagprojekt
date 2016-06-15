@@ -21,7 +21,7 @@ public class WorldSpace implements Serializable
     private List<Vec2i> rightMostWalkables = new ArrayList<>();
 
     public WorldSpace() {
-        cells = new Cell[tableSize.y][tableSize.x]; // TODO: Dynamic resizing
+        cells = new Cell[tableSize.y][tableSize.x];
     }
 
     public void integrateObservation(Environment env) {
