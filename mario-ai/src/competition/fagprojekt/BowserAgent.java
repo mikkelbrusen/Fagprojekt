@@ -22,6 +22,8 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
     Pathfinder pathfinder;
     MarioMove marioMove;
 
+    public static boolean PathfindingBailedOut;
+
     List<boolean[]> currentActions = new LinkedList<>(); // Constant add/remove at ends
 
     // Debug
@@ -43,7 +45,11 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
         if (currentActions.isEmpty()) {
             //System.out.println(debug.frameCount + ": Recalculating path");
 
+            PathfindingBailedOut = false;
             for(Vec2i targetCell : worldSpace.getRightMostWalkables()) {
+                if (PathfindingBailedOut)
+                    break;
+
                 List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastFloatPos, marioMove.velocity, targetCell);
                 if (path != null && !path.isEmpty()) {
                     targetPos = targetCell.clone(); // Debug

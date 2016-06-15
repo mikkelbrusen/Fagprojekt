@@ -7,6 +7,8 @@ public class Pathfinder {
     private MarioMove marioMove; // CHECK ME
     private JumpTable jumpTable;
 
+    final int MAX_MS = 35;
+
     List<Vec2i> lastPathCells = new ArrayList<>(); // Debug
 
     public Pathfinder(WorldSpace worldSpace, MarioMove marioMove, JumpTable jumpTable) {
@@ -17,6 +19,8 @@ public class Pathfinder {
 
     // Returns a list of the actions needed, to move from start to end
     public List<ActionUnit> searchAStar(Vec2f start, Vec2f startVelocity, Vec2i end) {
+        long startTimeInMs = System.currentTimeMillis();
+
         Queue<PathNode> open = new PriorityQueue<>();
         HashSet<Vec2i> closed = new HashSet<>(); // Constant time contains
 
@@ -31,6 +35,13 @@ public class Pathfinder {
         while (!open.isEmpty()) {
             current = open.poll();
             closed.add(current.getCell().clone());
+
+            // Bailout if going above time constraint
+            long currentTimeInMs = System.currentTimeMillis();
+            if (currentTimeInMs - startTimeInMs > MAX_MS) {
+                BowserAgent.PathfindingBailedOut = true;
+                return null;
+            }
 
             if (current.getCell().equals(end)) {
                 hasFoundEnd = true;
