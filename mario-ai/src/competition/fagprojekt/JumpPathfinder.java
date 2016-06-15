@@ -105,6 +105,7 @@ public class JumpPathfinder
 
         List<JumpPathNode> neighbours = new ArrayList<>();
         for (boolean[] action : possibleActions) {
+            // The first action must jump
             if (parent.getParent() == null && !action[Environment.MARIO_KEY_JUMP])
                 continue;
 
