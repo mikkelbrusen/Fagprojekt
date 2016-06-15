@@ -39,11 +39,11 @@ public class JumpPathfinder
         }
 
         // Stitch the two paths together
-        JumpPath endPath = new JumpPath();
-        endPath.actionUnit = new ActionUnit(downPath.actionUnit.getEndPosition(), downPath.actionUnit.getEndVelocity());
+        ActionUnit actionUnit = new ActionUnit(downPath.actionUnit.getEndPosition(), downPath.actionUnit.getEndVelocity());
+        JumpPath endPath = new JumpPath(actionUnit);
         endPath.actionUnit.addAll(upPath.getActions());
         endPath.actionUnit.addAll(downPath.getActions());
-        endPath.collisionCells.addAll(upPath.collisionCells);
+        endPath.addCollisionCells(upPath.getCollisionCells());
         //endPath.collisionCells.addAll(downPath.collisionCells);
 
         return endPath;
@@ -92,9 +92,10 @@ public class JumpPathfinder
             System.out.println("Didn't find end, taking best");
         }
 
-        JumpPath path = new JumpPath();
-        path.actionUnit = new ActionUnit(current.simMario.body.position,
+        ActionUnit actionUnit = new ActionUnit(current.simMario.body.position,
                 current.simMario.body.velocity);
+
+        JumpPath path = new JumpPath(actionUnit);
 
         while (current.parent != null) {
             path.actionUnit.push(current.action);
@@ -105,7 +106,7 @@ public class JumpPathfinder
             cp.y -= start.y;
             cp.x += 0.5f * WorldSpace.CELL_WIDTH;
             cp.y += WorldSpace.CELL_HEIGHT;
-            path.collisionCells.addAll(SimMario.cellsBlocked(cp));
+            path.addCollisionCells(SimMario.cellsBlocked(cp));
 
             current = current.parent;
         }

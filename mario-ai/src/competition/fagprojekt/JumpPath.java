@@ -2,6 +2,8 @@ package competition.fagprojekt;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -9,16 +11,15 @@ import java.util.List;
  */
 public class JumpPath implements Serializable{
     ActionUnit actionUnit;
-    List<Vec2i> collisionCells = new ArrayList<>(); // TODO: Make private
+    private List<Vec2i> collisionCells = new LinkedList<>();
 
-    public JumpPath(){
-        actionUnit = new ActionUnit(new Vec2f(0, 0), new Vec2f(0, 0));
+    public JumpPath(ActionUnit actionUnit) {
+        this.actionUnit = actionUnit.clone();
     }
 
-    public void addAction(boolean[] action){actionUnit.add(action);}
-
-    public List<boolean[]> getActions(){
-        return actionUnit.getActions();
+    public void addCollisionCells(List<Vec2i> cells) {
+        for (Vec2i c : cells)
+            collisionCells.add(c.clone());
     }
 
     // Returns true if any collision cells, relative to origin, aren't passable
@@ -36,5 +37,13 @@ public class JumpPath implements Serializable{
     public void printBlocked() {
         for (Vec2i c : collisionCells)
             System.out.printf("B: %s\n", c);
+    }
+
+    public List<boolean[]> getActions(){
+        return actionUnit.getActions();
+    }
+
+    public List<Vec2i> getCollisionCells() {
+        return Collections.unmodifiableList(collisionCells);
     }
 }
