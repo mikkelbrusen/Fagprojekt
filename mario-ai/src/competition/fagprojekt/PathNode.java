@@ -5,12 +5,12 @@ public class PathNode implements Comparable<PathNode> {
     public PathNode parent;
 
     public ActionUnit actions;
-    public Fitness fitness;
+    private Fitness fitness;
 
-    public PathNode(Vec2i position, PathNode parent, float scoreTo, float heuristic, Vec2f endPosition, Vec2f endVelocity) {
+    public PathNode(Vec2i position, PathNode parent, float scoreTo, float heuristic, ActionUnit actionUnit) {
         this.position = position.clone();
         this.parent = parent;
-        this.actions = new ActionUnit(endPosition, endVelocity);
+        this.actions = actionUnit.clone();
         this.fitness = new Fitness(scoreTo, heuristic);
     }
 

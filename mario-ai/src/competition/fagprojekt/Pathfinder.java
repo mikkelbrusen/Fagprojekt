@@ -21,8 +21,8 @@ public class Pathfinder {
         HashSet<Vec2i> closed = new HashSet<>(); // Constant time contains
 
         // Create current
-        PathNode current = new PathNode(start.toCell(), null, 0, 0, start, startVelocity);
-        current.actions = new ActionUnit(start, startVelocity);
+        PathNode current = new PathNode(start.toCell(), null, 0, 0,
+                new ActionUnit(start, startVelocity));
 
         closed.add(current.position.clone());
         open.add(current);
@@ -96,12 +96,10 @@ public class Pathfinder {
                 int score = jp.getActionUnit().getActions().size();
                 float heuristic = end.x - pos.x;
 
-                PathNode node = new PathNode(p1, parent, score, heuristic,
-                        endPosition, jp.getActionUnit().getEndVelocity());
+                ActionUnit actionUnit = new ActionUnit(endPosition, jp.getActionUnit().getEndVelocity());
+                actionUnit.addAll(jp.getActions());
 
-                node.actions = new ActionUnit(endPosition, jp.getActionUnit().getEndVelocity());
-                node.actions.addAll(jp.getActionUnit().getActions());
-
+                PathNode node = new PathNode(p1, parent, score, heuristic, actionUnit);
                 neighbours.add(node);
             }
         }
@@ -133,12 +131,11 @@ public class Pathfinder {
         int scoreForEdge = runFrames;
         float heuristic = (end.x - p1.x);
 
-        PathNode node = new PathNode(targetCell, parent, scoreForEdge, heuristic, endPos, newV);
-        node.actions = new ActionUnit(endPos, newV);
+        ActionUnit actionUnit = new ActionUnit(endPos, newV);
         for (int i = 0; i < runFrames; i++)
-            node.actions.add(MarioMove.moveAction(dir, false));
+            actionUnit.add(MarioMove.moveAction(dir, false));
 
-        return node;
+        return new PathNode(targetCell, parent, scoreForEdge, heuristic, actionUnit);
     }
 
     // Returns the number of frames required for running from x0,
