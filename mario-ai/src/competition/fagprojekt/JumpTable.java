@@ -84,7 +84,6 @@ public class JumpTable implements Serializable{
                         ActionUnit newUnit = new ActionUnit(position, path.getActionUnit().getEndVelocity());
                         newUnit.addAll(path.getActions());
                         JumpPath newPath = new JumpPath(newUnit);
-                        newPath.addCollisionCells(path.getCollisionCells());
 
                         // Filter collisions
                         Vec2i p1 = new Vec2i(i, j);
