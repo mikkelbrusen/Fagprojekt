@@ -2,10 +2,6 @@ package competition.fagprojekt;
 
 import ch.idsia.benchmark.mario.environments.Environment;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Created by max on 06/06/16.
  */
