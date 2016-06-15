@@ -29,6 +29,8 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
     // Debug
     Vec2i targetPos;
     List<ActionUnit> lastPath = new ArrayList<>();
+    Vec2f lastPosition = new Vec2f(0, 0);
+    Vec2f lastVelocity = new Vec2f(0, 0);
 
     // Anti-stuck
     Vec2f floatPosLastFrame = new Vec2f(0, 0);
@@ -38,6 +40,17 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
     {
         super("BowserAgent");
         reset();
+
+        // Debug
+        jumpTable.printJumpTable(0f);
+        JumpPath jp = jumpTable.findPathRelative(1, -1, 0, false);
+
+        System.out.println("Collision Cells: ");
+        for (Vec2i c : jp.getCollisionCells())
+            System.out.println(c);
+
+        System.out.println("Path: ");
+        BUtil.printActionUnit(jp.getActionUnit());
     }
 
     public boolean[] getAction()
@@ -46,23 +59,24 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
             //System.out.println(debug.frameCount + ": Recalculating path");
 
             PathfindingBailedOut = false;
-            for(Vec2i targetCell : worldSpace.getRightMostWalkables()) {
+            for (Vec2i targetCell : worldSpace.getRightMostWalkables()) {
                 if (PathfindingBailedOut)
                     break;
 
                 List<ActionUnit> path = pathfinder.searchAStar(marioMove.lastFloatPos, marioMove.velocity, targetCell);
                 if (path != null && !path.isEmpty()) {
-                    targetPos = targetCell.clone(); // Debug
                     currentActions.addAll(path.get(0).getActions());
 
                     // Debug
+                    targetPos = targetCell.clone();
                     lastPath = path;
+                    lastPosition = marioMove.lastFloatPos.clone();
+                    lastVelocity = marioMove.velocity.clone();
 
-                    //printFoundPath(path);
+                    printFoundPath(path);
 
                     break;
-                }
-                else {
+                } else {
                     // Debug
                     pathfinder.lastPathCells.clear();
                     lastPath.clear();
@@ -93,6 +107,8 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
             }
             standstillFrames = 0;
         }
+
+        updateDebug();
 
         return action;
     }
@@ -130,8 +146,6 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
 
         debug.update();
 
-        worldSpace.getRightMostWalkables().clear();
-
         debug.drawCell(marioMove.lastCell);
         for(Vec2i rightMost : worldSpace.getRightMostWalkables())
             debug.drawCell(rightMost, Color.gray);
@@ -140,19 +154,17 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
             debug.drawCell(targetPos, Color.green);
 
         // Draw path via SimMario
-        /*
-        SimMario debugMario = new SimMario(lastBody.position, lastBody.velocity, worldSpace);
-        Vec2f lastP = lastBody.position.clone();
+        SimMario debugMario = new SimMario(lastPosition, lastVelocity, worldSpace);
+        Vec2f lastP = lastPosition.clone();
         for (ActionUnit unit : lastPath) {
             for (boolean[] action : unit.getActions()) {
                 debugMario.move(action);
 
                 Color color = unit == lastPath.get(0) ? Color.blue : Color.magenta;
-                debug.drawLine(lastP, debugMario.body.position, color);
-                lastP = debugMario.body.position.clone();
+                debug.drawLine(lastP, debugMario.getPosition(), color);
+                lastP = debugMario.getPosition();
             }
         }
-        */
 
         if (currentActions.isEmpty() && DebugInput.keysPressed[DebugInput.KEY_K]) {
             Vec2i targetCell = debug.debugCell;
