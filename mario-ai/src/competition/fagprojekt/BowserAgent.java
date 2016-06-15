@@ -26,7 +26,6 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
 
     // Debug
     Vec2i targetPos;
-    Body2D lastBody = new Body2D(new Vec2f(0, 0), new Vec2f(0, 0));
     List<ActionUnit> lastPath = new ArrayList<>();
 
     // Anti-stuck
@@ -51,7 +50,6 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
                     currentActions.addAll(path.get(0).getActions());
 
                     // Debug
-                    lastBody = new Body2D(marioMove.lastFloatPos, marioMove.velocity);
                     lastPath = path;
 
                     //printFoundPath(path);
@@ -136,6 +134,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
             debug.drawCell(targetPos, Color.green);
 
         // Draw path via SimMario
+        /*
         SimMario debugMario = new SimMario(lastBody.position, lastBody.velocity, worldSpace);
         Vec2f lastP = lastBody.position.clone();
         for (ActionUnit unit : lastPath) {
@@ -147,6 +146,7 @@ public class BowserAgent extends BasicMarioAIAgent implements Agent
                 lastP = debugMario.body.position.clone();
             }
         }
+        */
 
         if (currentActions.isEmpty() && DebugInput.keysPressed[DebugInput.KEY_K]) {
             Vec2i targetCell = debug.debugCell;

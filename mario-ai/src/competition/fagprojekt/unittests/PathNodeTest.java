@@ -1,8 +1,5 @@
 package competition.fagprojekt.unittests;
 
-import competition.fagprojekt.Body2D;
-import competition.fagprojekt.PathNode;
-import competition.fagprojekt.Vec2f;
 import competition.fagprojekt.Vec2i;
 import junit.framework.TestCase;
 import org.testng.annotations.Test;

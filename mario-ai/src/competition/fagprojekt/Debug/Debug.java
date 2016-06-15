@@ -98,8 +98,8 @@ public class Debug
         SimMario mario = new SimMario(startPosition, startVelocity, _worldSpace);
         for(boolean[] a : actions) {
             mario.move(a);
-            drawLine(lastPosition, mario.body.position, color);
-            lastPosition = mario.body.position.clone();
+            drawLine(lastPosition, mario.position, color);
+            lastPosition = mario.position.clone();
         }
     }
 
