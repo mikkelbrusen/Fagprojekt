@@ -4,7 +4,7 @@ import ch.idsia.benchmark.mario.engine.sprites.Mario;
 import ch.idsia.benchmark.mario.environments.Environment;
 
 public class MarioMove {
-
+    // Values pulled from Mario.java
     public static final float RunAcceleration = 1.2f;
     public static final float WalkAcceleration = 0.6f;
     public static final float Gravity = 3f;
@@ -13,6 +13,7 @@ public class MarioMove {
     public static final float JumpSpeed = -1.89f;
     public static final int MaxJumpFrames = 7;
 
+    // Keeps track of last observed Mario position and velocity
     public Vec2i lastCell;
     public Vec2f lastFloatPos;
 
@@ -28,58 +29,8 @@ public class MarioMove {
         lastCell = marioPos.clone();
     }
 
-    static final float MaxJumpHeight = 46.55f; // Calculated. See MarioMath.mw
-    public static boolean canJumpToCell(Vec2f p0, Vec2f v0, Vec2i p1) {
-        // If doing a maximum jump, is the cell reachable?
-        Vec2f diff = Vec2f.subtract(WorldSpace.cellToFloat(p1), p0);
-
-        Vec2f endP = WorldSpace.cellToFloat(p1);
-        Vec2f p = p0.clone();
-        Vec2f v = v0.clone();
-
-        int facing = diff.x < 0 ? -1 :
-                diff.x > 0 ? 1 : 0;
-
-        int jumpTime = 7; // Look at Mario line 370 for this jumping code
-        while(facing == 1 && p.x < endP.x || facing == -1 && p.x > endP.x) {
-            // Apply jump, if possible
-            if(jumpTime > 0) {
-                v.y = jumpTime * -1.9f;
-                jumpTime--;
-            }
-
-            // Accelerate sideways
-            v.x += RunAcceleration * facing;
-
-            // Move
-            p = Vec2f.add(p, v);
-
-            // Apply inertia
-            v.x *= GroundInertia;
-            v.y *= FallInertia;
-
-            // Apply gravity
-            v.y += Gravity;
-        }
-
-        return p.y < endP.y; // Check if we're above the target cell now
-    }
-
-    public static int minimumJumpFramesToEndAtHeight(float y0, float y1) {
-        for(int i = 0; i <= MaxJumpFrames; i++) { // Try every jump frame combination
-            if(bodyAfterJumpAndFall(y0, i, i).position <= y1)
-                return i;
-        }
-        return -1; // TODO: What to return here? Implicit check for possibility?
-    }
-    public static int minimumJumpFramesToEndAtHeightAfterFrames(float y0, float y1, int runFrames) {
-        for(int i = 0; i <= MaxJumpFrames; i++) { // Try every jump frame combination
-            if(bodyAfterJumpAndFall(y0, i, runFrames).position <= y1)
-                return i;
-        }
-        return -1; // TODO: What to return here? Implicit check for possibility?
-    }
-
+    // Calculates the minimum number of frames to move from y0 to y1
+    // with start velocity v0 and maximum number of jumpFrames
     public static int minimumFramesToMoveToY(float y0, float v0, int jumpFramesLeft, float y1) {
         int lowest = 10000;
         for (int i = 0; i <= jumpFramesLeft; i++) {
@@ -88,6 +39,9 @@ public class MarioMove {
         }
         return lowest;
     }
+
+    // Calculates the minimum number of frames to move from y0 to y1
+    // with start velocity v0 and jumping in jumpFrames frames
     public static int minimumFramesToMoveToYWithJumpFrames(float y0, float v0, int jumpFrames, float y1) {
         float y = y0;
         float v = v0;
@@ -108,6 +62,7 @@ public class MarioMove {
 
             framesUsed++;
 
+            // More than 100 frames, it definitely impossible
             if (framesUsed > 100)
                 break;
         }
@@ -115,6 +70,9 @@ public class MarioMove {
         return framesUsed;
     }
 
+    // Calculates the x-position after running in frames frames
+    // with start x x0, start velocity v0.
+    // dir == -1 is left, dir == 1 is right
     public static float xPositionAfterRun(float x0, float v0, int dir, int frames) {
         float x = x0;
         float v = v0;
@@ -132,30 +90,13 @@ public class MarioMove {
         return x;
     }
 
-    public static Body1D bodyAfterJumpAndFall(float y, int jumpFrames, int totalFrames) {
-        Body1D yBody = new Body1D(y, 0); // Jumping reset vertical velocity, so we can ignore it as input
-        for(int i = 0; i < totalFrames; i++) {
-            if(i < jumpFrames)
-                yBody.velocity = (MaxJumpFrames - i) * JumpSpeed;
-
-            yBody.position += yBody.velocity;
-
-            yBody.velocity *= FallInertia;
-            yBody.velocity += Gravity;
-        }
-
-        return yBody;
-    }
-
-    public static Body2D bodyAfterAction(Body2D body, boolean[] action) {
-        Body2D endBody = new Body2D(body.position, body.velocity);
-
-        return endBody;
-    }
-
+    // Returns an empty action
     public static boolean[] newAction() {
         return new boolean[Environment.numberOfKeys];
     }
+
+    // Returns a an action where Mario moves in direction dir
+    // and a jump if doJump == true
     public static boolean[] moveAction(int dir, boolean doJump) {
         boolean[] a = newAction();
         a[Mario.KEY_SPEED] = true;
