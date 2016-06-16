@@ -138,9 +138,12 @@ public class Pathfinder {
         float newX = MarioMove.xPositionAfterRun(p0.x, v0.x, dir, runFrames);
         Vec2f endPos = new Vec2f(newX, p0.y);
 
+       // Calculate the heuristic
+        int framesX = Pathfinder.framesToRunTo(newX, newV.x, end.x);
+
         // Scoring
         int scoreForEdge = runFrames;
-        float heuristic = (end.x - p1.x);
+        float heuristic = framesX;
 
         ActionUnit actionUnit = new ActionUnit(endPos, newV);
         for (int i = 0; i < runFrames; i++)
