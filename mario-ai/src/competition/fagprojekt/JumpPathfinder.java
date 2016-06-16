@@ -71,9 +71,6 @@ public class JumpPathfinder
 
             // TODO: Refactor and fix
             Vec2f cp = current.getSimMario().getPosition().clone();
-            cp.x -= start.x;
-            cp.y -= start.y;
-            cp.y += 2f; // Adjust for SimMario grounded
             path.addCollisionCells(SimMario.cellsBlocked(cp));
 
             current = current.getParent();

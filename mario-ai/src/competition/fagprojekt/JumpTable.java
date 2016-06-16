@@ -86,10 +86,12 @@ public class JumpTable implements Serializable{
                         JumpPath newPath = new JumpPath(newUnit);
 
                         // Filter collisions
+                        Vec2i cellOffset = new Vec2i(xMax, yMax);
                         Vec2i p1 = new Vec2i(i, j);
                         for (Vec2i c : path.getCollisionCells()) {
-                            if (canCollideWith(p1, c))
-                                newPath.addCollisionCell(c);
+                            Vec2i c1 = Vec2i.subtract(c, cellOffset);
+                            if (canCollideWith(p1, c1))
+                                newPath.addCollisionCell(c1);
                         }
 
                         path = newPath;
