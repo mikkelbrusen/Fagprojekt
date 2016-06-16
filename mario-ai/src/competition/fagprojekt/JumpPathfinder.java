@@ -122,8 +122,8 @@ public class JumpPathfinder
             SimMario newSimMario = parent.getSimMario().clone();
             newSimMario.move(action);
 
-            Vec2f p = newSimMario.getPosition().clone();
-            Vec2f v = newSimMario.getVelocity().clone();
+            Vec2f p = newSimMario.getPosition();
+            Vec2f v = newSimMario.getVelocity();
 
             float score = 1 + parent.getFitness().getScoreTo();
 
@@ -153,7 +153,7 @@ public class JumpPathfinder
     }
 
     boolean isEnd(JumpPathNode node, Vec2f end) {
-        Vec2f p0 = node.getSimMario().getPosition().clone();
+        Vec2f p0 = node.getSimMario().getPosition();
         Vec2f p1 = end.clone();
         Vec2f d = Vec2f.subtract(p1, p0);
         return Math.abs(d.x) < 2f && // Close in x
