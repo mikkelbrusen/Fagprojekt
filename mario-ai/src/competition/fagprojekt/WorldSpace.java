@@ -154,8 +154,8 @@ public class WorldSpace implements Serializable
     }
     public static Vec2i floatToCell(Vec2f p) {
         return new Vec2i(
-                (int)(p.x / CELL_WIDTH),
-                (int)(p.y / CELL_HEIGHT));
+                (int)Math.floor(p.x / CELL_WIDTH),
+                (int)Math.floor(p.y / CELL_HEIGHT));
     }
 
     // Test
